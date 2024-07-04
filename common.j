@@ -16810,7 +16810,7 @@ native  SaveFogStateHandle				takes hashtable table, integer parentKey, integer 
 native  SaveFogModifierHandle			takes hashtable table, integer parentKey, integer childKey, fogmodifier whichFogModifier returns boolean
 
 /**
-
+There's no "load" counterpart.
 
 @patch 1.24a
 
