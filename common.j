@@ -163,6 +163,8 @@ type unitpool           extends     handle
 type itempool           extends     handle
 
 /**
+Races are defined by constants, but neutral slots have a "hidden" race of index 0 (let's call it "NONE").
+
 @patch 1.00
 */
 type race               extends     handle
@@ -875,6 +877,9 @@ type commandbuttoneffect            extends handle
 
 /**
 Returns the race that corresponds to the given integer.
+
+@note All player slots are valid (see `GetBJMaxPlayerSlots`), but neutral slots
+are a "hidden" race of index 0.
 
 @param i The integer representation of the race.
 
@@ -3472,16 +3477,28 @@ Allows to spent the other player's resources.
     constant playerstate PLAYER_STATE_RESOURCE_HERO_TOKENS      = ConvertPlayerState(3)
 
 /**
+Currently available soft limit for food (the one you can increase by building farms).
+
+@note See: `PLAYER_STATE_RESOURCE_FOOD_USED`, `PLAYER_STATE_FOOD_CAP_CEILING`
+
 @patch 1.00
 */
     constant playerstate PLAYER_STATE_RESOURCE_FOOD_CAP         = ConvertPlayerState(4)
 
 /**
+Player's currently used food.
+
+@note See: `PLAYER_STATE_RESOURCE_FOOD_CAP`, `PLAYER_STATE_FOOD_CAP_CEILING`
+
 @patch 1.00
 */
     constant playerstate PLAYER_STATE_RESOURCE_FOOD_USED        = ConvertPlayerState(5)
 
 /**
+Hard limit for food. Cannot increase above this value by building more farms.
+
+@note See: `PLAYER_STATE_RESOURCE_FOOD_CAP`, `PLAYER_STATE_RESOURCE_FOOD_USED`
+
 @patch 1.00
 */
     constant playerstate PLAYER_STATE_FOOD_CAP_CEILING          = ConvertPlayerState(6)
@@ -13363,6 +13380,9 @@ native ExecuteFunc          takes string funcName returns nothing
 /**
 Always returns a new boolean expression that has the result of evaluating logical (expr1 AND expr2).
 
+@note Always returns a new boolexpr in Lua (v2.0.3.22988 and earlier) even when reusing previous `Condition`/`Filter`.
+TODO: What about Jass VM? At least it reuses previously created `Condition`/`Filter`.
+
 @note `boolexpr` extends from `agent` and must be explicitly destroyed with `DestroyBoolExpr` to prevent leaks.
 However, most functions from blizzard.j destroy passed boolexpr automatically.
 
@@ -13375,6 +13395,9 @@ native And              takes boolexpr operandA, boolexpr operandB returns boole
 /**
 Always returns a new boolean expression that has the result of evaluating logical (expr1 OR expr2).
 
+@note Always returns a new boolexpr in Lua (v2.0.3.22988 and earlier) even when reusing previous `Condition`/`Filter`.
+TODO: What about Jass VM? At least it reuses previously created `Condition`/`Filter`.
+
 @note `boolexpr` extends from `agent` and must be explicitly destroyed with `DestroyBoolExpr` to prevent leaks.
 However, most functions from blizzard.j destroy passed boolexpr automatically.
 
@@ -13386,6 +13409,9 @@ native Or               takes boolexpr operandA, boolexpr operandB returns boole
 
 /**
 Always returns a new boolean expression that has the result of evaluating logical (NOT expr1).
+
+@note Always returns a new boolexpr in Lua (v2.0.3.22988 and earlier) even when reusing previous `Condition`/`Filter`.
+TODO: What about Jass VM? At least it reuses previously created `Condition`/`Filter`.
 
 @note `boolexpr` extends from `agent` and must be explicitly destroyed with `DestroyBoolExpr` to prevent leaks.
 However, most functions from blizzard.j destroy passed boolexpr automatically.
@@ -13501,6 +13527,11 @@ native DestroyBoolExpr  takes boolexpr e returns nothing
 
 
 /**
+Registers and attaches new event to the trigger. Returns the created event.
+
+@note `DestroyTrigger` correctly cleans up events.
+If you register many temporary events, you may want to periodically recycle entire triggers. 
+
 @patch 1.00
 */
 native TriggerRegisterVariableEvent takes trigger whichTrigger, string varName, limitop opcode, real limitval returns event
@@ -13511,7 +13542,10 @@ native TriggerRegisterVariableEvent takes trigger whichTrigger, string varName, 
 // Creates it's own timer and triggers when it expires
 
 /**
-Creates its own timer and triggers when it expires.
+Creates its own timer and triggers when it expires. Returns the newly created event.
+
+@note `DestroyTrigger` correctly cleans up events.
+If you register many temporary events, you may want to periodically recycle entire triggers. 
 
 @note The table below shows how often `TriggerRegisterTimerEvent` aka
 `TriggerRegisterTimerEventPeriodic` is executed per second with different
@@ -13541,10 +13575,13 @@ native TriggerRegisterTimerEvent takes trigger whichTrigger, real timeout, boole
 // Triggers when the timer you tell it about expires
 
 /**
-Attach trigger to timer t. The trigger executes each time when timer expires.
+Attach timer to trigger. The trigger executes each time when timer expires.
 Usually used on periodic timers.
 
-Returns event, which is not used by GUI functions.
+Returns the newly created event, which is not used by GUI functions.
+
+@note `DestroyTrigger` correctly cleans up events.
+If you register many temporary events, you may want to periodically recycle entire triggers. 
 
 @note See: `GetExpiredTimer` to retrieve timer inside trigger's actions.
 
@@ -13554,12 +13591,22 @@ native TriggerRegisterTimerExpireEvent takes trigger whichTrigger, timer t retur
 
 
 /**
+Registers and attaches new event to the trigger. Returns the created event.
+
+The trigger is executed every time the event condition (limitop and value) is fulfilled.
+
+@note `DestroyTrigger` correctly cleans up events.
+If you register many temporary events, you may want to periodically recycle entire triggers. 
+
 @patch 1.00
 */
 native TriggerRegisterGameStateEvent takes trigger whichTrigger, gamestate whichState, limitop opcode, real limitval returns event
 
 
 /**
+
+@note See: `DialogCreate`
+
 @patch 1.00
 */
 native TriggerRegisterDialogEvent       takes trigger whichTrigger, dialog whichDialog returns event
@@ -15029,6 +15076,8 @@ Removes all actions from a trigger.
 @bug If the actions of the trigger are currently running, hereby removed actions still pending to be called will still be called. In contrast to
 `TriggerRemoveAction`, this will be the case regardless if there is a `TriggerSleepAction` after `TriggerClearActions` or not.
 
+@bug 
+
 @patch 1.00
 */
 native TriggerClearActions  takes trigger whichTrigger returns nothing
@@ -15585,10 +15634,12 @@ Creates an item object at the specified coordinates ( x , y ).
 **Example:**
 
 ```
-call CreateItem('war2', 256, 384) // Jass
+call CreateItem('lmbr', 256, 384) // Jass
+call CreateItem('gold', 256, 450)
 ```
 ```{.lua}
-myItem = CreateItem(FourCC("war2"), 256, 384) -- Lua
+ilumber = CreateItem(FourCC("war2"), 256, 384) -- Lua
+igold = CreateItem(FourCC("gold"), 256, 450)
 ```
 
 @param itemid The rawcode of the item.
@@ -18221,7 +18272,9 @@ constant native Player              takes integer number returns player
 Returns reference to local player, as such it always points to yourself.
 Every other player in the game gets their player respectively.
 
-Do not use this function until you understand it fully and know how to avoid desyncs!
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
+@note Do not use this function until you understand it fully and know how to avoid desyncs!
 Always test your map in LAN multiplayer after changing code around it.
 
 Warcraft 3 has the lock-step network/execution model.
@@ -18322,9 +18375,14 @@ constant native IsLocationMaskedToPlayer    takes location whichLocation, player
 
 
 /**
-Returns race of the player.
+Returns race of the player, or `RACE_HUMAN` in case of null.
 
-The handle is constant and does not change between invocations. (Lua, v1.32.10)
+@note All player slots are valid (see `GetBJMaxPlayerSlots`), but neutral slots
+return "hidden" race of index 0.
+
+@note Previously created handles are always reused. (tested in v1.32.10-2.0.3.22988 Lua)
+
+@note See: `race`, `ConvertRace`
 
 @patch 1.00
 */
@@ -18772,16 +18830,31 @@ native FogModifierStop              takes fogmodifier whichFogModifier returns n
 // Game API
 
 /**
+Always returns one of the defined constants: `VERSION_REIGN_OF_CHAOS`, `VERSION_FROZEN_THRONE`.
+
+Reforged did not receive a separate constant, it self-identifies as `VERSION_FROZEN_THRONE`.
+
+@note You shouldn't compare the constants yourself, instead use:
+`VersionCompatible`, `VersionSupported` if a new type is ever added.
+
 @patch 1.07
 */
 native VersionGet takes nothing returns version
 
 /**
+Returns true in Reforged for version=`VERSION_REIGN_OF_CHAOS`.
+
+@note See: `VersionGet`, `VersionSupported`
+
 @patch 1.07
 */
 native VersionCompatible takes version whichVersion returns boolean
 
 /**
+Returns true in Reforged for version=`VERSION_REIGN_OF_CHAOS`.
+
+@note See: `VersionGet`, `VersionCompatible`, `VersionSupported`
+
 @patch 1.07
 */
 native VersionSupported takes version whichVersion returns boolean
@@ -19967,75 +20040,169 @@ native GetRandomReal takes real lowBound, real highBound returns real
 
 
 /**
+Creates and returns a new empty unit pool.
+
+Unit pools are used as a container, that holds unit types and their probability (weight),
+to roll and place random units.
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+upool = CreateUnitPool()
+UnitPoolAddUnitType(upool, FourCC("hpea"), 1)
+UnitPoolAddUnitType(upool, FourCC("opeo"), 1)
+myUnits = {} -- use CreateGroup, DestroyGroup in Jass
+for x = -2048, 1024, 128 do
+	-- resets the seed so the following chances are always the same
+	-- three human workers and 4th is a peon
+	math.randomseed(1337)
+	table.insert(myUnits, PlaceRandomUnit(upool, Player(0), x,256, 180.0))
+	table.insert(myUnits, PlaceRandomUnit(upool, Player(0), x,384, 180.0))
+	table.insert(myUnits, PlaceRandomUnit(upool, Player(0), x,512, 180.0))
+	table.insert(myUnits, PlaceRandomUnit(upool, Player(0), x,768, 180.0))
+end
+-- cleanup:
+for i = 1, #myUnits do
+	local u = myUnits[i]
+	RemoveUnit(u)
+end
+DestroyUnitPool()
+upool, myUnits = nil
+```
+
+@note To avoid leaks, use `DestroyUnitPool` to destroy it.
+
+@note See: `UnitPoolAddUnitType`, `UnitPoolRemoveUnitType`, `PlaceRandomUnit`
+
 @patch 1.00
 */
 native CreateUnitPool           takes nothing returns unitpool
 
 /**
+@note See: `CreateUnitPool`, `UnitPoolAddUnitType`, `UnitPoolRemoveUnitType`, `PlaceRandomUnit`
+
 @patch 1.00
 */
 native DestroyUnitPool          takes unitpool whichPool returns nothing
 
 /**
+@note See: `CreateUnitPool`, `DestroyUnitPool`, `UnitPoolRemoveUnitType`, `PlaceRandomUnit`
+
 @patch 1.00
 */
 native UnitPoolAddUnitType      takes unitpool whichPool, integer unitId, real weight returns nothing
 
 /**
+@note See: `CreateUnitPool`, `DestroyUnitPool`, `UnitPoolAddUnitType`, `PlaceRandomUnit`
+
 @patch 1.00
 */
 native UnitPoolRemoveUnitType   takes unitpool whichPool, integer unitId returns nothing
 
 /**
+Draws a random unit type ID from the unitpool and creates the unit, returning its handle.
+
+Returns null, if unit cannot be created (invalid type ID).
+
+@param forWhichPlayer unit's owner
+
+@param whichPool unitpool to draw from
+
+@param x X map coordinate to spawn unit at
+
+@param y Y map coordinate to spawn unit at
+
+@param facing unit rotation in degrees
+
+@note See: `CreateUnitPool`, `DestroyUnitPool`, `UnitPoolAddUnitType`, `UnitPoolRemoveUnitType`
+
 @patch 1.00
 */
 native PlaceRandomUnit          takes unitpool whichPool, player forWhichPlayer, real x, real y, real facing returns unit
 
 
 /**
-Creates an empty itempool handle.
+Creates and returns a new empty item pool.
 
-Item pools are initially empty, but can have item-types added
-to them via `ItemPoolAddItemType`. Item pools only serve for random item
-placing, via `PlaceRandomItem`.
+Item pools are used as a container, that holds item types and their probability (weight),
+to roll and place random items.
+
+@note To avoid leaks, use `DestroyItemPool` to destroy it.
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+ipool = CreateItemPool()
+ItemPoolAddItemType(ipool, FourCC("lmbr"), 1)
+ItemPoolAddItemType(ipool, FourCC("gold"), 1)
+myItems = {} -- use CreateGroup, DestroyGroup in Jass
+for x = -1024, 1024, 256 do
+	-- resets the seed so the following chances are always the same
+	-- one gold and three lumber items
+	math.randomseed(1337)
+	table.insert(myItems, PlaceRandomItem(ipool, x,-256, 180.0))
+	table.insert(myItems, PlaceRandomItem(ipool, x,-384, 180.0))
+	table.insert(myItems, PlaceRandomItem(ipool, x,-512, 180.0))
+	table.insert(myItems, PlaceRandomItem(ipool, x,-768, 180.0))
+end
+-- cleanup:
+for i = 1, #myItems do
+	local item = myItems[i]
+	RemoveItem(item)
+end
+DestroyItemPool()
+ipool, myItems = nil
+```
+
+@note See: `ItemPoolAddItemType`, `ItemPoolRemoveItemType`, `PlaceRandomItem`
 
 @patch 1.00
 */
 native CreateItemPool           takes nothing returns itempool
 
 /**
+@note See: `CreateItemPool`, `ItemPoolAddItemType`, `ItemPoolRemoveItemType`, `PlaceRandomItem`
+
 @patch 1.00
 */
 native DestroyItemPool          takes itempool whichItemPool returns nothing
 
 /**
-Adds an item-id to the itempool.
+Adds an item type ID to the itempool.
 
 @param whichItemPool The itempool to add the item to.
 
 @param itemId The rawcode of the item.
-An invalid itemId (like 0) can be added & rolled.
+An invalid item type ID (like 0) can be added & rolled.
 
 @param weight The weight of the item.
-The weight determines how likely it is for the item to be chose by `PlaceRandomItem`.
+The weight determines how likely it is for the item to be chosen by `PlaceRandomItem`.
+
+@note See: `CreateItemPool`, `DestroyItemPool`, `ItemPoolRemoveItemType`
 
 @patch 1.00
 */
 native ItemPoolAddItemType      takes itempool whichItemPool, integer itemId, real weight returns nothing
 
 /**
+@note See: `CreateItemPool`, `DestroyItemPool`, `ItemPoolAddItemType`, `PlaceRandomItem`
+
 @patch 1.00
 */
 native ItemPoolRemoveItemType   takes itempool whichItemPool, integer itemId returns nothing
 
 /**
-Draws a random itemid from the itempool and creates the item.
+Draws a random item type ID from the itempool and creates the item, returning its handle.
 
-@param whichItemPool The itempool to draw from.
+Returns null, if item cannot be created (invalid type ID).
 
-@param x The x-coordinate of the item.
+@param whichItemPool itempool to draw from
 
-@param y The y-coordinate of the item.
+@param x X map coordinate to spawn item at
+
+@param y Y map coordinate to spawn item at
+
+@note See: `CreateItemPool`, `DestroyItemPool`, `ItemPoolAddItemType`, `ItemPoolRemoveItemType`
 
 @patch 1.00
 */
@@ -20541,7 +20708,10 @@ native DisableRestartMission        takes boolean flag returns nothing
 
 
 /**
-Creates a text tag.
+Returns handle to an unused text tag. Returns handle to text tag#0 if all are currently in use.
+
+@note While text tags cannot leak additional memory, you must release them to avoid breaking the usage of text tags in general. 
+Use `DestroyTextTag` or make it temporary with `SetTextTagPermanent` and an appropriate `SetTextTagLifespan`.
 
 @note The text tag initially has the absolute world coordinates (0, 0, 0).
 
@@ -20549,7 +20719,7 @@ Creates a text tag.
 
 @note The IDs of text tags range from 99 to 0 as returned by `GetHandleId`.
 
-@note When there are already 100 text tags, this function will return the text tag with the ID 0 without resetting any of its properties.
+@note When there are already 100 text tags in use, this function will return the text tag with the ID 0 without resetting any of its properties.
 
 @note When a text tag is destroyed, its ID is pushed to a stack. Creating a text tag, when there are still IDs available, will pop from the stack, i.e., the last
 destroyed ID will be re-used first. You can also envision that 100 IDs counting up from 0 to 99 are pushed to the stack at the beginning of the game and ID 99 will
@@ -20560,7 +20730,7 @@ be popped first.
 native CreateTextTag                takes nothing returns texttag
 
 /**
-Destroys a text tag.
+Destroys given text tag.
 
 @param t The text tag to destroy.
 
@@ -21007,7 +21177,7 @@ native CreateTrackable      takes string trackableModelPath, real x, real y, rea
 // Quest API
 
 /**
-Creates a new quest.
+Creates a new quest and returns its handle.
 
 @note Quests are enabled on default (see `QuestSetEnabled`).
 
@@ -21312,7 +21482,11 @@ native IsQuestItemCompleted     takes questitem whichQuestItem returns boolean
 
 
 /**
-Creates a defeat condition globally displayed for every enabled quest above the description text field of the quest menu.
+Creates and returns handle of new defeat condition.
+
+It is globally displayed for every enabled quest above the description text field of the quest menu.
+
+@note To avoid leaks, use `DestroyDefeatCondition` to destroy it.
 
 @note Defeat conditions tell players what conditions would warrant a defeat.
 Note that this function will only display text. To put the condition in effect,
@@ -21593,16 +21767,23 @@ native TimerDialogSetRealTimeRemaining  takes timerdialog whichDialog, real time
 // Create a leaderboard object
 
 /**
-Creates a leaderboard handle.
+Creates a new leaderboard and returns its handle.
+
 Leaderboards initially have 0 rows, 0 columns, and no label.
 
+@note To avoid leaks, use `DestroyLeaderboard` to destroy it.
+
 @bug Do not use this in a global initialisation as it crashes the game there.
+
+@note See: `LeaderboardDisplay`
 
 @patch 1.00
 */
 native CreateLeaderboard                takes nothing returns leaderboard
 
 /**
+@note See: `CreateLeaderboard`, `LeaderboardClear`
+
 @patch 1.00
 */
 native DestroyLeaderboard               takes leaderboard lb returns nothing
@@ -22294,7 +22475,7 @@ native SetCameraOrientController    takes unit whichUnit, real xoffset, real yof
 
 
 /**
-Creates a new camerasetup object with the following default values.
+Creates a new camerasetup and returns its handle. The following are default values:
 
 |                   |               |
 |-------------------|---------------|
@@ -22358,9 +22539,13 @@ change will only be applied when `CameraSetupApply` (or some other variant) is r
 native CameraSetupSetDestPosition           takes camerasetup whichSetup, real x, real y, real duration returns nothing
 
 /**
-Returns the target location of a camerasetup.
+Create and return a new location, destination location is based on specified camera's setup.
+
+@note To avoid leaks, use `RemoveLocation` to destroy it.
 
 @param whichSetup The camera setup.
+
+@note See: `CameraSetupGetDestPositionX`, `CameraSetupGetDestPositionY`
 
 @patch 1.00
 */
@@ -22371,6 +22556,8 @@ Returns the target x-coordinate of a camerasetup.
 
 @param whichSetup The camera setup.
 
+@note See: `CameraSetupGetDestPositionLoc`, `CameraSetupGetDestPositionY`
+
 @patch 1.00
 */
 native CameraSetupGetDestPositionX          takes camerasetup whichSetup returns real
@@ -22379,6 +22566,8 @@ native CameraSetupGetDestPositionX          takes camerasetup whichSetup returns
 Returns the target y-coordinate of a camerasetup.
 
 @param whichSetup The camera setup.
+
+@note See: `CameraSetupGetDestPositionLoc`, `CameraSetupGetDestPositionX`
 
 @patch 1.00
 */
@@ -22700,9 +22889,20 @@ Return-value for the local players camera only.
 constant native GetCameraTargetPositionZ    takes nothing returns real
 
 /**
-Return-value for the local players camera only.
+Create and return a new location, set based on local player's camera target.
+
+@note To avoid leaks, use `RemoveLocation` to destroy it.
+
+@note Although a location will be created for each player, the contained position will be different
+for everybody (similar to `GetLocalPlayer`), because players' cameras are not network-synced.
+
+Do not base your game logic off these positions without syncing manually!
+
+@note Why is it defined a "constant"? Maybe it does reuse location in Jass? (tested in v2.0.3.22988 Lua)
 
 @async 
+
+@note See: `GetCameraTargetPositionX`, `GetCameraTargetPositionY`, `GetCameraTargetPositionZ`, `GetLocationZ`
 
 @patch 1.00
 */
@@ -22736,7 +22936,16 @@ Return-value for the local players camera only.
 constant native GetCameraEyePositionZ       takes nothing returns real
 
 /**
-Return-value for the local players camera only.
+Create and return a new location, set based on local player's camera eye position.
+
+@note To avoid leaks, use `RemoveLocation` to destroy it.
+
+@note Although a location will be created for each player, the contained position will be different
+for everybody (similar to `GetLocalPlayer`), because players' cameras are not network-synced.
+
+Do not base your game logic off these positions without syncing manually!
+
+@note Why is it defined a "constant"? Maybe it does reuse location in Jass? (tested in v2.0.3.22988 Lua)
 
 @async 
 
