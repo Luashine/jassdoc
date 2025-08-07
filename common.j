@@ -853,6 +853,8 @@ Returns the race that corresponds to the given integer.
 
 @param i The integer representation of the race.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -863,6 +865,8 @@ constant native ConvertRace                 takes integer i returns race
 Returns the alliancetype that corresponds to the given integer.
 
 @param i The integer representation of the alliancetype.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -875,6 +879,8 @@ Returns the racepreference that corresponds to the given integer.
 
 @param i The integer representation of the racepreference.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -885,6 +891,8 @@ constant native ConvertRacePref             takes integer i returns racepreferen
 Returns the igamestate that corresponds to the given integer.
 
 @param i The integer representation of the igamestate.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -897,6 +905,8 @@ Returns the fgamestate that corresponds to the given integer.
 
 @param i The integer representation of the fgamestate.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -907,6 +917,8 @@ constant native ConvertFGameState           takes integer i returns fgamestate
 Returns the playerstate that corresponds to the given integer.
 
 @param i The integer representation of the playerstate.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -919,6 +931,8 @@ Returns the playerscore that corresponds to the given integer.
 
 @param i The integer representation of the playerscore.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.13
@@ -929,6 +943,8 @@ constant native ConvertPlayerScore          takes integer i returns playerscore
 Returns the playergameresult that corresponds to the given integer.
 
 @param i The integer representation of the playergameresult.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -947,6 +963,8 @@ It is used to define the constants representing unit state. Accepts any integer,
 
 @note See: `GetUnitState`, `SetUnitState`.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -957,6 +975,8 @@ constant native ConvertUnitState            takes integer i returns unitstate
 Returns the aidifficulty that corresponds to the given integer.
 
 @param i The integer representation of the aidifficulty.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -969,6 +989,8 @@ Returns the gameevent that corresponds to the given integer.
 
 @param i The integer representation of the gameevent.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -979,6 +1001,8 @@ constant native ConvertGameEvent            takes integer i returns gameevent
 Returns the playerevent that corresponds to the given integer.
 
 @param i The integer representation of the playerevent.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -991,6 +1015,8 @@ Returns the playerunitevent that corresponds to the given integer.
 
 @param i The integer representation of the playerunitevent.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1001,6 +1027,8 @@ constant native ConvertPlayerUnitEvent      takes integer i returns playerunitev
 Returns the widgetevent that corresponds to the given integer.
 
 @param i The integer representation of the widgetevent.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1013,6 +1041,8 @@ Returns the dialogevent that corresponds to the given integer.
 
 @param i The integer representation of the dialogevent.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1023,6 +1053,8 @@ constant native ConvertDialogEvent          takes integer i returns dialogevent
 Returns the unitevent that corresponds to the given integer.
 
 @param i The integer representation of the unitevent.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1035,6 +1067,8 @@ Returns the limitop that corresponds to the given integer.
 
 @param i The integer representation of the limitop.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1045,6 +1079,8 @@ constant native ConvertLimitOp              takes integer i returns limitop
 Returns the unittype that corresponds to the given integer.
 
 @param i The integer representation of the unittype.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1059,6 +1095,8 @@ It is used to define the constants representing gamespeed. First index is 0. Acc
 
 @param i The integer representation of the gamespeed.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1069,6 +1107,8 @@ constant native ConvertGameSpeed            takes integer i returns gamespeed
 Returns the placement that corresponds to the given integer.
 
 @param i The integer representation of the placement.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1081,6 +1121,8 @@ Returns the startlocprio that corresponds to the given integer.
 
 @param i The integer representation of the startlocprio.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1091,6 +1133,8 @@ constant native ConvertStartLocPrio         takes integer i returns startlocprio
 Returns the gamedifficulty that corresponds to the given integer.
 
 @param i The integer representation of the gamedifficulty.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1103,6 +1147,8 @@ Returns the gametype that corresponds to the given integer.
 
 @param i The integer representation of the gametype.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1113,6 +1159,8 @@ constant native ConvertGameType             takes integer i returns gametype
 Returns the mapflag that corresponds to the given integer.
 
 @param i The integer representation of the mapflag.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1125,6 +1173,8 @@ Returns the mapvisibility that corresponds to the given integer.
 
 @param i The integer representation of the mapvisibility.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1135,6 +1185,8 @@ constant native ConvertMapVisibility        takes integer i returns mapvisibilit
 Returns the mapsetting that corresponds to the given integer.
 
 @param i The integer representation of the mapsetting.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1147,6 +1199,8 @@ Returns the mapdensity that corresponds to the given integer.
 
 @param i The integer representation of the mapdensity.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1157,6 +1211,8 @@ constant native ConvertMapDensity           takes integer i returns mapdensity
 Returns the mapcontrol that corresponds to the given integer.
 
 @param i The integer representation of the mapcontrol.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1169,6 +1225,8 @@ Returns the playercolor that corresponds to the given integer.
 
 @param i The integer representation of the playercolor.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1179,6 +1237,8 @@ constant native ConvertPlayerColor          takes integer i returns playercolor
 Returns the playerslotstate that corresponds to the given integer.
 
 @param i The integer representation of the playerslotstate.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1191,6 +1251,8 @@ Returns the volumegroup that corresponds to the given integer.
 
 @param i The integer representation of the volumegroup.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1201,6 +1263,8 @@ constant native ConvertVolumeGroup          takes integer i returns volumegroup
 Returns the camerafield that corresponds to the given integer.
 
 @param i The integer representation of the camerafield.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1213,6 +1277,8 @@ Returns the blendmode that corresponds to the given integer.
 
 @param i The integer representation of the blendmode.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1224,6 +1290,8 @@ Returns the raritycontrol that corresponds to the given integer.
 
 @param i The integer representation of the raritycontrol.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1234,6 +1302,8 @@ constant native ConvertRarityControl        takes integer i returns raritycontro
 Returns the texmapflags that corresponds to the given integer.
 
 @param i The integer representation of the texmapflags.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1247,6 +1317,8 @@ Converts a bitmask in integer i to a fog of war type. See: `fogstate`.
 @note Can be used for extended typecasting.
 <http://www.hiveworkshop.com/forums/j-280/t-232039/>
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.00
@@ -1257,6 +1329,8 @@ constant native ConvertFogState             takes integer i returns fogstate
 Returns the effecttype that corresponds to the given integer.
 
 @param i The integer representation of the effecttype.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1269,6 +1343,8 @@ Returns the version that corresponds to the given integer.
 
 @param i The integer representation of the version.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.07
@@ -1279,6 +1355,8 @@ constant native ConvertVersion              takes integer i returns version
 Returns the itemtype that corresponds to the given integer.
 
 @param i The integer representation of the itemtype.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1291,6 +1369,8 @@ constant native ConvertItemType             takes integer i returns itemtype
 `ConvertAttackType(7)`.
 <http://www.hiveworkshop.com/forums/t-269/h-227993/>
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.17a
@@ -1301,6 +1381,8 @@ constant native ConvertAttackType           takes integer i returns attacktype
 Returns the damagetype that corresponds to the given integer.
 
 @param i The integer representation of the damagetype.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1313,6 +1395,8 @@ Returns the weapontype that corresponds to the given integer.
 
 @param i The integer representation of the weapontype.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.17a
@@ -1323,6 +1407,8 @@ constant native ConvertWeaponType           takes integer i returns weapontype
 Returns the soundtype that corresponds to the given integer.
 
 @param i The integer representation of the soundtype.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1335,6 +1421,8 @@ Returns the pathingtype that corresponds to the given integer.
 
 @param i The integer representation of the pathingtype.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.18a
@@ -1345,6 +1433,8 @@ constant native ConvertPathingType          takes integer i returns pathingtype
 Returns the mousebuttontype that corresponds to the given integer.
 
 @param i The integer representation of the mousebuttontype.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @pure 
 
@@ -1357,6 +1447,8 @@ Returns the animtype that corresponds to the given integer.
 
 @param i The integer representation of the animtype.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.30.0.9655
@@ -1368,6 +1460,8 @@ Returns the subanimtype that corresponds to the given integer.
 
 @param i The integer representation of the subanimtype.
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.30.0.9655
@@ -1375,6 +1469,9 @@ Returns the subanimtype that corresponds to the given integer.
 constant native ConvertSubAnimType          takes integer i returns subanimtype
 
 /**
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1382,6 +1479,8 @@ constant native ConvertSubAnimType          takes integer i returns subanimtype
 constant native ConvertOriginFrameType      takes integer i returns originframetype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1389,6 +1488,8 @@ constant native ConvertOriginFrameType      takes integer i returns originframet
 constant native ConvertFramePointType       takes integer i returns framepointtype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1396,6 +1497,8 @@ constant native ConvertFramePointType       takes integer i returns framepointty
 constant native ConvertTextAlignType        takes integer i returns textaligntype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1403,6 +1506,8 @@ constant native ConvertTextAlignType        takes integer i returns textaligntyp
 constant native ConvertFrameEventType       takes integer i returns frameeventtype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1410,6 +1515,8 @@ constant native ConvertFrameEventType       takes integer i returns frameeventty
 constant native ConvertOsKeyType            takes integer i returns oskeytype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1417,6 +1524,8 @@ constant native ConvertOsKeyType            takes integer i returns oskeytype
 constant native ConvertAbilityIntegerField              takes integer i returns abilityintegerfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1424,6 +1533,8 @@ constant native ConvertAbilityIntegerField              takes integer i returns 
 constant native ConvertAbilityRealField                 takes integer i returns abilityrealfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1431,6 +1542,8 @@ constant native ConvertAbilityRealField                 takes integer i returns 
 constant native ConvertAbilityBooleanField              takes integer i returns abilitybooleanfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1438,6 +1551,8 @@ constant native ConvertAbilityBooleanField              takes integer i returns 
 constant native ConvertAbilityStringField               takes integer i returns abilitystringfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1445,6 +1560,8 @@ constant native ConvertAbilityStringField               takes integer i returns 
 constant native ConvertAbilityIntegerLevelField         takes integer i returns abilityintegerlevelfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1452,6 +1569,8 @@ constant native ConvertAbilityIntegerLevelField         takes integer i returns 
 constant native ConvertAbilityRealLevelField            takes integer i returns abilityreallevelfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1459,6 +1578,8 @@ constant native ConvertAbilityRealLevelField            takes integer i returns 
 constant native ConvertAbilityBooleanLevelField         takes integer i returns abilitybooleanlevelfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1466,6 +1587,8 @@ constant native ConvertAbilityBooleanLevelField         takes integer i returns 
 constant native ConvertAbilityStringLevelField          takes integer i returns abilitystringlevelfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1473,6 +1596,8 @@ constant native ConvertAbilityStringLevelField          takes integer i returns 
 constant native ConvertAbilityIntegerLevelArrayField    takes integer i returns abilityintegerlevelarrayfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1480,6 +1605,8 @@ constant native ConvertAbilityIntegerLevelArrayField    takes integer i returns 
 constant native ConvertAbilityRealLevelArrayField       takes integer i returns abilityreallevelarrayfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1487,6 +1614,8 @@ constant native ConvertAbilityRealLevelArrayField       takes integer i returns 
 constant native ConvertAbilityBooleanLevelArrayField    takes integer i returns abilitybooleanlevelarrayfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1494,6 +1623,8 @@ constant native ConvertAbilityBooleanLevelArrayField    takes integer i returns 
 constant native ConvertAbilityStringLevelArrayField     takes integer i returns abilitystringlevelarrayfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1501,6 +1632,8 @@ constant native ConvertAbilityStringLevelArrayField     takes integer i returns 
 constant native ConvertUnitIntegerField                 takes integer i returns unitintegerfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1508,6 +1641,8 @@ constant native ConvertUnitIntegerField                 takes integer i returns 
 constant native ConvertUnitRealField                    takes integer i returns unitrealfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1546,6 +1681,8 @@ for k,rawcode in pairs(t) do
 end
 ```
 
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1553,6 +1690,8 @@ end
 constant native ConvertUnitStringField                  takes integer i returns unitstringfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1560,6 +1699,8 @@ constant native ConvertUnitStringField                  takes integer i returns 
 constant native ConvertUnitWeaponIntegerField           takes integer i returns unitweaponintegerfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1567,6 +1708,8 @@ constant native ConvertUnitWeaponIntegerField           takes integer i returns 
 constant native ConvertUnitWeaponRealField              takes integer i returns unitweaponrealfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1574,6 +1717,8 @@ constant native ConvertUnitWeaponRealField              takes integer i returns 
 constant native ConvertUnitWeaponBooleanField           takes integer i returns unitweaponbooleanfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1581,6 +1726,8 @@ constant native ConvertUnitWeaponBooleanField           takes integer i returns 
 constant native ConvertUnitWeaponStringField            takes integer i returns unitweaponstringfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1588,6 +1735,8 @@ constant native ConvertUnitWeaponStringField            takes integer i returns 
 constant native ConvertItemIntegerField                 takes integer i returns itemintegerfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1595,6 +1744,8 @@ constant native ConvertItemIntegerField                 takes integer i returns 
 constant native ConvertItemRealField                    takes integer i returns itemrealfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1602,6 +1753,8 @@ constant native ConvertItemRealField                    takes integer i returns 
 constant native ConvertItemBooleanField                 takes integer i returns itembooleanfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1609,6 +1762,8 @@ constant native ConvertItemBooleanField                 takes integer i returns 
 constant native ConvertItemStringField                  takes integer i returns itemstringfield
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1616,6 +1771,8 @@ constant native ConvertItemStringField                  takes integer i returns 
 constant native ConvertMoveType                         takes integer i returns movetype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1623,6 +1780,8 @@ constant native ConvertMoveType                         takes integer i returns 
 constant native ConvertTargetFlag                       takes integer i returns targetflag
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1630,6 +1789,8 @@ constant native ConvertTargetFlag                       takes integer i returns 
 constant native ConvertArmorType                        takes integer i returns armortype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1637,6 +1798,8 @@ constant native ConvertArmorType                        takes integer i returns 
 constant native ConvertHeroAttribute                    takes integer i returns heroattribute
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1644,6 +1807,8 @@ constant native ConvertHeroAttribute                    takes integer i returns 
 constant native ConvertDefenseType                      takes integer i returns defensetype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1651,6 +1816,8 @@ constant native ConvertDefenseType                      takes integer i returns 
 constant native ConvertRegenType                        takes integer i returns regentype
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
@@ -1658,6 +1825,8 @@ constant native ConvertRegenType                        takes integer i returns 
 constant native ConvertUnitCategory                     takes integer i returns unitcategory
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @pure 
 
 @patch 1.31.0.11889
