@@ -12065,11 +12065,17 @@ native GetPlayerColor           takes player whichPlayer returns playercolor
 native GetPlayerSelectable      takes player whichPlayer returns boolean
 
 /**
+Returns one of `mapcontrol` constants. Returns `MAP_CONTROL_NONE` for null (invalid handle).
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @patch 1.00
 */
 native GetPlayerController      takes player whichPlayer returns mapcontrol
 
 /**
+Returns one of `playerslotstate` constants. Returns `PLAYER_SLOT_STATE_EMPTY` for null (invalid handle).
+
 @patch 1.00
 */
 native GetPlayerSlotState       takes player whichPlayer returns playerslotstate
@@ -12110,13 +12116,25 @@ native GetPlayerName            takes player whichPlayer returns string
 //
 
 /**
+Creates and returns a new timer.
+
+When no longer needed, you must destroy it using `DestroyTimer` to avoid leaks.
+
 @patch 1.00
 */
 native CreateTimer          takes nothing returns timer
 
 /**
-@bug Destroying does not pause timer, so if call of its callback is scheduled,
-then callback is called with `GetElapsedTimer` being `null`.
+Removes the timer object.
+
+To be safe, you should call `PauseTimer` before destroying it, so it doesn't run the callback function
+while having been practically removed. Also remember to clear all associated data.
+
+Needs confirmation: it is probably safe to destroy a timer without pausing within its callback, whenever
+it is certain it doesn't run or have the next callback scheduled.
+
+@bug Destroying does not pause timer automatically, so if call of its callback is scheduled,
+then callback is called with `GetExpiredTimer` being `null`.
 
 @patch 1.00
 */
@@ -12202,10 +12220,16 @@ After that passed timer is stopped even if it is periodic.
 native ResumeTimer          takes timer whichTimer returns nothing
 
 /**
+Returns handle of the current timer.
+
+Use this within the callback function passed to `TimerStart`.
+
 @bug Returns `null` if timer is destroyed right before callback call.
 
 @bug Might crash the game if called when there is no expired timer.
 <http://www.wc3c.net/showthread.php?t=84131>
+
+@note Reuses the existing handle. (tested in v2.0.3.22988 Lua)
 
 @patch 1.00
 */
@@ -12216,6 +12240,10 @@ native GetExpiredTimer      takes nothing returns timer
 //
 
 /**
+Creates and returns a new group.
+
+@note To avoid leaks, use `DestroyGroup` to destroy the group.
+
 @patch 1.00
 */
 native CreateGroup                          takes nothing returns group
@@ -12223,7 +12251,7 @@ native CreateGroup                          takes nothing returns group
 /**
 Destroys the group.
 
-Accessing a destroyed group shows no units, a size of 0 and cannot be modified in any way.
+@note Accessing a destroyed group shows no units, a size of 0 and cannot be modified in any way.
 
 @patch 1.07
 */
@@ -12285,6 +12313,8 @@ native BlzGroupGetSize                      takes group whichGroup returns integ
 Returns unit at the given index in group. Groups start at index 0.
 
 If the unit was removed from the game or index is out of bounds, returns null.
+
+@note Reuses the existing handle. (tested in v2.0.3.22988 Lua)
 
 @patch 1.31.0.11889
 */
@@ -12597,6 +12627,8 @@ If you use FirstOfGroup in iterations with removal, units in the group will even
 
 @note See [GroupUtils Library](https://web.archive.org/web/20200918161954/http://wc3c.net/showthread.php?t=104464) for vJass.
 
+@note Reuses the existing handle. (tested in v2.0.3.22988 Lua)
+
 @patch 1.00
 */
 native FirstOfGroup             takes group whichGroup returns unit
@@ -12610,6 +12642,8 @@ Creates an empty force object, returns a handle to it.
 
 Forces are groups containing players.
 To add/remove a player, see `ForceAddPlayer`/`ForceRemovePlayer`.
+
+@note To avoid leaks, use `DestroyForce` to destroy it.
 
 @patch 1.00
 */
@@ -12710,6 +12744,8 @@ X for the maximum point (maxX, maxY).
 of `GetWorldBounds`. The maxX and maxY will be smaller by `32.0` than that of
 the world bounds.
 
+@note To avoid leaks, use `RemoveRect` to destroy it.
+
 @note See: `RectFromLoc`, `RemoveRect`, `GetWorldBounds`.
 
 @patch 1.00
@@ -12726,6 +12762,8 @@ The rectangle size and coordinates are limited to valid map coordinates, see
 @bug You can't create your own rectangle that would match the dimensions
 of `GetWorldBounds`. The maxX and maxY will be smaller by `32.0` than that of
 the world bounds.
+
+@note To avoid leaks, use `RemoveRect` to destroy it.
 
 @note See: `Rect`, `RemoveRect`, `GetWorldBounds`.
 
@@ -12861,6 +12899,8 @@ native GetRectMaxY              takes rect whichRect returns real
 /**
 Creates an empty region with initially no cells.
 
+@note To avoid leaks, use `RemoveRegion` to destroy it.
+
 @patch 1.00
 */
 native CreateRegion             takes nothing returns region
@@ -12988,7 +13028,7 @@ Creates a new location that points to the (x,y) map coordinates.
 
 The current Z-height at that map position can be retrieved with `GetLocationZ`.
 
-To avoid leaks, use `RemoveLocation` to destroy the location.
+@note To avoid leaks, use `RemoveLocation` to destroy the location.
 
 @note Some natives may return a location with (0,0,0) which is different from
 a manually created location at (x=0,y=0) that will return the map's height via `GetLocationZ`. 
@@ -13131,11 +13171,15 @@ native GetWorldBounds           takes nothing returns rect
 /**
 Creates a new blank trigger object without any events, conditions or actions.
 
+@note To avoid leaks, use `DestroyTrigger` to destroy it.
+
 @patch 1.00
 */
 native CreateTrigger    takes nothing returns trigger
 
 /**
+Removes the trigger and (needs confirmation) is supposed to clear up associated data and event objects.
+
 @bug Do not destroy the current running Trigger (when waits are involved) as
 it can cause handle stack corruption as documented [here](http://www.wc3c.net/showthread.php?t=110519).
 
@@ -13472,7 +13516,7 @@ Creates its own timer and triggers when it expires.
 timeout values set.
 This is in comparison with a 1ms and 0ms `timer`.
 
-Note how its frequency was limited to 100 times per second in v1.32.x.
+Note how its frequency was limited to 100 times per second in v1.32.x and above.
 
 | Trigger or Timer \ Tick count  |   ROC 1.0 | Reforged 1.32.10 |
 |--------------------------------|----------:|-----------------:|
