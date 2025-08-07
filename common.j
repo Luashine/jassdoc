@@ -127,6 +127,8 @@ type region             extends     agent
 type rect               extends     agent
 
 /**
+Used in filters and conditions. A new boolexpr can be created using `Condition` or `Filter`.
+
 @patch 1.00
 */
 type boolexpr           extends     agent
@@ -13395,8 +13397,8 @@ However, most functions from blizzard.j destroy passed boolexpr automatically.
 native Not              takes boolexpr operand returns boolexpr
 
 /**
-Returns a new conditionfunc, when called by the game returns the result of evaluating func().
-func will receive no arguments and must return a boolean: true/false.
+Returns a new conditionfunc based on function `func`.
+The game will call `func()` without arguments and expect a boolean (true/false) return value.
 
 @param func A function that returns boolean or `null`.
 
@@ -13406,15 +13408,15 @@ However, most functions from blizzard.j destroy passed boolexpr automatically.
 @note **Lua:** Always returns a new handle unless the passed parameter is `nil`, in this case
 it MAY return the same handle depending on unknown conditions (consecutive calls are likely to reuse previous handle).
 
-**Jass:** Returns same handle when creating multiple filters for the same function:
+Otherwise you can keep reusing existing conditions.
+
+**Jass:** Returns same handle when you try to create multiple filters for the same function:
 `Condition(function foo) == Condition(function foo)` ("foo" can be non-constant and constant).
 
 For this reason, do **not** destroy filterfuncs created with `Condition` in Jass,
 in the best case it does nothing but in the worst case it would affect some internals.
 
 This behavior is similar to `Filter`.
-
-@pure 
 
 @note See: `And`, `Or`, `Not`, `Condition`, `Filter`, `DestroyCondition`
 
@@ -13437,26 +13439,26 @@ However, most functions from blizzard.j destroy passed boolexpr automatically.
 native DestroyCondition takes conditionfunc c returns nothing
 
 /**
-Returns a new filterfunc, when called by the game returns the result of evaluating func().
-func will receive no arguments and must return a boolean: true/false.
+Returns a new filterfunc based on function `func`.
+The game will call `func()` without arguments and expect a boolean (true/false) return value.
 
 @param func A filtering function that returns boolean or `null`.
 
 @note Lua, 1.32.10: `filterfunc` extends from `boolexpr`->`agent` and must be explicitly destroyed with `DestroyBoolExpr`/`DestroyFilter` to prevent leaks.
 However, most functions from blizzard.j destroy passed boolexpr automatically.
 
+Otherwise you can keep reusing existing filters.
+
 @note **Lua:** Always returns a new handle unless the passed parameter is `nil`, in this case
 it MAY return the same handle depending on unknown conditions (consecutive calls are likely to reuse previous handle).
 
-**Jass:** Returns same handle when creating multiple filters for the same function:
+**Jass:** Returns same handle when you try to create multiple filters for the same function:
 `Filter(function foo) == Filter(function foo)` ("foo" can be non-constant and constant).
 
 For this reason, do **not** destroy filterfuncs created with `Filter` in Jass,
 in the best case it does nothing but in the worst case it would affect some internals.
 
 This behavior is similar to `Condition`.
-
-@pure 
 
 @note See: `And`, `Or`, `Not`, `Condition`, `DestroyFilter`;
 `GetFilterUnit`, `GetFilterItem`, `GetFilterPlayer`, `GetFilterDestructable`.
