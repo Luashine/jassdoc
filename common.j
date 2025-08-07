@@ -388,6 +388,23 @@ type camerafield        extends     handle
 type camerasetup        extends     handle
 
 /**
+Only player colors index 0 - `GetBJMaxPlayerSlots` (inclusive) are valid.
+The extra neutral slots have a usable, but have a "hidden" dark gray color.
+
+**Example (Lua, 2.0.3):**
+
+```{.lua}
+change_player = Player(0)
+color_index = GetBJMaxPlayerSlots()-1
+new_color = GetPlayerColor(Player(color_index))
+
+BlzDisplayChatMessage(change_player, 0, "Here's my original color")
+SetPlayerColor(change_player, new_color)
+BlzDisplayChatMessage(change_player, 0, "Look at my new color!")
+```
+
+@note See: `GetPlayerColor`, `SetPlayerColor`
+
 @patch 1.00
 */
 type playercolor        extends     handle
@@ -1234,6 +1251,8 @@ Returns the playercolor that corresponds to the given integer.
 @param i The integer representation of the playercolor.
 
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
+@note See: `playercolor` for an explanation.
 
 @pure 
 
@@ -11827,12 +11846,16 @@ native IsMapFlagSet         takes mapflag whichMapFlag returns boolean
 
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @patch 1.00
 */
 constant native GetGamePlacement     takes nothing returns placement
 
 /**
 Returns the currently set gamespeed.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @note See: `SetGameSpeed` and for values and mechanics `gamespeed`.
 
@@ -11841,16 +11864,22 @@ Returns the currently set gamespeed.
 constant native GetGameSpeed         takes nothing returns gamespeed
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @patch 1.00
 */
 constant native GetGameDifficulty    takes nothing returns gamedifficulty
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @patch 1.00
 */
 constant native GetResourceDensity   takes nothing returns mapdensity
 
 /**
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @patch 1.00
 */
 constant native GetCreatureDensity   takes nothing returns mapdensity
@@ -11866,6 +11895,15 @@ constant native GetStartLocationX    takes integer whichStartLocation returns re
 constant native GetStartLocationY    takes integer whichStartLocation returns real
 
 /**
+Returns map location pointing at player start location.
+Returns null, if player index is invalid (see `GetBJMaxPlayers`).
+
+Always returns a new object. You must destroy it using `RemoveLocation` to avoid leaks.
+
+@param whichStartLocation start location index, 0-based
+
+@note See: `GetStartLocationX`, `GetStartLocationY`, `SetPlayerStartLocation`, `ForcePlayerStartLocation`
+
 @patch 1.00
 */
 constant native GetStartLocationLoc  takes integer whichStartLocation returns location
@@ -12009,6 +12047,13 @@ on the map, it will return -1.
 native GetPlayerStartLocation   takes player whichPlayer returns integer
 
 /**
+Returns player's current color.
+For invalid player slots always returns `PLAYER_COLOR_RED`.
+
+@note See `playercolor`, `SetPlayerColor`.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @patch 1.00
 */
 native GetPlayerColor           takes player whichPlayer returns playercolor
