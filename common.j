@@ -325,6 +325,12 @@ type gamespeed          extends     handle
 type gamedifficulty     extends     handle
 
 /**
+It's internally an integer bitfield, as such it may not exactly correspond to the predefined constants,
+that only represent a single flag. To check individual flags, use `IsGameTypeSupported` with a constant.
+
+For example, a melee test map with only one player slot started using `game.exe -loadfile path.w3m`
+returns a gametype whose integer value is equal 5 = flags `GAME_TYPE_MELEE` and `GAME_TYPE_USE_MAP_SETTINGS`.
+
 @patch 1.00
 */
 type gametype           extends     handle
@@ -1145,9 +1151,11 @@ constant native ConvertGameDifficulty       takes integer i returns gamedifficul
 /**
 Returns the gametype that corresponds to the given integer.
 
-@param i The integer representation of the gametype.
+@param i The integer representation of the gametype (a bitfield).
 
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
+@note See `gametype` for an explanation.
 
 @pure 
 
@@ -11705,11 +11713,21 @@ the map for preview.
 native SetStartLocPrio              takes integer whichStartLoc, integer prioSlotIndex, integer otherStartLocIndex, startlocprio priority returns nothing
 
 /**
+Returns the integer index of priority for the target player start (spawn) location.
+
+@note See: `ConvertStartLocPrio`, `GetStartLocPrio`
+
 @patch 1.00
 */
 native GetStartLocPrioSlot          takes integer whichStartLoc, integer prioSlotIndex returns integer
 
 /**
+Returns priority of the target player start (spawn) location.
+
+@note See: `ConvertStartLocPrio`, `GetStartLocPrioSlot`
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
 @patch 1.00
 */
 native GetStartLocPrio              takes integer whichStartLoc, integer prioSlotIndex returns startlocprio
@@ -11789,6 +11807,15 @@ native GetPlayers           takes nothing returns integer
 native IsGameTypeSupported  takes gametype whichGameType returns boolean
 
 /**
+Returns a gametype object representing the current game's enabled type flags.
+
+@note To check individual game type flags, use `IsGameTypeSupported` with a constant.
+
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+
+@note See: `gametype` for an explanation, `IsGameTypeSupported`, `GetGameTypeSelected`, `SetGameTypeSupported`,
+`ConvertGameType`
+
 @patch 1.00
 */
 native GetGameTypeSelected  takes nothing returns gametype
