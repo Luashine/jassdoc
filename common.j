@@ -12048,7 +12048,8 @@ native GetPlayerStartLocation   takes player whichPlayer returns integer
 
 /**
 Returns player's current color.
-For invalid player slots always returns `PLAYER_COLOR_RED`.
+
+For invalid player handles (namely `null` like for invalid slots) always returns `PLAYER_COLOR_RED`.
 
 @note See `playercolor`, `SetPlayerColor`.
 
@@ -18149,19 +18150,20 @@ native SetUnitUserData              takes unit whichUnit, integer data returns n
 // Player API
 
 /**
-Returns the instance of player based on ID number.
+Returns the instance of player based on ID number, or null for an invalid slot index.
 
-This function always returns the same instance, does not create new objects.
-If used with invalid values (below 0 or above `GetBJMaxPlayerSlots`), returns null in Reforged, crashed on Classic.
+@note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
 @note 
-Common.j: IDs start from 0, e.g. Player(0) is red, 1 is blue etc. -> `GetPlayerId`
-Blizzard.j (WorldEdit): IDs start with 1 -> `GetConvertedPlayerId`.
+- Common.j: IDs start from 0, e.g. Player(0) is red, 1 is blue etc. -> `GetPlayerId`
+- Blizzard.j (WorldEdit): IDs start with 1 -> `GetConvertedPlayerId`.
 
 @note See: `GetPlayerId`, `GetBJMaxPlayers`, `GetBJMaxPlayerSlots`, `GetPlayerNeutralPassive`, `GetPlayerNeutralAggressive`.
 
-@bug In old versions (which?) crashes the game if used with wrong values, that is values greather than 15
-or values lower than 0.
+@bug In old pre-Reforged versions (which?) crashes the game if used with wrong values: index < 0 or index > highest slot.
+See: `bj_MAX_PLAYER_SLOTS`
+
+@param number 0-based player slot index, \[0 - `GetBJMaxPlayerSlots`\] inclusive
 
 @pure 
 
