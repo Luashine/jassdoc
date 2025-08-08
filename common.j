@@ -15070,16 +15070,33 @@ native TriggerRegisterUnitInRange takes trigger whichTrigger, unit whichUnit, re
 
 
 /**
+@note It is often suggested to use trigger conditions instead of actions for increased performance.
+
+While they are indeed faster, conditions lack some of the event data, that is only pushed into trigger
+context *after* the condition has successfully passed, to call the trigger action with fully populated
+event data. Therefore condtions and actions are not equivalent in terms of event handling.
+
+*Optionally* populated event context data may include `GetTriggerUnit` and `GetTriggerPlayer`.
+TODO: This needs testing and code examples.
+
+Source: based on v1.26a data, Unryze in Hive Discord <https://discord.com/channels/178569180625240064/311662737015046144/1301657992881504258>
+
+@note See: `TriggerRemoveCondition`, `TriggerClearConditions`, `TriggerAddAction`
+
 @patch 1.00
 */
 native TriggerAddCondition    takes trigger whichTrigger, boolexpr condition returns triggercondition
 
 /**
+@note See: `TriggerAddCondition`, `TriggerClearConditions`
+
 @patch 1.00
 */
 native TriggerRemoveCondition takes trigger whichTrigger, triggercondition whichCondition returns nothing
 
 /**
+@note See: `TriggerAddCondition`, `TriggerRemoveCondition`
+
 @patch 1.00
 */
 native TriggerClearConditions takes trigger whichTrigger returns nothing
@@ -15100,6 +15117,8 @@ Adds an action to be called when the given trigger is fired through registered e
 
 @note New actions added to the trigger during the execution of the actions won't be subject for execution for this run.
 
+@note See: `TriggerAddAction`, `TriggerRemoveAction`, `TriggerClearActions`, `TriggerAddCondition`
+
 @patch 1.00
 */
 native TriggerAddAction     takes trigger whichTrigger, code actionFunc returns triggeraction
@@ -15109,6 +15128,8 @@ Removes an action from a trigger.
 
 @bug If the actions of the trigger are currently running and the removed action was still pending to be called, it will still be called unless
 there is a `TriggerSleepAction` after the `TriggerRemoveAction`.
+
+@note See: `TriggerAddAction`, `TriggerClearActions`
 
 @patch 1.00
 */
@@ -15120,7 +15141,14 @@ Removes all actions from a trigger.
 @bug If the actions of the trigger are currently running, hereby removed actions still pending to be called will still be called. In contrast to
 `TriggerRemoveAction`, this will be the case regardless if there is a `TriggerSleepAction` after `TriggerClearActions` or not.
 
-@bug 
+@bug (v1.26a, newer versions too afaik) This leaks internally, because the game does not free the handle
+Unlike `TriggerRemoveAction`, `TriggerRemoveCondition`, `TriggerClearConditions`, which do call "CAgent::Remove".
+
+You can use `TriggerRemoveAction` instead.
+
+Source: Unryze, Hive Discord <https://discord.com/channels/178569180625240064/311662737015046144/1301657105975214190>
+
+@note See: `TriggerAddAction`, `TriggerRemoveAction`
 
 @patch 1.00
 */
@@ -15688,9 +15716,15 @@ igold = CreateItem(FourCC("gold"), 256, 450)
 
 @param itemid The rawcode of the item.
 
-@param x The x-coordinate of the item.
+@param x X map coordinate
 
-@param y The y-coordinate of the item.
+@param y Y map coordinate
+
+@bug (at least v1.26a) Created item handles are pushed to an internal structure, this increases
+their reference count, but this structure is never used and so items cannot be properly cleared.
+"CItem::PushToWorldFrameAVC" / "::AddItemToAVCList".
+
+Source: Unryze, Hive Discord <https://discord.com/channels/178569180625240064/311662737015046144/1301659388653604916>
 
 @patch 1.00
 */
