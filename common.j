@@ -18983,6 +18983,8 @@ native          SetCampaignMenuRace takes race r returns nothing
 native          SetCampaignMenuRaceEx takes integer campaignIndex returns nothing
 
 /**
+Does nothing when you are in a custom map.
+
 @patch 1.00
 */
 native          ForceCampaignSelectScreen takes nothing returns nothing
@@ -19290,7 +19292,9 @@ native  ReloadGameCachesFromDisk takes nothing returns boolean
 
 
 /**
-@note You cannot create more than 255 gamecaches.
+Creates and returns handle to game cache. Returns null on error.
+
+@note You cannot create more than 255 gamecaches. Subsequent calls will return null.
 In multiplayer the existing game caches are not considered, so you can get a
 full 255 new game caches.
 
@@ -19300,6 +19304,9 @@ file if a `gamecache` with that name already exists, if yes, it will create a
 that will only count once to the 255 limit in the current game), if no and it
 does not exist yet in the current game either, it will take a new slot among
 the 255.
+
+@note See `gamecache` for an explanation about this system,
+`FlushGameCache` to clear and remove a cache, `SaveGameCache`
 
 @patch 1.00
 */
@@ -19531,7 +19538,11 @@ native  RestoreUnit						takes gamecache cache, string missionKey, string key, p
 
 
 /**
-@note You cannot create more than 255 hashtables.
+Creates and returns handle to hashtable. Returns null on error.
+
+@note You cannot create more than 255 hashtables. Subsequent calls will return null.
+
+@note See `FlushParentHashtable` to clear and remove a hashtable, `FlushChildHashtable`, `InitGameCache`
 
 @patch 1.24a
 */
@@ -20029,11 +20040,14 @@ native  RemoveSavedHandle					takes hashtable table, integer parentKey, integer 
 
 
 /**
+Clears and removes the hashtable. Frees one of the 255 available hashtable slots.
+
 @patch 1.24a
 */
 native  FlushParentHashtable						takes hashtable table returns nothing
 
 /**
+Clears all data that was stored under the "parentKey".
 @patch 1.24a
 */
 native  FlushChildHashtable					takes hashtable table, integer parentKey returns nothing
