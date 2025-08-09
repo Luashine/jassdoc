@@ -594,6 +594,9 @@ Now if you create your `gamecache` again via `InitGameCache("my_campaign.w3v")`
 (in another map or another game) it should have all previously stored values
 available and can be queried via `HaveStoredString`, `RestoreUnit`, `GetStoredInteger`, etc.
 
+@note (tested v2.0.3) Reforged seems to store every named game cache bundled inside one file
+`C:\Users\userr\Documents\Warcraft III\BattleNet\BATTLENET_NUMERIC_USERID\Campaigns\Classic\Campaigns.w3v`
+
 @patch 1.00
 */
 type gamecache          extends     agent
@@ -19292,7 +19295,8 @@ native  ReloadGameCachesFromDisk takes nothing returns boolean
 
 
 /**
-Creates and returns handle to game cache. Returns null on error.
+Tries to load the existing named game cache, otherwise creates an empty one.
+Returns handle to game cache, or null on error.
 
 @note You cannot create more than 255 gamecaches. Subsequent calls will return null.
 In multiplayer the existing game caches are not considered, so you can get a
