@@ -19453,12 +19453,16 @@ native  StoreBoolean					takes gamecache cache, string missionKey, string key, b
 
 /**
 Saves data of a unit in a game cache that can be loaded (spawned) with `RestoreUnit`.
+Does not erase the previous value when unit handle is invalid (null).
 
-The return value supposedly tells whether the save succeeded, practically always true.
+The return value supposedly tells whether the save succeeded, can return false
+even though the unit was saved.
 
 The saved attributes of the unit are (non-exhaustive): unit id, experience, hero level, unused skill points, hero proper name (index),
 strength/agility/intelligence, attack speed/move speed increments from agility, life, mana and attack damage increments
-(can be adjusted individually using tome abilities), sight range (day) (can be adjusted with `UNIT_RF_SIGHT_RADIUS`), armor increment
+(can be adjusted individually using tome abilities), sight range (day) (can be adjusted with `UNIT_RF_SIGHT_RADIUS`), armor increment.
+
+Does NOT save unit's name set with `BlzSetUnitName` nor unit's skin `BlzSetUnitSkin`.
 
 Descriptions of the items in the unit's inventory will also be saved (non-exhaustive): item id, charges, flags: drop upon death, perishable,
 invulnerable, pawnable, used on acquire (powerup), droppable, actively used
@@ -19466,6 +19470,17 @@ invulnerable, pawnable, used on acquire (powerup), droppable, actively used
 Descriptions of the unit's hero abilities will also be saved: ability id, current level
 
 See also the unit entry in the following Kaitai Struct file describing the w3v format (gamecaches file): https://github.com/WaterKnight/Warcraft3-Formats-KaitaiStruct/blob/main/w3-w3v.ksy
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+mygc_test = InitGameCache("mycachetest.w3v")
+-- 'emtg' = mountain giant
+rock = CreateUnit(Player(0), FourCC"emtg", 0,0, 135.0)
+print("Storage successful:", StoreUnit(mygc_test, "parent", "rock-unit", rock))
+rock2 = RestoreUnit(mygc_test, "parent", "rock-unit", Player(0), -300, -100, 270)
+rock3 = RestoreUnit(mygc_test, "parent", "rock-unit", Player(0), 300, -100, 270)
+```
 
 @bug When a unit obtains armor from a research and is then stored in a game cache, restoring it will retain the armor increment without the research, so if
 the research is done again, the unit will benefit doubly.
@@ -19655,7 +19670,11 @@ Returns `""` if the specified value's data is not found in the cache.
 native  GetStoredString					takes gamecache cache, string missionKey, string key returns string
 
 /**
+Creates a copy of the stored unit and returns handle to unit when successful.
+
 Returns `null` if the specified value's data is not found in the cache.
+
+@note See `StoreUnit` for an example.
 
 @patch 1.00
 */
