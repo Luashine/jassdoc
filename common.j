@@ -18512,41 +18512,108 @@ constant native GetPlayerAlliance       takes player sourcePlayer, player otherP
 
 
 /**
+Returns player's handicap factor between 0.01 and 100.0.
+
+Handicap affects player's units' max HP scaling. Default is 1.0 (100%).
+The minimum selectable value in a game lobby is 0.5 (50%).
+
+@note This handicap value **only** affects the maximum life.
+Other handicaps remain untouched and can be modified individually.
+
+@note See: `SetPlayerHandicap`, `GetPlayerHandicapBJ`,
+`GetPlayerHandicapXP`, `GetPlayerHandicapReviveTime`, `GetPlayerHandicapDamage`
+
 @patch 1.00
 */
 constant native GetPlayerHandicap       takes player whichPlayer returns real
 
 /**
+@note See: `SetPlayerHandicapXP`, `GetPlayerHandicapXPBJ`, `GetPlayerHandicap`, `GetPlayerHandicapReviveTime`, `GetPlayerHandicapDamage`
+
 @patch 1.00
 */
 constant native GetPlayerHandicapXP     takes player whichPlayer returns real
 
 /**
+@note See: `SetPlayerHandicapReviveTime`, `GetPlayerHandicapReviveTimeBJ`, `GetPlayerHandicap`, `GetPlayerHandicapXP`, `GetPlayerHandicapDamage`
+
 @patch 1.32.0.13369
 */
 constant native GetPlayerHandicapReviveTime takes player whichPlayer returns real
 
 /**
+@note See: `SetPlayerHandicapDamage`, `GetPlayerHandicapDamageBJ`, `GetPlayerHandicap`, `GetPlayerHandicapXP`, `GetPlayerHandicapReviveTime`
+
 @patch 1.32.0.13369
 */
 constant native GetPlayerHandicapDamage takes player whichPlayer returns real
 
 /**
+Sets target player's handicap factor to a value between 0.01 and 100.0.
+
+All player's units are rescaled immediately.
+
+Handicap affects player's units' max HP scaling. Default is 1.0 (100%).
+The minimum selectable value in a game lobby is 0.5 (50%).
+
+@note Setting this handicap value **only** affects the maximum life.
+Other handicaps remain untouched and can be modified individually.
+
+@bug (tested v2.0.3.22988) Using the valuees of <0.01 or >100.0 causes the scaling to bug out, such that
+the scaled HP cannot be scaled back to the original by setting a sane value.
+
+**Test code (Lua):**
+
+The following code *with these extreme values* is not idempotent:
+
+```{.lua}
+do
+	local p = Player(0)
+	local get, set = GetPlayerHandicap, SetPlayerHandicap
+	local previous = get()
+	set(p, 120.123)
+	local max = get(p)
+	set(p, 0.4)
+	local min = get(p)
+	set(p, 0)
+	local zero = get(p)
+	set(p, -0.7)
+	local negative = get(p)
+	print(tostring(set):gsub(".-: ", ""), previous, max, min, zero, negative)
+end
+```
+
+@note See: `GetPlayerHandicap`, `SetPlayerHandicapBJ`, `SetPlayerHandicapXP`, `SetPlayerHandicapReviveTime`, `SetPlayerHandicapDamage`
+
+@param handicap multiplier between 0.01 and 100.0, default: 1.0
+
 @patch 1.00
 */
 constant native SetPlayerHandicap       takes player whichPlayer, real handicap returns nothing
 
 /**
+@note See:  `GetPlayerHandicapXP`, `SetPlayerHandicapXPBJ`, `SetPlayerHandicap`, `SetPlayerHandicapReviveTime`, `SetPlayerHandicapDamage`
+
+@param handicap multiplier between 0.01 and 100.0, default: 1.0
+
 @patch 1.00
 */
 constant native SetPlayerHandicapXP     takes player whichPlayer, real handicap returns nothing
 
 /**
+@note See: `GetPlayerHandicapReviveTime`, `SetPlayerHandicapReviveTimeBJ`, `SetPlayerHandicap`, `SetPlayerHandicapXP`, `SetPlayerHandicapDamage`
+
+@param handicap multiplier between 0.01 and 100.0, default: 1.0
+
 @patch 1.32.0.13369
 */
 constant native SetPlayerHandicapReviveTime takes player whichPlayer, real handicap returns nothing
 
 /**
+@note See: `GetPlayerHandicapDamage`, `SetPlayerHandicapDamageBJ`, `SetPlayerHandicap`, `SetPlayerHandicapXP`, `SetPlayerHandicapReviveTime`
+
+@param handicap multiplier between 0.01 and 100.0, default: 1.0
+
 @patch 1.32.0.13369
 */
 constant native SetPlayerHandicapDamage takes player whichPlayer, real handicap returns nothing
@@ -19338,7 +19405,9 @@ native  StoreReal						takes gamecache cache, string missionKey, string key, rea
 native  StoreBoolean					takes gamecache cache, string missionKey, string key, boolean value returns nothing
 
 /**
-Stores a description of a unit in a game cache that can be retrieved with `RestoreUnit`.
+Saves data of a unit in a game cache that can be loaded (spawned) with `RestoreUnit`.
+
+return value, storestring too
 
 The saved attributes of the unit are (non-exhaustive): unit id, experience, hero level, unused skill points, hero proper name (index),
 strength/agility/intelligence, attack speed/move speed increments from agility, life, mana and attack damage increments
