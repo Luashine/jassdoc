@@ -594,6 +594,17 @@ Now if you create your `gamecache` again via `InitGameCache("my_campaign.w3v")`
 (in another map or another game) it should have all previously stored values
 available and can be queried via `HaveStoredString`, `RestoreUnit`, `GetStoredInteger`, etc.
 
+@note The use of game caches is practically deprecated except for campaigns, mostly due to
+the total max limit being a critical limitation.
+
+Hash tables (`InitHashtable`) were added to the game to allow storage of arbitrary
+data at arbitrary index keys. They cannot be persisted (saved) though.
+
+Nevertheless, the `Preload` API is currently being used by maps to save
+any data to disk and provide save/load functionality. There are libraries
+available to help you with this. The sync API is then used to send and receive
+loaded data between players, see `BlzTriggerRegisterPlayerSyncEvent`.
+
 @note (tested v2.0.3) Reforged seems to store every named game cache bundled inside one file
 `C:\Users\userr\Documents\Warcraft III\BattleNet\BATTLENET_NUMERIC_USERID\Campaigns\Classic\Campaigns.w3v`
 
@@ -19366,8 +19377,9 @@ Tries to load the existing named game cache, otherwise creates an empty one.
 Returns handle to game cache, or null on error.
 
 @note You cannot create more than 255 gamecaches. Subsequent calls will return null.
-In multiplayer the existing game caches are not considered, so you can get a
-full 255 new game caches.
+
+In multiplayer the existing game caches are neither considered nor loaded,
+so you can initialize a full 255 new and empty game caches in a game session.
 
 In singleplayer, when you call `InitGameCache`, it looks in the Campaigns.w3v
 file if a `gamecache` with that name already exists, if yes, it will create a
@@ -19375,6 +19387,23 @@ file if a `gamecache` with that name already exists, if yes, it will create a
 that will only count once to the 255 limit in the current game), if no and it
 does not exist yet in the current game either, it will take a new slot among
 the 255.
+
+@note It's impossible to tell whether you have loaded an existing cache from
+disk or created an empty one. One way to work around this is to save a value,
+that would indicate that you had saved the cache previously (Lua code):
+
+```{.lua}
+-- load logic
+mygc = InitGameCache("mycache.w3v")
+isGamecacheNew = true
+if GetStoredBoolean(mygc, "general", "game-cache-from-disk") == true then
+	isGamecacheNew = false
+end
+-- you are playing the map, times passes ...
+-- save logic
+StoreBoolean(mygc, "general", "game-cache-from-disk", true)
+isSaveSuccessful = SaveGameCache(mygc)
+```
 
 @note See `gamecache` for an explanation about this system,
 `FlushGameCache` to clear and remove a cache, `SaveGameCache`
@@ -19384,6 +19413,9 @@ the 255.
 native  InitGameCache    takes string campaignFile returns gamecache
 
 /**
+- Singleplayer: Only observed to return true.
+- Multiplayer: Always returns false, because game caches are always temporary.
+
 @patch 1.00
 */
 native  SaveGameCache    takes gamecache whichCache returns boolean
@@ -19407,7 +19439,7 @@ native  StoreBoolean					takes gamecache cache, string missionKey, string key, b
 /**
 Saves data of a unit in a game cache that can be loaded (spawned) with `RestoreUnit`.
 
-return value, storestring too
+The return value supposedly tells whether the save succeeded, practically always true.
 
 The saved attributes of the unit are (non-exhaustive): unit id, experience, hero level, unused skill points, hero proper name (index),
 strength/agility/intelligence, attack speed/move speed increments from agility, life, mana and attack damage increments
@@ -19427,11 +19459,17 @@ the research is done again, the unit will benefit doubly.
 be overwritten, i.e., they will remain and be merged with the non-hero attributes. This can be observed in the persisted .w3v file. Ingame, it
 would not make a difference because the restored non-hero unit normally would not use the hero attributes.
 
+@note Only `StoreUnit` and `StoreString` have a return value.
+
 @patch 1.00
 */
 native  StoreUnit						takes gamecache cache, string missionKey, string key, unit whichUnit returns boolean
 
 /**
+The return value supposedly tells whether the save succeeded, practically always true.
+
+@note Only `StoreUnit` and `StoreString` have a return value.
+
 @patch 1.07
 */
 native  StoreString						takes gamecache cache, string missionKey, string key, string value returns boolean
