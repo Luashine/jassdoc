@@ -19367,14 +19367,29 @@ native DialogDisplay                takes player whichPlayer, dialog whichDialog
 //
 
 /**
+Causes existing game caches to be updated by reading data from disk again.
+
+@note For example, if you replaced the file storing game caches on disk, new data
+will not be retrieved from there until you call this function. It is unknown
+whether this function is normally required to load recently saved data.
+
+You can probably use this to dismiss all currently unsaved game cache data and
+rollback to the previous state (whatever the file on disk holds).
+
 @patch 1.07
 */
 native  ReloadGameCachesFromDisk takes nothing returns boolean
 
 
 /**
-Tries to load the existing named game cache, otherwise creates an empty one.
-Returns handle to game cache, or null on error.
+Tries to load the named game cache from disk, otherwise creates an empty one.
+Returns new handle to game cache, or null on error.
+
+**Note:** This really always returns a new handle even when you want to init
+a previously loaded game cache of the same file path. You will end up with 
+different handles referring to the same cache.
+
+@note Repeated calls do not reload data from disk. Use `ReloadGameCachesFromDisk`
 
 @note You cannot create more than 255 gamecaches. Subsequent calls will return null.
 
