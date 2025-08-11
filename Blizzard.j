@@ -4547,6 +4547,9 @@ endfunction
 //===========================================================================
 
 /**
+@note For some reason limits the amount of destructable that it adds for death
+tracking to only 64 via `bj_MAX_DEST_IN_REGION_EVENTS`.
+
 @patch 1.07
 */
 function RegisterDestDeathInRegionEnum takes nothing returns nothing
