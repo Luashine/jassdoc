@@ -19294,7 +19294,7 @@ native  DoNotSaveReplay         takes nothing returns nothing
 // Dialog API
 
 /**
-Creates a new dialog. It is empty and hidden by default.
+Creates and returns a new dialog. It is empty and hidden by default.
 
 Since this creates an object and returns a handle, it must be freed when no longer needed
 with `DialogDestroy`.
@@ -19361,7 +19361,7 @@ screen edges (it is centered).
 native DialogSetMessage             takes dialog whichDialog, string messageText returns nothing
 
 /**
-Creates a menu button and returns a handle to it.
+Creates and returns a new menu button.
 
 You must save the button handle to later compare it to the selected button in
 a `EVENT_DIALOG_BUTTON_CLICK` using `GetClickedButton` and `GetClickedDialog`.
@@ -19412,8 +19412,7 @@ The 15th button will render outside the visible area (you'll see a few pixels of
 native DialogAddButton              takes dialog whichDialog, string buttonText, integer hotkey returns button
 
 /**
-Creates a menu button that will exit the game for the player who clicks it.
-Returns a handle of button.
+Creates and returns a new quit menu button, that will exit the game for the player who clicks it.
 
 See the detailed description in `DialogAddButton`.
 
