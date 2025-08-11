@@ -14991,6 +14991,9 @@ is of the correct sub-type: `GetTriggerUnit`, `GetTriggerDestructable`.
 @note There's no "GetTriggerItem" so you have to downcast it from `widget` type.
 See example.
 
+@note For some reason BJ `RegisterDestDeathInRegionEnum` limits the amount of destructable that it adds for death
+tracking to only 64 via `bj_MAX_DEST_IN_REGION_EVENTS`.
+
 @note **Example (Lua):** This event and trigger can be used to operate on
 widgets, units, destructables, items (with typecasting).
 
