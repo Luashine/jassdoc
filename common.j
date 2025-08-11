@@ -19174,11 +19174,17 @@ native  SetOpCinematicAvailable takes integer campaignNumber, boolean available 
 native  SetEdCinematicAvailable takes integer campaignNumber, boolean available  returns nothing
 
 /**
+Returns one of the "MAP_DIFFICULTY_*" constants.
+
+@note See: `SetDefaultDifficulty`
+
 @patch 1.00
 */
 native  GetDefaultDifficulty    takes nothing returns gamedifficulty
 
 /**
+@note See: `GetDefaultDifficulty`
+
 @patch 1.00
 */
 native  SetDefaultDifficulty    takes gamedifficulty g returns nothing
@@ -20821,16 +20827,82 @@ and user pings can overwrite scripted pings.
 native PingMinimapEx                takes real x, real y, real duration, integer red, integer green, integer blue, boolean extraEffects returns nothing
 
 /**
+Creates and returns a new minimap icon, that follows the unit around.
+
+Handles you have stored in variables may get reused (Lua v2.0.3.22988),
+you are advised to null them whenever the icon is destroyed.
+
+@note Only 255 map icons can be created at a time. Even if you are at the
+limit, players can still ping the minimap manually.
+
+Works somewhat similar to `CreateTextTag`. Attempting to create more will return
+a minimapicon handle whose `GetHandleId` returns 0. For valid icons, `GetHandleId`
+returns a number between \[1; 256\] (inclusive).
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+myunit = CreateUnit(Player(0), FourCC("hfoo"), 0, 0, 270.0)
+minimapIcon = CreateMinimapIconOnUnit(myunit, 255, 0, 255, [[UI\Minimap\MiniMap-ControlPoint.mdl]], FOG_OF_WAR_VISIBLE)
+SetMinimapIconOrphanDestroy(minimapIcon, true)
+```
+
+@bug (tested v2.0.3.22988) The minimap icon appears to update its position *every* frame, whereas
+unit locations on the minimap are updated infrequently, ca. every 200ms.
+
+@param x X world coordinate
+@param y Y world coordinate
+@param red 0-255 red color (color = value mod 255, wraps around)
+@param green 0-255 green color (color = value mod 255, wraps around)
+@param blue 0-255 blue color (color = value mod 255, wraps around)
+@param pingPath model path
+@param fogVisibility controls visibility when hidden/masked by fog or always visible
+
 @patch 1.32.0.13369
 */
 native CreateMinimapIconOnUnit      takes unit whichUnit, integer red, integer green, integer blue, string pingPath, fogstate fogVisibility returns minimapicon
 
 /**
+@note See: `CreateMinimapIcon`
+
+@param x X world coordinate
+@param y Y world coordinate
+@param red 0-255 red color (color = value mod 255, wraps around)
+@param green 0-255 green color (color = value mod 255, wraps around)
+@param blue 0-255 blue color (color = value mod 255, wraps around)
+@param pingPath model path
+@param fogVisibility controls visibility when hidden/masked by fog or always visible
 @patch 1.32.0.13369
 */
 native CreateMinimapIconAtLoc       takes location where, integer red, integer green, integer blue, string pingPath, fogstate fogVisibility returns minimapicon
 
 /**
+Creates and returns a new static minimap icon.
+
+Handles you have stored in variables may get reused (Lua v2.0.3.22988),
+you are advised to null them whenever the icon is destroyed.
+
+@note Only 255 map icons can be created at a time. Even if you are at the
+limit, players can still ping the minimap manually.
+
+Works somewhat similar to `CreateTextTag`. Attempting to create more will return
+a minimapicon handle whose `GetHandleId` returns 0. For valid icons, `GetHandleId`
+returns a number between \[1; 256\] (inclusive).
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+minimapIcon = CreateMinimapIcon(600,600, 255, 0, 255, [[UI\Minimap\MiniMap-ControlPoint.mdl]], FOG_OF_WAR_VISIBLE)
+```
+
+@param x X world coordinate
+@param y Y world coordinate
+@param red 0-255 red color (color = value mod 255, wraps around)
+@param green 0-255 green color (color = value mod 255, wraps around)
+@param blue 0-255 blue color (color = value mod 255, wraps around)
+@param pingPath model path
+@param fogVisibility controls visibility when hidden/masked by fog or always visible
+
 @patch 1.32.0.13369
 */
 native CreateMinimapIcon            takes real x, real y, integer red, integer green, integer blue, string pingPath, fogstate fogVisibility returns minimapicon
@@ -20841,16 +20913,31 @@ native CreateMinimapIcon            takes real x, real y, integer red, integer g
 native SkinManagerGetLocalPath      takes string key returns string
 
 /**
+Destroys the minimap icon and frees the internal slot it occupies.
+
 @patch 1.32.0.13369
 */
 native DestroyMinimapIcon           takes minimapicon pingId returns nothing
 
 /**
+Controls visibility status.
+
+@param visisble true: displayed on minimap; false: hidden
+
 @patch 1.32.0.13369
 */
 native SetMinimapIconVisible        takes minimapicon whichMinimapIcon, boolean visible returns nothing
 
 /**
+Controls whether the minimap icon should destroy itself when the unit it's attached to dies
+(even if it's a revivable hero).
+
+You do *not* need to manually call `DestroyMinimapIcon` if it's automatically destroyed.
+
+@note Icons not attached to a unit are destroyed immediately.
+
+@param doDestroy true: destroy when unit dies; false: remain at unit's last position forever
+
 @patch 1.32.0.13369
 */
 native SetMinimapIconOrphanDestroy  takes minimapicon whichMinimapIcon, boolean doDestroy returns nothing
@@ -24564,6 +24651,11 @@ native CommandAI            takes player num, integer command, integer data retu
 native PauseCompAI          takes player p,   boolean pause                 returns nothing
 
 /**
+Returns one of the constants representing set AI difficulty for the given player slot.
+
+Returns `AI_DIFFICULTY_NEWBIE` for an invalid player handle (like null).
+Otherwise the fallback value is `AI_DIFFICULTY_NORMAL` e.g. for human players.
+
 @patch 1.07
 */
 native GetAIDifficulty      takes player num                                returns aidifficulty
