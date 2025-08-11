@@ -224,6 +224,11 @@ type aidifficulty       extends     handle
 
 
 /**
+See: `GetTriggerEventId`
+
+@bug This API seems unfinished, missing constants or sub-type getters a la
+`GetTriggerWidget` -> `GetTriggerUnit`.
+
 @patch 1.00
 */
 type eventid            extends     handle
@@ -3807,11 +3812,15 @@ Hard limit for food. Cannot increase above this value by building more farms.
 
 
 /**
+See: `TriggerRegisterTrackableHitEvent`
+
 @patch 1.00
 */
     constant gameevent EVENT_GAME_TRACKABLE_HIT                 = ConvertGameEvent(7)
 
 /**
+See: `TriggerRegisterTrackableTrackEvent`
+
 @patch 1.00
 */
     constant gameevent EVENT_GAME_TRACKABLE_TRACK               = ConvertGameEvent(8)
@@ -13373,11 +13382,27 @@ constant native GetEnumPlayer       takes nothing returns player
 
 
 /**
+Returns handle to trigger.
+
+@note Always reuses existing handle.
+
 @patch 1.00
 */
 constant native GetTriggeringTrigger    takes nothing returns trigger
 
 /**
+Returns an `eventid` for which there's currently no direct use, because
+all other event types are sub-types such as `gameevent` or `playerevent`,
+which are not intended to be compared against. Instead the sub-types are used
+only in a read-only way to register specific events to triggers.
+
+However, you can store it as a global as a do-it-yourself event type constant.
+The returned object appears to be reused
+(tested in Lua v2.0.3.22988: as long as it is not garbage collected).
+
+@bug This API seems unfinished, missing constants or sub-type getters a la
+`GetTriggerWidget` -> `GetTriggerUnit`.
+
 @patch 1.00
 */
 constant native GetTriggerEventId       takes nothing returns eventid
@@ -13810,14 +13835,70 @@ constant native GetLeavingUnit takes nothing returns unit
 
 
 /**
-Registers when a player clicks on the given `trackable`.
+Registers when any player clicks (mouse down) on the given `trackable`.
+
+@note `GetTriggerPlayer` remains unset inside the trigger action.
+See `trackable` for a workaround involving a trackable per each player.
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+trackableHitTrigger = CreateTrigger()
+track = CreateTrackable([[Units\Creeps\HeroTinkerFactory\HeroTinkerFactory.mdl]], -200,500, 135.0)
+trackableHitEvent = TriggerRegisterTrackableHitEvent(trackableHitTrigger, track)
+hitAction = TriggerAddAction(trackableHitTrigger, function()
+	local trig = GetTriggeringTrigger()
+	local tr = GetTriggeringTrackable()
+	print("hitEv", tostring(tr),GetHandleId(tr))
+	print("hitEv Trig", tostring(trig), GetHandleId(trig))
+	if not EVENTID_TRACKABLE_HIT then
+		EVENTID_TRACKABLE_HIT = GetTriggerEventId()
+	end
+	print(GetTriggerEventId())
+end)
+```
+
+@event EVENT_GAME_TRACKABLE_HIT
 
 @patch 1.00
 */
 native TriggerRegisterTrackableHitEvent takes trigger whichTrigger, trackable t returns event
 
 /**
-Registers when a player hovers over the given `trackable`.
+Registers when any player's cursor begins to hover over the given `trackable`.
+
+@note The event fires only once, until the player's mouse leaves the silhouette
+of the trackable model. Then it can fire again.
+
+If the model has a fully transparent area somewhere in the model (imagine a donut "O"
+as a model), then moving the cursor diagonally across the model through the center
+will count as "enter - leave - enter - leave" and fire twice in total.
+
+The hover check is not run every local graphics frame. It is possible to flick the
+cursor so fast, that a hover will not register.
+
+@note `GetTriggerPlayer` remains unset inside the trigger action.
+See `trackable` for a workaround involving a trackable per each player.
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+trackableTrackTrigger = CreateTrigger()
+track2 = CreateTrackable([[Units\Creeps\HeroTinkerFactory\HeroTinkerFactory.mdl]], 200,500, 135.0)
+trackableTrackEvent = TriggerRegisterTrackableTrackEvent(trackableTrackTrigger, track2)
+trackAction = TriggerAddAction(trackableTrackTrigger, function()
+	local trig = GetTriggeringTrigger()
+	local tr = GetTriggeringTrackable()
+	print("trackEv", tr, GetHandleId(tr))
+	print("trackEv Trig", trig, GetHandleId(trig))
+	if not EVENTID_TRACKABLE_TRACK then
+		EVENTID_TRACKABLE_TRACK = GetTriggerEventId()
+	end
+	print(GetTriggerEventId())
+end)
+```
+
+@event EVENT_GAME_TRACKABLE_TRACK
 
 @patch 1.00
 */
@@ -13843,6 +13924,8 @@ native TriggerRegisterUpgradeCommandEvent takes trigger whichTrigger, integer wh
 // EVENT_GAME_TRACKABLE_TRACK
 
 /**
+Returns (reuses) handle to trackable that's responsible for current event.
+
 @event `EVENT_GAME_TRACKABLE_HIT`
 
 @event `EVENT_GAME_TRACKABLE_TRACK`
@@ -21457,19 +21540,23 @@ native EnableSelect                 takes boolean state, boolean ui returns noth
 // Trackable API
 
 /**
-Creates a trackable at the given coordinates but with zero z-coordinate.
+Creates and returns a new trackable at the given coordinates, elevated by map terrain.
+
 Trackables are used to register mouse clicks or hovers at the trackables
 position. But their functionality is very limited, as you can't, for example
 distinguish the triggering player out of the box. To get a general overview
 to the common workarounds see the `trackable` documentation.
 
+@bug It is not possible to destroy or modify a trackable once created.
+Consider the API unfinished.
+
 @param trackableModelPath The path to the model the trackable should use. Models
 with team colours will use the neutral-hostile team colour. To create an
 invisible trackable provide the empty string `""`.
 
-@param x The x-coordinate where the trackable should be created.
+@param x X map coordinate where the trackable should be created.
 
-@param y The x-coordinate where the trackable should be created.
+@param y Y map coordinate where the trackable should be created.
 
 @param facing Rotation, trackable facing in degrees.
 
@@ -21479,7 +21566,7 @@ invisible trackable provide the empty string `""`.
 * 270 = South
 * -90 = South (wraps around)
 
-@note To create a trackable with a non-zero z-coordinate you can use the same
+@note To create a trackable at an arbitrary height (Z-coordinate) you can use the same
 technique as with `AddSpecialEffect`, that is create an invisible platform
 before creating the trackable.
 
