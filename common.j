@@ -21953,8 +21953,10 @@ native IsQuestEnabled      takes quest whichQuest returns boolean
 
 
 /**
-Creates a new item/requirement for a quest displayed above the description text field of the quest
+Creates and returns a new item/requirement for a quest displayed above the description text field of the quest
 in the quest menu.
+
+@note There doesn't exist a destructor to remove an individual `questitem`.
 
 @param whichQuest The quest to add the requirement to.
 
@@ -22106,7 +22108,7 @@ native ForceQuestDialogUpdate   takes nothing returns nothing
 // Timer Dialog API
 
 /**
-Creates a new timer dialog based on the underlying timer.
+Creates and returns a new timer dialog based on the underlying timer.
 It is hidden by default and has "Remaining" as title (localized).
 
 Timer dialog works as a visible countdown timer in the format: "Title hh:mm:ss".
@@ -22414,6 +22416,18 @@ native LeaderboardGetLabelText          takes leaderboard lb returns string
 native PlayerSetLeaderboard             takes player toPlayer, leaderboard lb returns nothing
 
 /**
+Returns:
+- existing leaderboard handle, if player has one attached
+- null, if player does not have a leaderboard attached to them
+
+@note **Example (Lua):**
+
+```{.lua}
+lbred = CreateLeaderboard()
+PlayerSetLeaderboard(Player(0), lbred)
+lbred_again = PlayerGetLeaderboard(Player(0))
+```
+
 @patch 1.00
 */
 native PlayerGetLeaderboard             takes player toPlayer returns leaderboard
@@ -22770,7 +22784,7 @@ native MultiboardSetItemsIcon           takes multiboard lb, string iconPath ret
 // funcs for modifying individual items
 
 /**
-Acquires and returns a new handle for the multiboard cell.
+Acquires and always returns a new handle for the multiboard cell.
 
 @param lb Target multiboard.
 
@@ -22780,7 +22794,7 @@ Acquires and returns a new handle for the multiboard cell.
 
 @note Because a new handle is created each time, the handle must be
 freed with `MultiboardReleaseItem`. The handle is different even if you
-retrieve the same cell of the multiboard (v1.32.10, Lua).
+retrieve the same cell of the multiboard (v1.32.10, 2.0.3+, Lua).
 
 @note The parameter order of `row` and `column` is (y,x) if you think of coordinates.
 
