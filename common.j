@@ -24291,7 +24291,9 @@ native AddSpellEffectTargetById     takes integer abilityId, effecttype t, widge
 
 
 /**
-Creates a lightning between two points.
+Creates and returns a new lightning between two points.
+
+@note To avoid leaks, use `DestroyLightning` to destroy it.
 
 @param codeName 4 letter id from the LightningData.slk.
 
@@ -24318,7 +24320,9 @@ and [test map](https://www.hiveworkshop.com/threads/lightning-test-v1-0.204927/)
 native AddLightning                 takes string codeName, boolean checkVisibility, real x1, real y1, real x2, real y2 returns lightning
 
 /**
-Creates a lightning between two points.
+Creates and returns a new lightning between two points.
+
+@note To avoid leaks, use `DestroyLightning` to destroy it.
 
 @param codeName 4 letter id from the LightningData.slk.
 
