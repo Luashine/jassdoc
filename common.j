@@ -24692,6 +24692,10 @@ obj1 = CreateUbersplat(0,0, "ROFL", 255,255,255,255, true, false)
 obj2 = CreateUbersplat(0,0, "ROFL", 255,255,255,255, true, false)
 ```
 
+@param name four letter shortcode.
+Ubersplats and their shortcodes are defined in "UberSplatData.slk", see:
+<https://www.hiveworkshop.com/threads/ubersplat-import-path-for-building-ground-texture.326827/>
+
 @patch 1.18a
 */
 native CreateUbersplat              takes real x, real y, string name, integer red, integer green, integer blue, integer alpha, boolean forcePaused, boolean noBirthTime returns ubersplat
@@ -27097,6 +27101,7 @@ native BlzIsLocalClientActive                      takes nothing returns boolean
 
 /**
 Returns the unit that is currently hovered by the mouse of the local player.
+Reuses previous handle if it still exists.
 
 @async 
 
@@ -27217,7 +27222,16 @@ Resets the effect's 3-dimensional scaling matrix. Default is {1,1,1}.
 native BlzResetSpecialEffectMatrix                 takes effect whichEffect returns nothing
 
 /**
+Returns the specified ability instance, if the unit has it (unlearned abilities don't count).
+Reuses previous handle if it exists. Returns null on error.
+
 @note Returns the same ability instance for different building ability codes like 'AHbu', 'ANbu' etc. See `GetUnitAbilityLevel`.
+
+@note This function assumes an item only has one ability instance of the specific type ID.
+
+@param abilId target ability type ID aka rawcode aka FourCC
+
+@note See `BlzGetItemAbilityByIndex` for an example.
 
 @patch 1.31.0.11889
 */
@@ -27225,8 +27239,16 @@ native BlzGetUnitAbility                           takes unit whichUnit, integer
 
 /**
 Returns a handle to specific unit's ability instance.
+Reuses previous handle if it exists. Returns null on error or if the specified index is empty.
+
+@note You can iterate all abilities of the target unit by starting at 0 and count up until
+this returns null.
 
 @note Last added ability is at index 0, older abilities are pushed up.
+
+@param index begins at 0
+
+@note See `BlzGetItemAbilityByIndex` for an example.
 
 @patch 1.31.0.11889
 */
@@ -27702,11 +27724,75 @@ native BlzRemoveAbilityStringLevelArrayField       takes ability whichAbility, a
 // Item 
 
 /**
+Returns a handle to specific item's ability instance. The item must be equipped for this.
+Reuses previous handle if it exists. Returns null on error or if the specified index is empty.
+
+@note Returns the same ability handle as those returned by `BlzGetUnitAbility`, `BlzGetUnitAbilityByIndex`.
+
+@note You can iterate all abilities of the target item by starting at 0 and count up until
+this returns null.
+
+@note Last added ability is at index 0, older abilities are pushed up.
+
+@param index begins at 0
+
+@note **Example (Lua, 2.0.3):**
+
+Create a hero, give him items and show what abilities belong to the hero
+and what abilities are present on items.
+
+```{.lua}
+function printUnitAbilities(whichUnit, description)
+	assert(whichUnit)
+	print("Printing abilities for unit: ".. description)
+	for i = 0, 10 do
+		local abil = BlzGetUnitAbilityByIndex(whichUnit, i)
+		if not abil then
+			break
+		end
+		local rawcode = string.pack(">I4", BlzGetAbilityId(abil))
+		print("item", i, abil, GetHandleId(abil), rawcode)
+	end
+end
+function printItemAbilities(whichItem, description)
+	assert(whichItem)
+	print("Printing abilities for item: ".. description)
+	for i = 0, 10 do
+		local abil = BlzGetItemAbilityByIndex(whichItem, i)
+		if not abil then
+			break
+		end
+		local rawcode = string.pack(">I4", BlzGetAbilityId(abil))
+		print("item", i, abil, GetHandleId(abil), rawcode)
+	end
+end
+
+myHero = CreateUnit(Player(0), FourCC("Hamg"), 0, 0, 270.0)
+auraItem = UnitAddItemById(myHero, FourCC("ajen"))
+dmgItem = UnitAddItemById(myHero, FourCC("rat9"))
+hpRegItem = UnitAddItemById(myHero, FourCC("sreg"))
+
+printUnitAbilities(myHero, "hero mage")
+printItemAbilities(auraItem, "aura item, janggo of endurance") -- only shows up on hero
+printItemAbilities(dmgItem, "damage item, claws") -- only shows up on hero
+printItemAbilities(hpRegItem, "hp reg item, scroll of regen") -- shows up on hero and item
+```
 @patch 1.31.0.11889
 */
 native BlzGetItemAbilityByIndex                    takes item whichItem, integer index returns ability
 
 /**
+Returns a handle to specific item's ability instance. The item must be equipped for this.
+Reuses previous handle if it exists. Returns null on error or if the specified index is empty.
+
+@note Returns the same ability handle as those returned by `BlzGetUnitAbility`, `BlzGetUnitAbilityByIndex`.
+
+@note This function assumes an item only has one ability instance of the specific type ID.
+
+@param abilCode target ability type ID aka rawcode aka FourCC
+
+@note See: `BlzGetItemAbilityByIndex` for an example.
+
 @patch 1.31.0.11889
 */
 native BlzGetItemAbility                           takes item whichItem, integer abilCode returns ability
