@@ -15801,7 +15801,7 @@ constant native GetTriggerDestructable takes nothing returns destructable
 // Item API
 
 /**
-Creates an item object at the specified coordinates ( x , y ).
+Creates and returns a new item. Returns null in case of error.
 
 **Example:**
 
@@ -15836,6 +15836,10 @@ native          CreateItem      takes integer itemid, real x, real y returns ite
 native          RemoveItem      takes item whichItem returns nothing
 
 /**
+Returns item's assigned owner.
+
+@note New items are created with `Player(GetPlayerNeutralPassive())` as owner.
+
 @patch 1.00
 */
 native          GetItemPlayer   takes item whichItem returns player
@@ -15876,6 +15880,14 @@ native          SetItemDroppable takes item i, boolean flag returns nothing
 native          SetItemPawnable takes item i, boolean flag returns nothing
 
 /**
+Change item's assigned owner.
+
+@note New items are created with `Player(GetPlayerNeutralPassive())` as owner.
+
+@param changeColor true: change model color to new owner's color; false: don't change.
+The model must support player tinting to show the color.
+
+@note See: `GetItemPlayer`.
 @patch 1.00
 */
 native          SetItemPlayer    takes item whichItem, player whichPlayer, boolean changeColor returns nothing
@@ -15894,16 +15906,28 @@ native          IsItemInvulnerable  takes item whichItem returns boolean
 @note 
 An item can be hidden locally, but it will desync if visibility causes a local side-effect.
 
+@note A currently equipped item is hidden by the game and cannot be forcedly made visible.
+
+@bug If you make an item invisible while a unit is ordered to pick it up, the unit will
+still pick up the item upon arrival.
+
 @patch 1.07
 */
 native          SetItemVisible  takes item whichItem, boolean show returns nothing
 
 /**
+Returns true if item is visible. Returns false if hidden, or on error.
+
+@note An equipped item is automatically hidden.
+
 @patch 1.07
 */
 native          IsItemVisible   takes item whichItem returns boolean
 
 /**
+Returns true if item is equipped by a unit.
+Returns false otherwise, or if the handle is null.
+
 @patch 1.07
 */
 native          IsItemOwned     takes item whichItem returns boolean
@@ -15950,6 +15974,14 @@ native          EnumItemsInRect     takes rect r, boolexpr filter, code actionFu
 native          GetItemLevel    takes item whichItem returns integer
 
 /**
+Returns one of the `itemtype` constants. 
+
+@note **Example (Lua):**
+
+```{.lua}
+dmgItem = CreateItem(FourCC("rat9"), 0,0) --> Claws of +9 attack
+print(GetItemType(dmgItem)) --> itemtype handle of ITEM_TYPE_PERMANENT
+```
 @patch 1.07
 */
 native          GetItemType     takes item whichItem returns itemtype
@@ -15988,11 +16020,25 @@ native          GetItemCharges  takes item whichItem returns integer
 native          SetItemCharges  takes item whichItem, integer charges returns nothing
 
 /**
+Gets the stored custom integer.
+
+@note This data field is usually exclusively used by indexing systems to uniquely
+identify an item or unit.
+@note Only one data can exist at a time.
+
+@note See: `SetItemUserData`, `GetUnitUserData`, `SetUnitUserData`
 @patch 1.13
 */
 native          GetItemUserData takes item whichItem returns integer
 
 /**
+Sets a custom integer.
+
+@note This data field is usually exclusively used by indexing systems to uniquely
+identify an item or unit.
+@note Only one data can exist at a time.
+
+@note See: `GetItemUserData`, `GetUnitUserData`, `SetUnitUserData`
 @patch 1.13
 */
 native          SetItemUserData takes item whichItem, integer data returns nothing
@@ -17198,6 +17244,8 @@ If an item exists in the given slot, it is removed from the inventory and droppe
 Returns the handle of dropped item when successful.
 Returns null on failure (no item, invalid slot/unit).
 
+Reuses handle, if it exists.
+
 @param whichUnit Target unit.
 
 @param itemSlot Slot number (zero-based, i.e. 0 to 5).
@@ -17225,6 +17273,8 @@ Returns a handle to item in slot number `itemSlot` of the specified unit.
 
 Returns null otherwise:
 when there's no item in slot, no slot (less than 6 slots), invalid slot number, invalid unit.
+
+The handle is reused, if it exists.
 
 @param whichUnit Target unit.
 
@@ -18405,6 +18455,14 @@ native SetUnitTypeSlots             takes unit whichUnit, integer slots returns 
 
 
 /**
+Returns the saved custom integer for a unit.
+
+@note This data field is usually exclusively used by indexing systems to uniquely
+identify an item or unit.
+@note Only one data can exist at a time.
+
+@note See: `GetItemUserData`, `SetItemUserData`, `GetUnitUserData`, `SetUnitUserData`
+
 @patch 1.07
 */
 native GetUnitUserData              takes unit whichUnit returns integer
@@ -28028,15 +28086,40 @@ native BlzSetItemSkin                                 takes item whichItem, inte
 
 
 /**
+Creates and returns a new item that has all the attributes of the
+`itemid`, but looks like the `skinId` item.
+
+@note **Example (Lua):**
+
+Creates the lumber item... that looks like gold and is "Gold" in name only.
+
+```{.lua}
+trollItem = BlzCreateItemWithSkin(FourCC"lmbr", 0,0, FourCC"gold")
+```
+
+@note If you use skinId of a unit, the item will still spawn although with unit's model,
+without a texture (all black), unit's name and it'll lack an item description when
+you click on it.
+
 @patch 1.32.0.13369
 */
 native BlzCreateItemWithSkin                       takes integer itemid, real x, real y, integer skinId returns item
 
 /**
-Creates a unit with the model from the unit referenced by the skinId.
-`BlzCreateUnitWithSkin(players[0], 'hpea', 0, 0, 270, 'hfoo')` will create a peasant with a footman model.
-Scale from the unit referenced by the skinId is applied to whichUnit.
-SoundSet from the unit referenced by the skinId is applied to whichUnit.
+Creates and returns a new unit with the model from the unit referenced by the skinId.
+
+Scale, SoundSet are applied to created unit based on `skinId` unit.
+
+@note **Example**
+
+Create a peasant with a footman model:
+
+```{.j}
+set global_myUnit = BlzCreateUnitWithSkin(Player(0), 'hpea', 0, 0, 270, 'hfoo') // Jass
+```
+```{.lua}
+myUnit = BlzCreateUnitWithSkin(Player(0), FourCC('hpea'), 0, 0, 270, FourCC('hfoo')) -- Lua
+```
 
 @param id The owner of the unit.
 
