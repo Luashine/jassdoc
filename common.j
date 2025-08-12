@@ -24443,10 +24443,19 @@ native SetTerrainPathable           takes real x, real y, pathingtype t, boolean
 //
 
 /**
-This returns a new image, the first ID given being 0 and then counting upwards (0, 1, 2, 3, ...).
+Creates and returns a new image.
+Returns a special static error handle (reused) for invalid parameters, when an image wasn't created.
+
+`GetHandleId` returns 0 for the first created image and then IDs count upwards (0, 1, 2, 3, ...).
+Returns -1, if the parameters were invalid and no image created.
+
+The image is not visible by default.
 
 @param file The path to the image. The image itself should have its border alpha-ed out
-completely. If an invalid path is specified CreateImage returns image(-1).
+completely. If an invalid path is specified CreateImage returns image(-1). Examples:
+
+- proper texture path: `ReplaceableTextures\Selection\SpellAreaOfEffect.blp`
+- also valid, a flat model: `UI\Minimap\MiniMap-ControlPoint.mdl`
 
 @param sizeX The x-dimensions of the image.
 
@@ -24469,6 +24478,7 @@ completely. If an invalid path is specified CreateImage returns image(-1).
 @param imageType Working values range from 1 to 4 (4 and 1 included).
 Using 0 causes CreateImage to return image(-1). Every other value will simply
 cause WC3 to not display the image.
+
 imageTypes also influence the order in which images are drawn above one another:
 
 | Value | Name           | Description |
@@ -24478,10 +24488,21 @@ imageTypes also influence the order in which images are drawn above one another:
 | 3     | Occlusion Mask | Drawn above imageType 4 and 2 and below imageType 1. |
 | 4     | Ubersplat      | Drawn below every other type. Images of this type are additionally affected by time of day and the fog of war (only for tinting). |
 
-
-
 Multiple images with the same type are drawn in their order of creation,
 meaning that the image created first is drawn below the image created after.
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+myImage = CreateImage([[ReplaceableTextures\Selection\SpellAreaOfEffect.blp]], 512,512,1, 0,0,200, 0,0,0, 1)
+SetImageRenderAlways(myImage, true)
+```
+
+@note Blizzard internally uses images for the shadows of units, selection circles,
+and the preview version of selection circles. This list is non-exhaustive.
+
+@note Images are so-called pseudo-handles, they have a separate handle stack for their own exclusive use.
+They can be handled asynchronously.
 
 @patch 1.18a
 */
@@ -24493,34 +24514,86 @@ image instantly (no ref counting for images).
 
 @param whichImage Which image to destroy.
 
-@bug May crash the game if an invalid image is used (null, before the first image is created).
+@bug In old patches may have crashed the game when an invalid image was used (null, before the first image is created).
+
+@bug v2.0.3.22988: When called with null as argument, still messes up internal state.
+It may first remove last created unit's shadow. Then depending on what you do: own units'
+on-hover and regular selection circles. Yet it doesn't crash. Images created after this stunt
+probably inherit the destroyed image's properties.
 
 @patch 1.18a
 */
 native DestroyImage                 takes image whichImage returns nothing
 
 /**
-It shows/hides image whichImage, depending on boolean flag (true shows, false hides).
-Seems like a redundant function in the light of SetImageRender(Always).
+Separately controls visibility of the image
+if and only if `SetImageRenderAlways` is set to true.
+
+@param flag true: visible; false: hidden
 
 @patch 1.18a
 */
 native ShowImage                    takes image whichImage, boolean flag returns nothing
 
 /**
-Untested, but if its decription can account for anthing, it locks the Z position
-to the given height, if the flag is true. After a bit of testing i concluded
-that this is the only function thats able to modify an images Z offset.
+@note CreateImage's sizeZ appears to have no effect. When using a texture, they are flat
+
+@note A negative height can "hide" the image, if it moves underneath terrain. See: `BlzShowTerrain`.
+Conversely, if you had moved it too damn high, it would be floating outside of your camera view.
+
+@param flag
+- true: sets absolute height of the image, ignoring terrain elevation.
+- false (default at image creation): the image ignores `height` and `posZ` and instead
+smoothly overlays terrain elevation and ramps, but not walkable destructables (appears beneath them).
+
+@param height Z axis, height offset. The resulting Z coordinate is calculated based on this height
+and the `posZ` used during image creation (probably a simple sum, but needs clarification).
+
+@note **Example (Lua, 2.0.2):**
+
+```{.lua}
+imgX, imgY = 0,0
+myTempLoc = Location(imgX, imgY)
+imgZ = GetLocationZ(myTempLoc)
+RemoveLocation(myTempLoc)
+
+imgAbove = CreateImage([[ReplaceableTextures\Selection\SpellAreaOfEffect.blp]],  192,192,0, imgX-100,imgY,imgZ, 0,0,0, 2)
+imgGround = CreateImage([[ReplaceableTextures\Selection\SpellAreaOfEffect.blp]], 192,192,0, imgX,    imgY,imgZ, 0,0,0, 2)
+imgBelow = CreateImage([[ReplaceableTextures\Selection\SpellAreaOfEffect.blp]],  192,192,0, imgX+100,imgY,imgZ, 0,0,0, 2)
+
+SetImageColor(imgAbove, 255,64,64, 255)
+SetImageColor(imgGround, 64,255,64, 255)
+SetImageColor(imgBelow, 64,64,255, 255)
+
+SetImageRenderAlways(imgAbove, true)
+SetImageRenderAlways(imgGround, true)
+SetImageRenderAlways(imgBelow, true)
+
+SetImageConstantHeight(imgAbove, true, 128)
+SetImageConstantHeight(imgGround, false, 0)
+SetImageConstantHeight(imgBelow, true, -128)
+-- Use this to show the image below terrain level
+BlzShowTerrain(false)
+
+-- Run this later to destroy all images
+DestroyImage(imgAbove)
+DestroyImage(imgGround)
+DestroyImage(imgBelow)
+```
 
 @patch 1.18a
 */
 native SetImageConstantHeight       takes image whichImage, boolean flag, real height returns nothing
 
 /**
-Sets the X/Y position of the provided image.
-This is the bottom left corner of the image, unless you used values
-form originX/Y/Z in the constructor other than 0, in which case the bottom
+Sets the X/Y/Z position of the provided image.
+
+This is the bottom left corner of the image, unless you used values other than 0
+for originX/Y/Z in the constructor, in which case the bottom
 left corner is moved further into negative X/Y/Z direction.
+
+@param z Z axis coordinate, the same as `posZ` in `CreateImage`.
+Do not confuse with `height` offset from `SetImageConstantHeight`.
 
 @patch 1.18a
 */
@@ -24529,29 +24602,39 @@ native SetImagePosition             takes image whichImage, real x, real y, real
 /**
 Valid values for all channels range from 0 to 255.
 
+@param r visibility of red channel, where 255 = full intensity (value mod 255)
+@param g visibility of green channel, where 255 = full intensity (value mod 255)
+@param b visibility of blue channel, where 255 = full intensity (value mod 255)
+@param alpha opacity, where 255: fully opaque; 0: completely transparent (value mod 255).
+
 @patch 1.18a
 */
 native SetImageColor                takes image whichImage, integer red, integer green, integer blue, integer alpha returns nothing
 
 /**
-@bug Does not work. Use `SetImageRenderAlways` instead.
+@bug 1.24, 2.0.3.22988: Does not work. Use `SetImageRenderAlways` instead.
 
 @patch 1.18a
 */
 native SetImageRender               takes image whichImage, boolean flag returns nothing
 
 /**
-Since `SetImageRender` is non-functional, this should be used to
-enable/disable rendering of the image.
+Since `SetImageRender` is non-functional, use this to toggle rendering of the image.
+
+@param flag true: rendered (visible); false: not rendered
 
 @patch 1.18a
 */
 native SetImageRenderAlways         takes image whichImage, boolean flag returns nothing
 
 /**
-Draws the specified image above the water if the flag is true. The second
-boolean (useWaterAlpha) doesnt seem to do much. Every imagetype other than 1
-doesnt seem to appear above water.
+@param flag true: overlay image at terrain or water level, whichever is highest. false: always overlay at terrain level
+
+@param useWaterAlpha only works **if** `flag` above is true.
+true: apply water's blend to "covered" parts of the image;
+false: only use image's own alpha.
+
+@bug (tested v2.0.3.22988): Is parameter `useWaterAlpha` supposed to only work when `flag == true`?
 
 @patch 1.18a
 */
@@ -24571,6 +24654,8 @@ Changes the specified images type.
 
 Multiple images with the same type are drawn in their order of creation,
 meaning that the image created first is drawn below the image created after.
+
+@note Different image types seem to render at slightly different heights.
 
 @patch 1.18a
 */
