@@ -24026,7 +24026,7 @@ native GetDialogueTextKey           takes sound soundHandle returns string
 //
 
 /**
-Creates a weather effect that is spatially limited to the specified area.
+Creates and returns a new weather effect that is spatially limited to the specified area.
 
 This creates a new object and returns its handle, to prevent leaks it must be destroyed
 with `RemoveWeatherEffect` when no longer needed.
@@ -24082,7 +24082,13 @@ native EnableWeatherEffect          takes weathereffect whichEffect, boolean ena
 
 
 /**
-Create a crater at the given coordinates.
+Create and return a new crater at the given coordinates.
+
+An animation is played over `duration` to smooth out the terrain change.
+
+@note A literal destructor function for `terraindeformation` does not
+exist in the API. Unknown, if these are automatically cleaned up correctly after use.
+However `TerrainDeformStop` exists.
 
 @param x The x coordinate of the craters center.
 
@@ -24090,11 +24096,13 @@ Create a crater at the given coordinates.
 
 @param radius The radius of the crater.
 
-@param depth The depth of the crater.
+@param depth The depth of the crater: positive to sink terrain, negative to raise it.
 
 @param duration The duration in milliseconds.
 
-@param permanent Make the deformation permanent.
+@param permanent `true` to make the deformation permanent,
+`false` to play a temporary deformation (at the end of `duration`) quickly
+returns to original terrain height.
 
 @note To approximate the resulting height of a point `distance` units away from the
 center point `(x, y)` you can use the following formula: `Cos(bj_PI/2 * distance / radius) * -depth`. See this [issue](https://github.com/lep/jassdoc/issues/31) for some more information.
@@ -24103,6 +24111,11 @@ center point `(x, y)` you can use the following formula: `Cos(bj_PI/2 * distance
 settings. Thus reading data like terrain height might lead to async values.
 See the other note on a way to compute an appropiate height to use instead.
 
+@note The community has been blaming terrain deformations as a source of
+desyncs since forever even when terrain height wasn't used by the map.
+Example thread:
+<https://www.hiveworkshop.com/threads/should-i-remove-all-terrain-deformation-spells-to-lower-risk-of-desync.359381/>
+
 @note Permanent terrain deformations are not present in saved game files.
 
 @patch 1.07
@@ -24110,36 +24123,118 @@ See the other note on a way to compute an appropiate height to use instead.
 native TerrainDeformCrater          takes real x, real y, real radius, real depth, integer duration, boolean permanent returns terraindeformation
 
 /**
+Create, start playing and return a new ripple effect at the given coordinates.
+
+An animation is played over `duration`.
+
+@note A literal destructor function for `terraindeformation` does not
+exist in the API. Unknown, if these are automatically cleaned up correctly after use.
+However `TerrainDeformStop` exists.
+
 @param duration The duration in milliseconds.
+@param limitNeg Seems to offset phase by π or swap out sine for cosine function.
+
+- `true`: given negative depth, start off at center offset being zero and begin sinking at half period.
+- `false`: given negative depath, start off at center offset being maximum and begin sinking.
 
 @note Permanent terrain deformations are not present in saved game files.
+
+@note **Example (Lua):**
+
+The following creates a circular standing wave that clearly looks synthetic,
+rather than looking like an earth quake.
+
+```{.lua}
+deformStanding = TerrainDeformRipple(64.0, 64.0, 768.0, -40.0, 4000,  2,   4.0, 2.0, 80.0, true)
+```
+
+@note The community has been blaming terrain deformations as a source of
+desyncs since forever even when terrain height wasn't used by the map.
+Example thread:
+<https://www.hiveworkshop.com/threads/should-i-remove-all-terrain-deformation-spells-to-lower-risk-of-desync.359381/>
 
 @patch 1.07
 */
 native TerrainDeformRipple          takes real x, real y, real radius, real depth, integer duration, integer count, real spaceWaves, real timeWaves, real radiusStartPct, boolean limitNeg returns terraindeformation
 
 /**
+Create, start playing and return a new moving wave effect at the given coordinates.
+
+@note A literal destructor function for `terraindeformation` does not
+exist in the API. Unknown, if these are automatically cleaned up correctly after use.
+However `TerrainDeformStop` exists.
+
 @note Permanent terrain deformations are not present in saved game files.
+@param dirX travel direction on the X axis
+@param dirY travel direction on the Y axis
+@param distance in map units, how far will the wave travel
+@param trailTime in milliseconds
+
+@note **Example (Lua, 2.0.3):**
+
+Shows a diagonally moving wave. These parameters don't look good
+and the wave resets abruptly.
+
+```{.lua}
+terrainWave = TerrainDeformWave(64.0, 64.0, 512, 512, 1024, 120.0, 700, -80, 400, 3)
+```
+
+@note The community has been blaming terrain deformations as a source of
+desyncs since forever even when terrain height wasn't used by the map.
+Example thread:
+<https://www.hiveworkshop.com/threads/should-i-remove-all-terrain-deformation-spells-to-lower-risk-of-desync.359381/>
 
 @patch 1.07
 */
 native TerrainDeformWave            takes real x, real y, real dirX, real dirY, real distance, real speed, real radius, real depth, integer trailTime, integer count returns terraindeformation
 
 /**
-@param duration The duration in milliseconds.
+Create, start playing and return a new randomized deformation at the given coordinates.
+
+For each `updateInterval` cycle, rolls a new delta and sets terrain deformation
+points within radius to this new delta. Does not have a smoothing animation.
+
+@note A literal destructor function for `terraindeformation` does not
+exist in the API. Unknown, if these are automatically cleaned up correctly after use.
+However `TerrainDeformStop` exists.
+
+@param x X map coordinate of effect's center
+@param y Y map coordinate of effect's center
+@param radius radius of effect
+@param minDelta minimum Z offset
+@param maxDelta maximum Z offset
+@param duration duration of effect in milliseconds
+@param updateInterval cycle duration in milliseconds
 
 @note Permanent terrain deformations are not present in saved game files.
+
+@note **Example (Lua):**
+
+This kind of looks like an earth quake, although the random aspect is too
+random to appear smooth.
+
+```{.lua}
+deformRandom = TerrainDeformRandom(64.0, 64.0, 768, -5, 15, 4000, 150)
+```
+
+@note The community has been blaming terrain deformations as a source of
+desyncs since forever even when terrain height wasn't used by the map.
+Example thread:
+<https://www.hiveworkshop.com/threads/should-i-remove-all-terrain-deformation-spells-to-lower-risk-of-desync.359381/>
 
 @patch 1.07
 */
 native TerrainDeformRandom          takes real x, real y, real radius, real minDelta, real maxDelta, integer duration, integer updateInterval returns terraindeformation
 
 /**
+@note See: `TerrainDeformStopAll`
 @patch 1.07
 */
 native TerrainDeformStop            takes terraindeformation deformation, integer duration returns nothing
 
 /**
+@note See: `TerrainDeformStopAll`
+
 @patch 1.07
 */
 native TerrainDeformStopAll         takes nothing returns nothing
