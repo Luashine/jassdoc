@@ -24666,6 +24666,32 @@ native SetImageType                 takes image whichImage, integer imageType re
 //
 
 /**
+Creates and returns a new ubersplat. Returns a special error handle, when input is invalid.
+
+Basically, ubersplats are building ground textures.
+
+`GetHandleId` returns 0 for the first created ubersplat and then IDs count upwards (0, 1, 2, 3, ...).
+Returns -1, if the parameters were invalid and no image created.
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+myUber = CreateUbersplat(0,-1200, "LSDL", 255,255,255,255, true, false)
+SetUbersplatRenderAlways( myUber, true )
+```
+
+@note The API is similar to `image`, see `CreateImage`.
+
+@bug (tested v2.0.3.22988) Attempting to create invalid names may crash the game.
+<https://us.forums.blizzard.com/en/warcraft3/t/crash-in-createubersplat-constructor/36945>
+
+```{.lua}
+-- This name does not exist.
+-- The first line completes execution. The second consecutive invalid create crashes.
+obj1 = CreateUbersplat(0,0, "ROFL", 255,255,255,255, true, false)
+obj2 = CreateUbersplat(0,0, "ROFL", 255,255,255,255, true, false)
+```
+
 @patch 1.18a
 */
 native CreateUbersplat              takes real x, real y, string name, integer red, integer green, integer blue, integer alpha, boolean forcePaused, boolean noBirthTime returns ubersplat
@@ -24729,7 +24755,15 @@ native SetBlightPoint           takes player whichPlayer, real x, real y, boolea
 native SetBlightLoc             takes player whichPlayer, location whichLocation, real radius, boolean addBlight returns nothing
 
 /**
-Creates a new, undead blighted gold mine unit at the specified coordinates for the player. The haunted gold mine will create blight around the area, and will become a normal gold mine when destroyed. The amount of gold in the mine is determined by the Data - Max Gold field for the ability Gold Mine ability ('Agld').
+Creates and returns a new, undead blighted gold mine unit at the specified coordinates for the player.
+The haunted gold mine will create blight around the area.
+
+@note It will become a normal gold mine when destroyed or removed using `RemoveUnit` (special handling by the game).
+
+@note Collisions are resolved automatically by finding a free place to put the new gold mine at,
+even if the coordinates are set close to each other.
+
+@note The amount of gold in the mine is determined by the Data - Max Gold field for the ability Gold Mine ability ('Agld').
 
 @param id The player to create the goldmine for.
 
