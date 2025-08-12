@@ -17497,6 +17497,8 @@ See: `GetUnitX`, `BlzGetLocalUnitZ`, `BlzGetUnitZ`, GetWidgetX`, `GetWidgetY`.
 constant native GetUnitY            takes unit whichUnit returns real
 
 /**
+Creates and returns a new location with unit's map position.
+
 @bug If the unit is loaded into a zeppelin this will not return the position
 of the zeppelin but the last position of the unit before it was loaded into
 the zeppelin.
@@ -17537,7 +17539,7 @@ Returns unit's current unit state as an absolute value.
 constant native GetUnitState        takes unit whichUnit, unitstate whichUnitState returns real
 
 /**
-Returns the owner player of the unit.
+Returns the owner player of the unit (handle is reused).
 
 @param whichUnit Target unit.
 
@@ -17553,6 +17555,18 @@ constant native GetOwningPlayer     takes unit whichUnit returns player
 constant native GetUnitTypeId       takes unit whichUnit returns integer
 
 /**
+Returns race of the unit it belongs to (returns a constant).
+
+@note **Example (Lua):**
+
+```{.lua}
+castle = CreateUnit(Player(1), FourCC("htow"), 500, 0, 270.0)
+peon = CreateUnit(Player(1), FourCC("opeo"), 500, 0, 270.0)
+-- castle is human and peon is orc:
+print(GetUnitRace(castle) == RACE_HUMAN and "human town is human!" or "human town isn't human?")
+print(GetUnitRace(peon) == RACE_ORC and "peon is an orc!" or "peon is not an orc?")
+```
+
 @patch 1.00
 */
 constant native GetUnitRace         takes unit whichUnit returns race
@@ -17604,16 +17618,70 @@ native          SetUnitUseFood      takes unit whichUnit, boolean useFood return
 
 
 /**
+Returns:
+- null, if rally point is not a map location (default)
+- creates and returns new location, if a point on terrain is set.
+
+@note You can reset the point to default by clicking on the building itself.
+This will effectively set the rally point to be a unit, the building itself obviously.
+
+You can only set a rally to a unit if it's your hero or a gold mine. In case of
+destructables only trees count as a rally target. Otherwise rally will be set to a map
+location based on clicked unit's/destructable's map location (origin) at the time.
+
+@note **Example (Lua):**
+
+```{.lua}
+function checkRallyPoint(unit)
+	local loc = GetUnitRallyPoint(unit)
+	local rallyUnit = GetUnitRallyUnit(unit)
+	local rallyDestr = GetUnitRallyDestructable(unit)
+	if loc then
+		print("rally point is a location: ", GetLocationX(loc), GetLocationY(loc))
+	end
+	if rallyUnit then
+		print("rally point is a unit: ", GetUnitName(rallyUnit))
+	end
+	if rallyDestr then
+		print("rally point is a destructable: ", GetDestructableName(rallyDestr))
+	end
+	
+	if loc then RemoveLocation(loc) end
+end
+castle = CreateUnit(Player(1), FourCC("htow"), 500, 0, 270.0)
+myDestr = CreateDestructable(FourCC("LTbr"), 96, 0, 180, 1, 0)
+myTree = CreateDestructable(FourCC("LTlt"), 128, 256, 180, 1, 0)
+-- now set the rally point somewhere else...
+checkRallyPoint(castle)
+```
+
+@note See `GetUnitRallyUnit`, `GetUnitRallyUnit`
 @patch 1.13
 */
 constant native GetUnitRallyPoint           takes unit whichUnit returns location
 
 /**
+Returns:
+- null, if rally point is not a unit
+- returns handle of unit that is set as rally target (building itself by default)
+
+@note Rally unit can only be a building or hero under your ownership or a goldmine.
+Haunted goldmines are only a valid target for undead player who owns that mine.
+
+@note See `GetUnitRallyPoint` for an example, `GetUnitRallyDestructable`
 @patch 1.13
 */
 constant native GetUnitRallyUnit            takes unit whichUnit returns unit
 
 /**
+Returns:
+- null, if rally point is not a destructable
+- returns handle of destructable that is set as rally target (a tree)
+
+@note You can only set trees as a valid target destructable.
+Other destructables cannot be targeted and will instead point to the map location.
+
+@note See `GetUnitRallyPoint` for an example, `GetUnitRallyUnit`
 @patch 1.13
 */
 constant native GetUnitRallyDestructable    takes unit whichUnit returns destructable
