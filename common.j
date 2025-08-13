@@ -15991,6 +15991,12 @@ print(GetItemType(dmgItem)) --> itemtype handle of ITEM_TYPE_PERMANENT
 native          GetItemType     takes item whichItem returns itemtype
 
 /**
+SetItemDropID is for CAbilityRebirth(AIrb) (not the same as ankh of reincarnation)
+
+It set a unitID for this ability to use it later for creating unit.
+
+@note Note capital "ID" in the function name.
+
 @patch 1.07
 */
 native          SetItemDropID   takes item whichItem, integer unitId returns nothing
