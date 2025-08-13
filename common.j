@@ -1941,6 +1941,10 @@ constant native OrderId2String              takes integer orderId           retu
 constant native UnitId                      takes string  unitIdString      returns integer
 
 /**
+Returns internal name for unit type.
+
+These names are defined in "UnitUI.slk", column "name".
+
 **Example (Lua):** `UnitId2String( FourCC("hfoo") ) --> "footman" (internal name, not localized)`{.lua}
 
 @note See `GetObjectName` if you need to retrieve a unit's localized pretty name by the type ID.
@@ -16048,8 +16052,9 @@ native          SetItemUserData takes item whichItem, integer data returns nothi
 // Facing arguments are specified in degrees
 
 /**
-Creates a unit of type `unitid` for player `id`, facing a certain direction at the provided coordinates.
-Returns handle to unit.
+Creates and returns unit of type `unitid` for player `id`, facing a certain direction at the provided coordinates.
+
+Returns null, if player is null or `unitid` is invalid.
 
 **Example:** Create a human footman for first player (red) at map coordinates -30, 0, facing north:
 
@@ -16113,13 +16118,29 @@ call SetImageColor(i, 255, 0, 0, 255)
 native          CreateUnit              takes player id, integer unitid, real x, real y, real face returns unit
 
 /**
-@param face Unit facing in degrees.
+Creates and returns unit of type `unitid` for player `id`, facing a certain direction at the provided coordinates.
 
+Returns null, if player is null or `unitname` is invalid.
+
+@param face Unit facing in degrees.
+@param unitname internal name, case-insensitive. See `UnitId2String`
+
+@note **Example (Lua):**
+
+```{.lua}
+myFootman = CreateUnitByName(Player(0), "footman", 300.0, 1000.0, 270.0)
+```
+
+@note See: `CreateUnit`
 @patch 1.00
 */
 native          CreateUnitByName        takes player whichPlayer, string unitname, real x, real y, real face returns unit
 
 /**
+Creates and returns unit of type `unitid` for player `id`, facing a certain direction at the provided location.
+
+Returns null, if player or location is null or `unitid` is invalid.
+
 @param id The owner of the unit.
 
 @param unitid The rawcode of the unit.
@@ -16128,22 +16149,79 @@ native          CreateUnitByName        takes player whichPlayer, string unitnam
 
 @param face Unit facing in degrees.
 
+@note See: `CreateUnit` to avoid creating and removing a location.
+
 @patch 1.00
 */
 native          CreateUnitAtLoc         takes player id, integer unitid, location whichLocation, real face returns unit
 
 /**
+Creates and returns unit of type `unitname` for player `id`, facing a certain direction at the provided location.
+
+Returns null, if player or location is null or `unitname` is invalid.
+
+@param unitname internal name, case-insensitive. See `UnitId2String`
 @param face Unit facing in degrees.
+
+@note See: `CreateUnitByName` to avoid creating and removing a location, otherwise use `CreateUnit` directly.
 
 @patch 1.00
 */
 native          CreateUnitAtLocByName   takes player id, string unitname, location whichLocation, real face returns unit
 
 /**
-Creates the corpse of a specific unit for a player at the coordinates ( x , y ).
-The unit will die upon spawning and play their decay animation, therefore they
-will not necessarily be a corpse immediately after this function call. If the
-unit corresponding to the rawcode cannot have a corpse, then the returned value is null.
+Creates and returns a new unit, who is *less than alive*, for a given player
+at map coordinates.
+
+Returns null, if player is null, or `unitid` is invalid, or unit has a
+"deathType" classification of "does not decay" (aka 'udea' aka "Combat - Death Type").
+
+@note The unit will die upon spawning and, starting from the default standing animation,
+interpolate to and play their decay animation. Therefore they
+will not necessarily be a skeletal corpse immediately after this function call.
+
+For units that have a "decay bone" animation, you can skip their default decay
+sequence ("decay flesh" only then "decay bone") by setting the animation after
+spawning:
+
+```{.j}
+// Jass, night elves archerer
+local unit earc = CreateCorpse(Player(0), 'earc', 0, 200, 270.0) 
+call SetUnitAnimation(earc, "decay bone")
+```
+```{.lua}
+-- Lua, night elves archerer
+local earc = CreateCorpse(Player(0), FourCC"earc", 0, 200, 270.0)
+SetUnitAnimation(earc, "decay bone")
+```
+
+This trick doesn't work for units like "Mountain Giant" ('emtg') because it only
+has one animation called "decay". And he's really slow to disappear.
+
+Another workaround is to spawn the corpse somewhere else, wait however long the model
+takes and then move the corpse to desired location with `SetUnitX`, `SetUnitY`.
+
+Note: `SetUnitTimeScale` does not affect this animation, even if called right after
+creating the corpse.
+
+@note **Example (Lua):**
+
+```{.lua}
+emtg = CreateCorpse(Player(0), FourCC"emtg", -100, 1600, 270.0) -- mountain giant, no bones
+earc = CreateCorpse(Player(0), FourCC"earc", 0, 1600, 270.0) -- archer, decays to bones
+```
+
+@note A hero's corpse can actually be revived using `ReviveHero`.
+The corpses are regular units after all.
+
+@bug (tested v2.0.3.22988) Heroes don't play their death animation and they don't have
+a decay animation in their models either. They just remain in their default "stand"
+animation. This is probably true for all models without a decay animation.
+
+@note Heroes you own always show their icon at the top left for quick access. Creating a
+hero corpse using this method does not add an icon to the list. This is different
+from creating a hero and then killing them using `CreateUnit` and `KillUnit`, which would
+leave an icon behind.
 
 @param whichPlayer The owner of the corpse.
 
@@ -28289,6 +28367,8 @@ native BlzCreateItemWithSkin                       takes integer itemid, real x,
 /**
 Creates and returns a new unit with the model from the unit referenced by the skinId.
 
+Returns null, if player is null or `unitid` is invalid, however an invalid `skinId` is not an error.
+
 Scale, SoundSet are applied to created unit based on `skinId` unit.
 
 @note **Example**
@@ -28314,11 +28394,32 @@ myUnit = BlzCreateUnitWithSkin(Player(0), FourCC('hpea'), 0, 0, 270, FourCC('hfo
 
 @param skinId The function will apply the skinId model to the unit created.
 
+@bug (tested 2.0.3.22988+) BlzCreateUnitWithSkin messes up other units'
+selection UI icons, if they are of the same `objectid`.
+
+After spawning these units, the first four selected footman UI icons will
+always be those of 'Hamg'.
+
+```{.lua}
+for i = 1, 4 do
+BlzCreateUnitWithSkin(Player(0), FourCC("hfoo"), 300.0, 1000.0, 270.0, FourCC"Hamg")
+end
+for i = 1, 4 do
+CreateUnit(Player(0), FourCC("hfoo"), 300.0, 1000.0, 270.0)
+end
+
+Needs testing: other "WithSkin" may be affected too.
+
+<https://us.forums.blizzard.com/en/warcraft3/t/blzcreateunitwithskin-messes-up-other-units-icons/36949>
+
 @patch 1.32.0.13369
 */
 native BlzCreateUnitWithSkin                       takes player id, integer unitid, real x, real y, real face, integer skinId returns unit
 
 /**
+Creates and returns a new destructable using another object's visual data.
+Returns null if `objectid` is invalid, however an invalid `skinId` is not an error.
+
 See: `CreateDestructable`
 
 @note Map position of destructables with pathing texture is grid-aligned by 32.
@@ -28327,11 +28428,20 @@ See: `CreateDestructable`
 
 For example: skin and hover name, but not portrait. Shows no model if invalid.
 
+@note **Example (Lua):**
+
+```{.lua}
+barrelWithExplosiveSkin = BlzCreateDestructableWithSkin(FourCC("LTbr"), -400.0, -1000.0, 270.0, 1.0, 0, FourCC("LTex"))
+```
+
 @patch 1.32.0.13369
 */
 native BlzCreateDestructableWithSkin               takes integer objectid, real x, real y, real face, real scale, integer variation, integer skinId returns destructable
 
 /**
+Creates and returns a new destructable at a height using another object's visual data.
+Returns null if `objectid` is invalid, however an invalid `skinId` is not an error.
+
 See: `CreateDestructableZ`
 
 @note Map position of destructables with pathing texture is grid-aligned by 32.
@@ -28340,27 +28450,59 @@ See: `CreateDestructableZ`
 
 For example: skin and hover name, but not portrait. Shows no model if invalid.
 
+@note **Example (Lua):**
+
+```{.lua}
+barrelWithExplosiveSkin = BlzCreateDestructableWithSkin(FourCC("LTbr"), -128.0, -256.0,        270.0, 1.0, 0, FourCC("LTex"))
+stackedBarrel =          BlzCreateDestructableZWithSkin(FourCC("LTbr"), -128.0, -256.0, 160.0, 270.0, 1.0, 0, FourCC("LTex"))
+```
+
 @patch 1.32.0.13369
 */
 native BlzCreateDestructableZWithSkin              takes integer objectid, real x, real y, real z, real face, real scale, integer variation, integer skinId returns destructable
 
 /**
+Creates and returns a new dead destructable using another object's visual data.
+Returns null if `objectid` is invalid, however an invalid `skinId` is not an error.
+
+`GetDestructableLife` returns 0.0, because it's spawned dead.
+
 See: `CreateDeadDestructable`
 
 @param skinId rawcode of another destructable. Applies some visual aspects based on the other destructable.
 
 For example: skin and hover name, but not portrait. Shows no model if invalid.
 
+@note **Example (Lua):**
+
+```{.lua}
+-- This is a Lordaeron Summer tree, but with the autumn skin.
+treeStump = BlzCreateDeadDestructableWithSkin(FourCC("LTlt"), -300.0, -1000.0, 270.0, 1.0, 0, FourCC("FTtw"))
+```
+
 @patch 1.32.0.13369
 */
 native BlzCreateDeadDestructableWithSkin           takes integer objectid, real x, real y, real face, real scale, integer variation, integer skinId returns destructable
 
 /**
+Creates and returns a new dead destructable at height using another object's visual data.
+Returns null if `objectid` is invalid, however an invalid `skinId` is not an error.
+
+`GetDestructableLife` returns 0.0, because it's spawned dead.
+
 See: `CreateDeadDestructableZ`
 
 @param skinId rawcode of another destructable. Applies some visual aspects based on the other destructable.
 
 For example: skin and hover name, but not portrait. Shows no model if invalid.
+
+@note **Example (Lua):**
+
+```{.lua}
+-- This is a Lordaeron Summer tree, but with the autumn skin.
+treeStump = BlzCreateDeadDestructableWithSkin(FourCC("LTlt"), 100.0, 100.0, 270.0, 1.0, 0, FourCC("FTtw"))
+treeStumpZ = BlzCreateDeadDestructableZWithSkin(FourCC("LTlt"), 100.0, 100.0, 48.0, 270.0, 1.0, 0, FourCC("FTtw"))
+```
 
 @patch 1.32.0.13369
 */
