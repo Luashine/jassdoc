@@ -19192,11 +19192,20 @@ native  IsFogEnabled         takes nothing returns boolean
 
 
 /**
-Creates an object that overrides the fog in a rect for a specific player.
+Creates and returns a new fog modifier that overrides the fog in a
+rectangular area for a specific player.
 
 A fog modifier is disabled by default, use `FogModifierStart` to enable.
 
-This creates a new object with a handle and must be removed to avoid leaks: `DestroyFogModifier`.
+@note To avoid leaks, use `DestroyFogModifier` to destroy it.
+
+@note **Example (Lua):**
+
+```{.lua}
+rectFog = Rect(64*10, 64*10, 64*20, 64*20)
+fogmodRect = CreateFogModifierRect(Player(0), FOG_OF_WAR_MASKED, rectFog, false, true)
+FogModifierStart(fogmodRect)
+```
 
 @param whichState Determines what type of fog the area is being modified to. See `fogstate` for type explanation.
 
@@ -19205,6 +19214,9 @@ This creates a new object with a handle and must be removed to avoid leaks: `Des
 @param useSharedVision Apply modifier to target's allied players with shared vision?
 
 @param afterUnits Will determine whether or not units in that area will be masked by the fog. If it is set to true and the fogstate is masked, it will hide all the units in the fog modifier's radius and mask the area. If set to false, it will only mask the areas that are not visible to the units.
+
+@note Unlike `CreateFogModifierRadiusLoc`, the rect is not "attached". In other words,
+moving the rect will not modify the area or location of the fog modifier. 
 
 @bug (v1.32.10) Just by creating a modifier of type `FOG_OF_WAR_FOGGED` or
 `FOG_OF_WAR_VISIBLE`, this will modify the player's global fog state before it is
@@ -19217,11 +19229,19 @@ after fog modifier creation.
 native CreateFogModifierRect        takes player forWhichPlayer, fogstate whichState, rect where, boolean useSharedVision, boolean afterUnits returns fogmodifier
 
 /**
-Creates an object that overrides the fog in a circular radius for a specific player.
+Creates and returns a new fog modifier that overrides the fog in a
+circular area for a specific player.
 
 A fog modifier is disabled by default, use `FogModifierStart` to enable.
 
-This creates a new object with a handle and must be removed to avoid leaks: `DestroyFogModifier`.
+@note To avoid leaks, use `DestroyFogModifier` to destroy it.
+
+@note **Example (Lua):**
+
+```{.lua}
+fogmodCircle = CreateFogModifierRadius(Player(0), FOG_OF_WAR_FOGGED, 640, 0, 480, false, true)
+FogModifierStart(fogmodCircle)
+```
 
 @param whichState Determines what type of fog the area is being modified to. See `fogstate` for type explanation.
 
@@ -19246,15 +19266,28 @@ after fog modifier creation.
 native CreateFogModifierRadius      takes player forWhichPlayer, fogstate whichState, real centerx, real centerY, real radius, boolean useSharedVision, boolean afterUnits returns fogmodifier
 
 /**
-Creates an object that overrides the fog in a circular radius for a specific player.
+Creates and returns a new fog modifier that overrides the fog in a
+circular area around a location for a specific player.
+
+As long as the location exists, it follows and updates to its position.
 
 A fog modifier is disabled by default, use `FogModifierStart` to enable.
 
-This creates a new object with a handle and must be removed to avoid leaks: `DestroyFogModifier`.
+@note To avoid leaks, use `DestroyFogModifier` to destroy it.
+
+@note **Example (Lua):**
+
+```{.lua}
+locFog = Location(640, -1280)
+fogmodCircleLoc = CreateFogModifierRadiusLoc(Player(0), FOG_OF_WAR_FOGGED, locFog, 480, false, true)
+FogModifierStart(fogmodCircleLoc)
+-- You can move the location if you wanted to move the modifier
+MoveLocation(locFog, -640, 0)
+```
 
 @param whichState Determines what type of fog the area is being modified to. See `fogstate` for type explanation.
 
-@param center The location where the fog modifier begins.
+@param center Attach location as fog modifier's center point.
 
 @param radius Determines the extent that the fog travels (expanding from the location `center`).
 
