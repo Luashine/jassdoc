@@ -15420,9 +15420,10 @@ constant native GetTriggerWidget takes nothing returns widget
 // Facing arguments are specified in degrees
 
 /**
-Creates a destructable on the ground at the coordinates ( x, y ).
+Creates and returns a new destructable on the ground at the coordinates ( x, y ).
 
-Returns handle to created destructable, or null on failure.
+Returns handle to created destructable, or null on failure/doodad/invalid `objectid`;
+an unknown variation does not count as an error.
 
 @note When no longer needed, use `RemoveDestructable` to remove it from the game and avoid leaks
 (remember to null local variables in Jass).
@@ -15460,9 +15461,10 @@ myDestr = CreateDestructable(FourCC("LTbr"), 96, 0, 180, 1, 0) -- Lua
 native          CreateDestructable          takes integer objectid, real x, real y, real face, real scale, integer variation returns destructable
 
 /**
-Creates an elevated destructable at the coordinates ( x, y, z ).
+Creates and returns a new destructable on the ground at the coordinates ( x, y, z ).
 
-Returns handle to created destructable, or null on failure.
+Returns handle to created destructable, or null on failure/doodad/invalid `objectid`;
+an unknown variation does not count as an error.
 
 @note When no longer needed, use `RemoveDestructable` to remove it from the game and avoid leaks
 (remember to null local variables in Jass).
@@ -15496,14 +15498,28 @@ native          CreateDestructableZ         takes integer objectid, real x, real
 /**
 Creates the dead version of a destructable at the coordinates ( x , y ).
 
-Returns handle to created destructable, or null on failure.
+Returns handle to created destructable, or null on failure/doodad/invalid `objectid`;
+an unknown variation does not count as an error.
 
 @note When no longer needed, use `RemoveDestructable` to remove it from the game and avoid leaks
 (remember to null local variables in Jass).
 
 @note If the destructable has no animations, it will show the destructable's default
-form. If it has a death animation, but no decay animation, then the object will
-be created in memory but will not visibly appear.
+form. If it has a death animation, it will be spawned and set to the end of the
+death animation: usually invisible (decayed) or the permanent decay animation.
+
+This is equivalent to creating a destructable and immediately calling `KillDestructable`.
+
+@note **Example (Lua):**
+
+```{.lua}
+-- This is the cage *destructible*, whereas 'LOce' is a Doodad
+-- and cannot be spawned using API.
+-- 'LOcg' has a death and a visible decay animation
+cageDead = CreateDeadDestructable(FourCC("LOcg"), -300, 0, 180, 1, 0)
+-- gate appears as destroyed
+gateDead = CreateDeadDestructable(FourCC("LTe1"), -900, 1300, 180, 1, 0)
+```
 
 @param objectid The rawcode of the destructable to be created.
 
@@ -15530,14 +15546,15 @@ native          CreateDeadDestructable      takes integer objectid, real x, real
 /**
 Creates the dead version of a destructable elevating at the coordinates ( x , y , z ).
 
-Returns handle to created destructable, or null on failure.
+Returns handle to created destructable, or null on failure/doodad/invalid `objectid`;
+an unknown variation does not count as an error.
 
 @note When no longer needed, use `RemoveDestructable` to remove it from the game and avoid leaks
 (remember to null local variables in Jass).
 
 @note If the destructable has no animations, it will show the destructable's default
-form. If it has a death animation, but no decay animation, then the object will
-be created in memory but will not visibly appear.
+form. If it has a death animation, it will be spawned and set to the end of the
+death animation: usually invisible (decayed) or the permanent decay animation.
 
 @param objectid The rawcode of the destructable to be created.
 
