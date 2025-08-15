@@ -23836,6 +23836,8 @@ Possibly completely ignored.
 @bug (tested v2.0.3.23038-PTR): Crashes the game
 `sndFromLabel = CreateSoundFromLabel("BloodElfDragonHawkPissed", false, false, false, 50, 50)`
 
+<https://us.forums.blizzard.com/en/warcraft3/t/crash-createsoundfromlabelbloodelfdragonhawkpissed/36976>
+
 @patch 1.00
 */
 native CreateSoundFromLabel         takes string soundLabel, boolean looping, boolean is3D, boolean stopwhenoutofrange, integer fadeInRate, integer fadeOutRate returns sound
