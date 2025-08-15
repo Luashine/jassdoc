@@ -24520,9 +24520,12 @@ native TerrainDeformStopAll         takes nothing returns nothing
 
 
 /**
-Creates the special effect in point with coordinates (x;y) using the model file with a path modelName.
+Creates and returns a new special effect.
+
 The altitude (Z) of the newly spawned effect is at the ground level, be it terrain, some pathable destructable or on top of water.
 In other words, the effect's Z coordinate does not have to be 0.
+
+@note To avoid leaks, use `DestroyEffect` to destroy it.
 
 @note In older patches to create an effect with a Z-position other than zero see <https://www.hiveworkshop.com/threads/function-to-create-effect-at-z.165250/#post-1561722>.
 In 1.29.2.9231 and newer use `BlzSetSpecialEffectPosition` or `BlzSetSpecialEffectZ`.
@@ -24531,34 +24534,69 @@ In 1.29.2.9231 and newer use `BlzSetSpecialEffectPosition` or `BlzSetSpecialEffe
 
 @note An effect is only visible if its center is within draw distance and is not hidden by fog of war.
 
+@note **Example (Lua):**
+
+```{.lua}
+myEffect = AddSpecialEffect([[Doodads\Cinematic\CameraProp\CameraProp]], 0, 0)
+-- when no longer needed:
+DestroyEffect(myEffect)
+```
+
+@param modelName model file path
+@param x X map coordinate
+@param y Y map coordinate
 @patch 1.00
 */
 native AddSpecialEffect             takes string modelName, real x, real y returns effect
 
 /**
-Creates the special effect in the stated location using the model file with a path modelName.
+Creates and returns a new special effect.
+
 The altitude (Z) of the newly spawned effect is at the ground level, be it terrain, some pathable destructable or on top of water.
 In other words, the effect's Z coordinate does not have to be 0.
+
+@note To avoid leaks, use `DestroyEffect` to destroy it.
 
 @note In older patches to create an effect with a Z-position other than zero see <https://www.hiveworkshop.com/threads/function-to-create-effect-at-z.165250/#post-1561722>.
 In 1.29.2.9231 and newer use `BlzSetSpecialEffectPosition` or `BlzSetSpecialEffectZ`.
 
 @note To create an effect only visible to one player see <https://www.hiveworkshop.com/threads/gs.300430/#post-3209073>.
 
+@note **Example (Lua):**
+
+```{.lua}
+myLoc = Location(100, 0)
+myEffectLoc = AddSpecialEffect([[Doodads\Cinematic\CameraProp\CameraProp]], myLoc)
+RemoveLocation(myLoc)
+-- when no longer needed:
+DestroyEffect(myEffectLoc)
+```
+
+@param modelName model file path
+@param where spawn location on the map
+
 @patch 1.00
 */
 native AddSpecialEffectLoc          takes string modelName, location where returns effect
 
 /**
-Attaches the special effect to the attachment point attachPointName of the
-target widget, using the model file with a path modelName.
+Creates and returns a new special effect, which is attached to the widget
+at the specified point on the model.
 
 Upon creation, the effect will play its "birth" animation followed by its "stand" animation (once the birth animation has finished). If the model does not have animations, it will show up the way it appears by default. The effect will last indefinitely unless it is destroyed, even if the model seems to disappear. To destroy an effect, see DestroyEffect.
+
+@note To avoid leaks, use `DestroyEffect` to destroy it.
+
+An effect is **not** automatically destroyed even when the target it is attached to
+dies or is completely removed using e.g. `RemoveUnit`.
+
+You can check this for yourself using `BlzGetSpecialEffectScale(effectOfARemovedUnit)`
 
 @param modelName The path of the model. Use double backslashes when specifying
 a directory, rather than single backslashes. See AddSpecialEffect for an example.
 
-@param targetWidget The widget to attach the effect to.
+@param targetWidget The widget to attach the effect to
+(a widget is a unit or, technically, destructable or item).
 
 @param attachPointName The attachment point of the widget where the effect will
 be placed. Attachment points are points in a model that can be referenced to as
@@ -24573,12 +24611,22 @@ you are attaching effects to.
 
 @note To create an effect only visible to one player see <https://www.hiveworkshop.com/threads/gs.300430/#post-3209073>.
 
+@note **Example (Lua):**
+
+```{.lua}
+bloodmage = CreateUnit(Player(0), FourCC("Hblm"), 0,0, 0)
+phoenixEffect = AddSpecialEffectTarget([[units\human\phoenix\phoenix]], bloodmage, "head")
+-- when no longer needed or unit is removed:
+DestroyEffect(phoenixEffect)
+```
+
 @patch 1.00
 */
 native AddSpecialEffectTarget       takes string modelName, widget targetWidget, string attachPointName returns effect
 
 /**
 Destroys the effect.
+
 If the model has a death animation, plays it including the sound (temporarily leaving a blood pool), otherwise finishes current animation.
 
 Example (Lua):
@@ -24613,12 +24661,17 @@ It's probably not implemented like `AbilityId2String` doesn't work too.
 native AddSpellEffectLoc            takes string abilityString, effecttype t,location where returns effect
 
 /**
-Creates the special effect in point with coordinates (x;y) with Z = 0 using the
+Creates and returns a new special effect using the
 model file from the Object Editor field of type t from the ability, unit or
 buff (works with all these types, though the name states it's ability-only
 function) with raw code abilityId. If this field has more than one effect
 inside, it will only create the first effect stated in the field, ignoring
 all others.
+
+The altitude (Z) of the newly spawned effect is at the ground level, be it terrain, some pathable destructable or on top of water.
+In other words, the effect's Z coordinate does not have to be 0.
+
+@note To avoid leaks, use `DestroyEffect` to destroy it.
 
 **Example (Lua):**
 
@@ -24626,43 +24679,91 @@ Create an effect based on unit's attack missile model ('hsor' is human Sorceress
 
 ```{.lua}
 atkEffect = AddSpellEffectById(FourCC("hsor"), EFFECT_TYPE_MISSILE, 0, 0)
+-- when no longer needed:
+DestroyEffect(atkEffect)
 ```
 
 @note In older patches to create an effect with a Z-position other than zero see <https://www.hiveworkshop.com/threads/function-to-create-effect-at-z.165250/#post-1561722>.
 In 1.29.2.9231 and newer use `BlzSetSpecialEffectPosition` or `BlzSetSpecialEffectZ`.
+
+@param abilityId ability rawcode (aka FourCC)
+@param x X map coordinate
+@param y Y map coordinate
 
 @patch 1.00
 */
 native AddSpellEffectById           takes integer abilityId, effecttype t,real x, real y returns effect
 
 /**
-Creates the special effect in location where with Z = 0 using the model file
-from the Object Editor field of type t from the ability, unit or buff (works
-with all these types, though the name states it's ability-only function) with
-raw code abilityId. If this field has more than one effect inside, it will only
-create the first effect stated in the field, ignoring all others.
+Creates and returns a new special effect using the
+model file from the Object Editor field of type t from the ability, unit or
+buff (works with all these types, though the name states it's ability-only
+function) with raw code abilityId. If this field has more than one effect
+inside, it will only create the first effect stated in the field, ignoring
+all others.
+
+The altitude (Z) of the newly spawned effect is at the ground level, be it terrain, some pathable destructable or on top of water.
+In other words, the effect's Z coordinate does not have to be 0.
+
+@note To avoid leaks, use `DestroyEffect` to destroy it.
+
+An effect is **not** automatically destroyed even when the target it is attached to
+dies or is completely removed using e.g. `RemoveUnit`.
+
+You can check this for yourself using `BlzGetSpecialEffectScale(effectOfARemovedUnit)`
 
 @note In older patches to create an effect with a Z-position other than zero see <https://www.hiveworkshop.com/threads/function-to-create-effect-at-z.165250/#post-1561722>.
 In 1.29.2.9231 and newer use `BlzSetSpecialEffectPosition` or `BlzSetSpecialEffectZ`.
+
+@note **Example (Lua):**
+
+```{.lua}
+myLoc = Location(400, 0)
+mySpellEffectLoc = AddSpellEffectByIdLoc(FourCC("hsor"), EFFECT_TYPE_MISSILE, myLoc)
+RemoveLocation(myLoc)
+-- when no longer needed:
+DestroyEffect(mySpellEffectLoc)
+```
+
+@note See: `AddSpellEffectById` that avoids using location.
 
 @patch 1.00
 */
 native AddSpellEffectByIdLoc        takes integer abilityId, effecttype t,location where returns effect
 
 /**
+Creates and returns a new special effect.
+
+@note To avoid leaks, use `DestroyEffect` to destroy it.
+
+An effect is **not** automatically destroyed even when the target it is attached to
+dies or is completely removed using e.g. `RemoveUnit`.
+
+You can check this for yourself using `BlzGetSpecialEffectScale(effectOfARemovedUnit)`
+
+@note See: `AddSpellEffectById`, `AddSpecialEffectTarget`
+
 @patch 1.00
 */
 native AddSpellEffectTarget         takes string modelName, effecttype t, widget targetWidget, string attachPoint returns effect
 
 /**
-Attaches the special effect to the attachment point attachPointName of the
+Creates and returns a new special effect, which
+is attached to the attachment point attachPointName of the
 target widget, using the model file from the Object Editor field of type t from
 the ability, unit or buff (works with all these types, though the name states
 it's ability-only function) with raw code abilityId. If this field has more than
 one effect inside, it will only create the first effect stated in the field,
 ignoring all others.
 
-**Example (Lua):**
+@note To avoid leaks, use `DestroyEffect` to destroy it.
+
+An effect is **not** automatically destroyed even when the target it is attached to
+dies or is completely removed using e.g. `RemoveUnit`.
+
+You can check this for yourself using `BlzGetSpecialEffectScale(effectOfARemovedUnit)`
+
+@note **Example (Lua):**
 
 Attach an effect based on unit's attack missile model ('hsor' is human Sorceress)
 to the head of the Blood Mage hero. A fire bird (SD) will follow him around:
@@ -24671,7 +24772,11 @@ to the head of the Blood Mage hero. A fire bird (SD) will follow him around:
 bloodmage = CreateUnit(Player(0), FourCC("Hblm"), 0,0, 0)
 birdEffect = AddSpellEffectTargetById(FourCC("hsor"), EFFECT_TYPE_MISSILE, bloodmage, "head")
 BlzSetSpecialEffectScale(birdEffect, 3)
+-- when no longer needed or unit is removed:
+DestroyEffect(phoenixEffect)
 ```
+
+@note See: `AddSpecialEffectTarget`
 
 @patch 1.00
 */
@@ -27731,7 +27836,8 @@ pick up the setting.
 native BlzGetLocale                                takes nothing returns string
 
 /**
-Returns the whole model's scaling ratio (default: 1).
+Returns the whole model's scaling ratio (default: 1),
+or 0.0 if effect is invalid/null.
 
 @patch 1.31.0.11889
 
