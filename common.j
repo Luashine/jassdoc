@@ -15023,9 +15023,9 @@ widgets, units, destructables, items (with typecasting).
 
 ```{.lua}
 -- Create necessary widgets
-u = CreateUnit(Player(0), FourCC("Hamg"), -30, 0, 90)
-d = CreateDestructable(FourCC("ZTg1"), 256, 0, 90, 1, 0)
-item = CreateItem(FourCC("war2"), 256, 384)
+myUnit = CreateUnit(Player(0), FourCC("Hamg"), -30, 0, 90)
+myDestr = CreateDestructable(FourCC("ZTg1"), 256, 0, 90, 1, 0)
+myItem = CreateItem(FourCC("war2"), 256, 384)
 
 -- This is our trigger action
 hasht = InitHashtable() -- for type-casting
@@ -15050,12 +15050,12 @@ end
 -- Create and register widgets to this trigger
 trig = CreateTrigger()
 TriggerAddAction(trig, widgetDied)
-for k,widg in pairs({u,d,item}) do TriggerRegisterDeathEvent(trig, widg) end
+for k,widg in pairs({myUnit,myDestr,myItem}) do TriggerRegisterDeathEvent(trig, widg) end
 
 -- Kill widgets and observe what happens
-SetWidgetLife(u, 0)
-SetWidgetLife(d, 0)
-SetWidgetLife(item, 0)
+SetWidgetLife(myUnit, 0)
+SetWidgetLife(myDestr, 0)
+SetWidgetLife(myItem, 0)
 ```
 
 @note You can use this with units, items, destructables. Explained in `widget`.
@@ -15426,10 +15426,24 @@ See `widget` for an explanation how this applies to units, destructables, items.
 native  GetWidgetY      takes widget whichWidget returns real
 
 /**
-Returns the target widget (that caused the trigger-event) inside a trigger action.
+Returns (reuses) handle to the target widget (that caused the trigger-event) inside a trigger action.
 Otherwise returns null.
 
 @note Only works in triggers that operate on actual `widget` type, like `TriggerRegisterDeathEvent`.
+
+@bug `GetTriggerItem` is missing from API. Workaround as used in `TriggerRegisterDeathEvent`:
+
+```{.lua}
+local hasht = InitHashtable()
+local w,u,d,i
+w,u,d = GetTriggerWidget(),GetTriggerUnit(),GetTriggerDestructable()
+if not u and not d then -- the widget is an item
+	-- Downcasting (explicit type casting from widget to a child type)
+	SaveWidgetHandle(hasht, 1, 1, w) -- put as widget
+	i = LoadItemHandle(hasht, 1, 1) -- retrieve as item
+end
+FlushParentHashtable(hasht)
+```
 
 @patch 1.00
 */
@@ -15831,6 +15845,9 @@ print(GetDestructableName(d)) --> "Barrel"
 native          GetDestructableName         takes destructable d returns string
 
 /**
+Returns (reuses) handle to the target destructable (that caused the trigger-event) inside a trigger action.
+Otherwise returns null.
+
 @note Can be used in `TriggerRegisterDeathEvent` if the dead widget is actually
 a destructable.
 
