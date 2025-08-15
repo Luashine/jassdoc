@@ -663,6 +663,15 @@ type lightning          extends     handle
 type pathingtype        extends     handle
 
 /**
+@bug `MOUSE_BUTTON_TYPE_BACK` and `MOUSE_BUTTON_TYPE_FORWARD` are not defined. (v2.0.3)
+
+```{.lua}
+-- Lua, forward-compatible
+-- place in map root or somewhere else before using in trigger.
+MOUSE_BUTTON_TYPE_BACK = MOUSE_BUTTON_TYPE_BACK or ConvertMouseButtonType (4)
+MOUSE_BUTTON_TYPE_FORWARD = MOUSE_BUTTON_TYPE_FORWARD or ConvertMouseButtonType (5)
+```
+
 @patch 1.29.0.8803
 */
 type mousebuttontype    extends     handle
@@ -2699,6 +2708,7 @@ Allows to spent the other player's resources.
     constant mousebuttontype    MOUSE_BUTTON_TYPE_LEFT          = ConvertMouseButtonType(1)
 
 /**
+@bug (tested v2.0.3.23038-PTR)
 @patch 1.29.0.8803
 */
     constant mousebuttontype    MOUSE_BUTTON_TYPE_MIDDLE        = ConvertMouseButtonType(2)
@@ -4477,6 +4487,8 @@ a specific widget (unit/item/destructable).
     constant playerevent        EVENT_PLAYER_MOUSE_DOWN                 = ConvertPlayerEvent(305)
 
 /**
+@bug Wheel click, Back and Forward click only work on `EVENT_PLAYER_MOUSE_DOWN` (v2.0.3)
+
 @patch 1.29.0.8803
 */
     constant playerevent        EVENT_PLAYER_MOUSE_UP                   = ConvertPlayerEvent(306)
@@ -25751,11 +25763,62 @@ However minimap and the entire bottom UI still show the correct coordinates.
 native BlzGetTriggerPlayerMousePosition            takes nothing returns location
 
 /**
-It is used inside a mouse event trigger’s action/condition it will return the mousebuttontype (type) used at the moment of the event trigger.
+Returns one of the mousebuttontype constants, representing which mouse button was clicked.
+
+If the constant is not defined (in case of BACK/FORWARD buttons), then it
+returns the handle what was supposed to be the constant. However in Lua the handle
+may be recycled between calls and different (unless you define and save it).
+
+Only valid when used inside a mouse event trigger’s action/condition.
 
 @event EVENT_PLAYER_MOUSE_UP
 
 @event EVENT_PLAYER_MOUSE_DOWN
+
+@bug `MOUSE_BUTTON_TYPE_BACK` and `MOUSE_BUTTON_TYPE_FORWARD` are not defined.
+
+@note **Example (Lua, v2.0.3):**
+
+```{.lua}
+mouseClick_player = Player(0)
+if mouseClick_t then -- clean up if run multiple times
+    DestroyTrigger(mouseClick_t)
+    mouseClick_t = nil
+end
+MOUSE_BUTTON_TYPE_BACK = MOUSE_BUTTON_TYPE_BACK or ConvertMouseButtonType (4)
+MOUSE_BUTTON_TYPE_FORWARD = MOUSE_BUTTON_TYPE_FORWARD or ConvertMouseButtonType (5)
+mouseClick_func = function()
+    local mx,my = BlzGetTriggerPlayerMouseX(), BlzGetTriggerPlayerMouseY()
+	local playerMouseButton = BlzGetTriggerPlayerMouseButton()
+	local buttonStr
+	if playerMouseButton == MOUSE_BUTTON_TYPE_LEFT then
+		buttonStr = "left"
+	elseif playerMouseButton == MOUSE_BUTTON_TYPE_MIDDLE then
+		buttonStr = "middle" -- only works on MOUSE_UP
+	elseif playerMouseButton == MOUSE_BUTTON_TYPE_RIGHT then
+		buttonStr = "right"
+	elseif playerMouseButton == MOUSE_BUTTON_TYPE_BACK then
+		buttonStr = "back" -- only works on MOUSE_UP
+	elseif playerMouseButton == MOUSE_BUTTON_TYPE_FORWARD then
+		buttonStr = "forward" -- only works on MOUSE_UP
+	else
+		buttonStr = "unknown(".. tostring(playerMouseButton) ..")"
+		for i = 0, 1000 do -- find out what the button id is
+			local newButton = ConvertMouseButtonType(i)
+			if newButton == playerMouseButton then
+				buttonStr = buttonStr .. "=(index ".. i ..")"
+				break
+			end
+		end
+	end
+	
+    print("Mouse up/down ".. buttonStr .." at: ".. mx ..",".. my)
+end
+mouseClick_t = CreateTrigger()
+mouseClick_e1 = TriggerRegisterPlayerEvent(mouseClick_t, mouseClick_player, EVENT_PLAYER_MOUSE_UP)
+mouseClick_e2 = TriggerRegisterPlayerEvent(mouseClick_t, mouseClick_player, EVENT_PLAYER_MOUSE_DOWN)
+mouseClick_a = TriggerAddAction(mouseClick_t, mouseClick_func)
+```
 
 @patch 1.29.2.9231
 */
