@@ -23651,7 +23651,9 @@ native NewSoundEnvironment          takes string environmentName returns nothing
 
 
 /**
-Creates a sound handle.
+Creates and returns a new sound handle.
+
+@note (Lua, tested 2.0.3) The returned sound handle may be reused.
 
 @param fileName The path to the file.
 
@@ -23672,30 +23674,75 @@ The known settings available in Warcraft III are:
 
 | Value              |  Setting               |
 |--------------------| ---------------------- |
+|`"AcidsEAX"`        | (seen in Reforged)     |
 |`"CombatSoundsEAX"` | combat                 |
-|`"KotoDrumsEAX"`    | drums                  | 
-|`"SpellsEAX"`       | spells                 |
-|`"MissilesEAX"`     | missiles               |
-|`"HeroAcksEAX"`     | hero acknowledgements  |
-|`"DoodadsEAX"`      | doodads                |
 |`"DefaultEAXON"`    | default                |
+|`"DoodadsEAX"`      | doodads                |
+|`"HeroAcksEAX"`     | hero acknowledgements  |
+|`"KotoDrumsEAX"`    | drums                  | 
+|`"MissilesEAX"`     | missiles               |
+|`"SpellsEAX"`       | spells                 |
 
-@note You can only play the same sound handle once.
+@note (version?) You can only play the same sound handle once.
 
-@note You can only play the same sound filepath four times.
+In v2.0.3.23038 the following works fine:
 
-@note Sounds of the same filepath (on different sound handles) must have a delay
+```{.lua}
+snd = CreateSound(soundPath, false, false, false, 0, 0, "HeroAcksEAX")
+StartSound(snd)
+-- ...wait until sound ends playing...
+StartSound(snd) -- plays again!
+```
+
+@note (version?) You can only play the same sound filepath four times.
+In v2.0.3.23038 even the same handle can be played more often.
+
+@note (version?) Sounds of the same filepath (on different sound handles) must have a delay
 of at least 0.1 seconds inbetween them to be played.
-You can overcome this by starting one earlier and then using `SetSoundPosition`.
+You can overcome this by starting one earlier and then using `SetSoundPosition` (`SetSoundPlayPosition`?).
 
-@note You can only play 16 sounds in general.
+@note (version?) You can only play 16 sounds in general.
+
+In v2.0.3.23038 you can hear the first and the last sound handles fine.
+Either the max sound channels are set to very high or the game coalesces/
+skips equivalent sounds.
+
+```{.lua}
+-- Preload the sound separately and earlier, so it's played
+-- without delays or possible subtle issues 
+soundPath = [[units\nightelf\shandris\shandrispissed2.flac]]
+Preload(soundPath)
+-- Later: Start many at the same time
+oldSnd = nil
+for i = 1, 70 do
+	snd = CreateSound(soundPath, false, false, false, 0, 0, "HeroAcksEAX")
+	print(i, snd)
+	if snd then
+		if i ~= 1 and (oldSnd == nil or oldSnd == snd) then
+			print(i, "unexpected sound handle:", oldSnd, snd)
+		end
+		oldSnd = snd
+		if i <= 7 then -- selectively change pitch for first or last sounds
+			SetSoundPitch(snd, 1.5)
+			SetSoundVolume(snd, 8)
+		elseif i >= 65 then
+			SetSoundPitch(snd, 0.75)
+			SetSoundVolume(snd, 12)
+		else
+			SetSoundVolume(snd, 4) -- very quiet, but volume is amplified by overlapping
+		end
+		StartSound(snd)
+		KillSoundWhenDone(snd)
+	end
+end
+```
 
 @patch 1.00
 */
 native CreateSound                  takes string fileName, boolean looping, boolean is3D, boolean stopwhenoutofrange, integer fadeInRate, integer fadeOutRate, string eaxSetting returns sound
 
 /**
-Creates a sound but applies default settings to the sound, which are found
+Creates and returns a new sound handle, but applies default settings to the sound, which are found
 under the label from the following SLK-files:
 
 * UI\SoundInfo\AbilitySounds.slk
@@ -23705,6 +23752,17 @@ under the label from the following SLK-files:
 * UI\SoundInfo\UISounds.slk
 * UI\SoundInfo\UnitAckSounds.slk
 * UI\SoundInfo\UnitCombatSounds.slk
+
+@note (Lua, tested 2.0.3) The returned sound handle may be reused.
+
+@note **Example (Lua):**
+
+```{.lua}
+shandrisPissed1 = [[units\nightelf\shandris\shandrispissed1.flac]]
+sndFromLabel = CreateSoundFilenameWithLabel(shandrisPissed1, false, false, false, 20, 0, "ShandrisPissed")
+-- 3D sound is set to false, don't need to set 3D map position
+StartSound(sndFromLabel)
+```
 
 @param fileName The path to the file.
 
@@ -23722,26 +23780,73 @@ the faster the sound fades out. Maximum number is 127.
 @param SLKEntryName the label out of one of the SLK-files, whose settings should be
 used, e.g. values like volume, pitch, pitch variance, priority, channel, min distance, max distance, distance cutoff or eax.
 
-@note You can only play the same sound handle once.
+@note (version?) You can only play the same sound handle once.
+Not true in current Reforged, see `CreateSound`.
 
-@note You can only play the same sound filepath four times.
+@note (version?) You can only play the same sound filepath four times.
+In v2.0.3.23038 even the same handle can be played more often.
 
-@note Sounds of the same filepath (on different sound handles) must have a delay
+@note (version?) Sounds of the same filepath (on different sound handles) must have a delay
 of at least 0.1 seconds inbetween them to be played.
-You can overcome this by starting one earlier and then using `SetSoundPosition`.
+You can overcome this by starting one earlier and then using `SetSoundPosition` (`SetSoundPlayPosition`?).
 
-@note You can only play 16 sounds in general.
+@note (version?) You can only play 16 sounds in general.
+Not true in current Reforged, see `CreateSound`.
 
 @patch 1.00
 */
 native CreateSoundFilenameWithLabel takes string fileName, boolean looping, boolean is3D, boolean stopwhenoutofrange, integer fadeInRate, integer fadeOutRate, string SLKEntryName returns sound
 
 /**
+Creates and returns a new sound handle.
+
+@note (Lua, tested 2.0.3) The returned sound handle may be reused.
+
+@note **Example (Lua):**
+
+```{.lua}
+sndFromLabel = CreateSoundFromLabel("ShandrisPissed", false, false, false, 50, 50)
+-- 3D position is a requirement for sounds with flag WANT3D, regardless of `is3D` here
+SetSoundPosition(sndFromLabel, 0,0,0)
+StartSound(sndFromLabel)
+-- ...wait until sound ends playing...
+StartSound(sndFromLabel) -- plays again!
+```
+
+@note See `CreateSoundFilenameWithLabel` for SLK file list with label definitions.
+
+@bug (tested v2.0.3.23038-PTR): Always plays the first file in the list.
+Although the game can and does randomize e.g. unit sounds.
+
+@bug (tested v2.0.3.23038-PTR): `is3D=false` parameter is overriden by `WANT3D` flag from label.
+Possibly completely ignored.
+
+@bug (tested v2.0.3.23038-PTR): Crashes the game
+`sndFromLabel = CreateSoundFromLabel("BloodElfDragonHawkPissed", false, false, false, 50, 50)`
+
 @patch 1.00
 */
 native CreateSoundFromLabel         takes string soundLabel, boolean looping, boolean is3D, boolean stopwhenoutofrange, integer fadeInRate, integer fadeOutRate returns sound
 
 /**
+Creates and returns a new sound handle.
+
+@note (Lua, tested 2.0.3) The returned sound handle may be reused.
+
+@note **Example (Lua):**
+
+```{.lua}
+midi = CreateMIDISound("CityScapeDay", 20, 20)
+SetSoundVolume(midi, 127)
+StartSound(midi)
+SetSoundPlayPosition(midi, 34000) -- owl and barking sounds
+```
+
+@note The game uses MIDI with a custom sound bank (.DLS, basically
+a "palette" for the synthesizer) to synthesize ambient sounds on
+the fly based on samples from the sound bank. Space efficient and
+clever! You can use <https://spessasus.github.io/SpessaSynth/> to play.
+
 @patch 1.00
 */
 native CreateMIDISound              takes string soundLabel, integer fadeInRate, integer fadeOutRate returns sound
@@ -23763,6 +23868,31 @@ Applies default settings to the sound, which are found under the label from the 
 @param soundLabel the label out of one of the SLK-files, whose settings should be
 used, e.g. values like volume, pitch, pitch variance, priority, channel, min distance, max distance, distance cutoff or eax.
 
+"Flags" SLK column used by the game (separators: `,` or `, ` or `|`):
+
+- "CHANNELFULLPREEMPT"
+- "CHANNELFULLPREEMPTOLDEST" - extracted from memory dump
+- "CINEMATICSONLY"
+- "DONOTATTENUATE2D" - extracted from memory dump/WESTRING
+- "DUPLICATEPREEMPT" - extracted from memory dump
+- "DUPUSERNAMEPREEMPT" -  extracted from memory dump/WESTRING
+- "DYNAMICOCCLUSION"
+- "IGNOREUSERNAME"
+- "INGAMEONLY" - extracted from memory dump/WESTRING
+- "LISTFULLPREEMPT"
+- "LISTFULLPREEMPTOLDEST" - extracted from memory dump
+- "LOOPING"
+- "NOECHODELAY" - extracted from memory dump
+- "NODUPEUSERNAMES" - extracted from memory dump
+- "NODUPLICATES" - prevents douple playing of this sound (by repeated actions)
+- "PRECACHE" - extracted from memory dump/WESTRING
+- "RANDOMPITCH"
+- "RANDOMVOLUME"
+- "SCALEPRIORITY"
+- "WANT3D"
+- "ZOOMEDINONLY" - extracted from memory dump/WESTRING
+
+
 @patch 1.00
 */
 native SetSoundParamsFromLabel      takes sound soundHandle, string soundLabel returns nothing
@@ -23778,7 +23908,7 @@ native SetSoundDistanceCutoff       takes sound soundHandle, real cutoff returns
 native SetSoundChannel              takes sound soundHandle, integer channel returns nothing
 
 /**
-Sets the sounds volume.
+Sets the sound's volume.
 
 @param soundHandle which sound.
 
@@ -23865,13 +23995,14 @@ native AttachSoundToUnit            takes sound soundHandle, unit whichUnit retu
 /**
 Starts the sound.
 
-@note You can only play the same sound handle once.
+@note (version?) You can only play the same sound handle once.
+Not true in current Reforged, see `CreateSound`.
 
-@note You can only play 16 sounds in general.
+@note (version?) You can only play 16 sounds in general.
 
-@note Sounds of the same filepath (on different sound handles) must have a delay
+@note (version?) Sounds of the same filepath (on different sound handles) must have a delay
 of at least 0.1 seconds inbetween them to be played.
-You can overcome this by starting one earlier and then using `SetSoundPosition`.
+You can overcome this by starting one earlier and then using `SetSoundPosition` (`SetSoundPlayPosition`?).
 
 @patch 1.00
 */
