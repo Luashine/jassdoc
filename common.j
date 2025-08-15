@@ -14454,7 +14454,7 @@ constant native BlzGetStackingItemTargetPreviousCharges takes nothing returns in
 // EVENT_PLAYER_UNIT_ISSUED_ORDER
 
 /**
-Returns the unit that received the order.
+Returns (reuses) handle to the unit that received the order.
 
 Same as `GetTriggerUnit` in this context.
 
@@ -14523,6 +14523,7 @@ end
 function printIssuedPointOrder()
 	local loc = GetOrderPointLoc()
 	local x,y,z = GetLocationX(loc),GetLocationY(loc),GetLocationZ(loc)
+	RemoveLocation(loc)
 	-- GetOrderPointX(),GetOrderPointY() is identical to location...
 	-- if you only wanted (x,y)
 	print("Next is an Issued Point Order at:", x,y,z)
@@ -14606,7 +14607,7 @@ get that target object first.
 constant native GetOrderPointY takes nothing returns real
 
 /**
-Returns a new location for the current point order (anywhere on map terrain).
+Creates and returns a new location for the current point order (anywhere on map terrain).
 
 Returns 0,0,0 for other event types. If you want to get the position of the target for a target order,
 get that target object first.
@@ -14629,7 +14630,7 @@ constant native GetOrderPointLoc takes nothing returns location
 // EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER
 
 /**
-Returns the target widget (unit/item/destructable) for the current order.
+Returns (reuses) handle to the target widget (unit/item/destructable) for the current order.
 
 @note See: `GetOrderTargetDestructable`, `GetOrderTargetItem`, `GetOrderTargetUnit`.
 
@@ -14642,7 +14643,7 @@ Returns the target widget (unit/item/destructable) for the current order.
 constant native GetOrderTarget              takes nothing returns widget
 
 /**
-Returns the targetted destructable, if the order target is a destructable.
+Returns (reuses) handle to the targetted destructable, if the order target is a destructable.
 
 Returns null on failure.
 
@@ -14657,7 +14658,7 @@ Returns null on failure.
 constant native GetOrderTargetDestructable  takes nothing returns destructable
 
 /**
-Returns the targetted item, if the order target is an item.
+Returns (reuses) handle to the targetted item, if the order target is an item.
 
 @note See: `GetOrderTarget`, `GetOrderTargetDestructable`, `GetOrderTargetUnit`.
 
@@ -14670,7 +14671,7 @@ Returns the targetted item, if the order target is an item.
 constant native GetOrderTargetItem          takes nothing returns item
 
 /**
-Returns the targetted unit, if the order target is a unit.
+Returns (reuses) handle to the targetted unit, if the order target is a unit.
 
 @note See: `GetOrderTarget`, `GetOrderTargetDestructable`, `GetOrderTargetItem`.
 
@@ -15072,7 +15073,7 @@ native TriggerRegisterDeathEvent takes trigger whichTrigger, widget whichWidget 
 
 
 /**
-Returns handle to unit which triggered the most recent event when called from
+Returns (reuses) handle to unit which triggered the most recent event when called from
 within a trigger action function. Returns `null` handle when used incorrectly.
 
 @note Can be used in `TriggerRegisterDeathEvent` if the dead widget is actually
