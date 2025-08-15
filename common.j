@@ -27667,11 +27667,14 @@ native BlzGetTriggerSyncPrefix                     takes nothing returns string
 native BlzGetTriggerSyncData                       takes nothing returns string
 
 /**
-Registers event to call trigger when player presses a key + metakey.
+Registers and returns a new event to run trigger when player presses a key + metakey.
+
 Key presses are synced by the game between players automatically.
 
+@note
 Meta keys are modifier keys like CTRL, SHIFT, ALT. See `BlzGetTriggerPlayerMetaKey`. If you just want a key press without them, use 0.
 
+@note
 **Example (Lua):**
 
 ````{.lua}
@@ -27697,7 +27700,7 @@ If keyDown = true: calls trigger repeatedly while key is being held down. In V1.
 native BlzTriggerRegisterPlayerKeyEvent            takes trigger whichTrigger, player whichPlayer, oskeytype key, integer metaKey, boolean keyDown returns event
 
 /**
-Returns the key that was pressed during current event.
+Returns one of the constants representing the key, that was pressed during current event.
 
 **Example:** `if BlzGetTriggerPlayerKey() == OSKEY_F then ...`
 
