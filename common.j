@@ -898,6 +898,13 @@ type unitcategory                   extends handle
 type pathingflag                    extends handle
 
 /**
+This API exists as a guide for players to show what buttons to click
+and which abilities to use. It was intended for singleplayer campaign
+only.
+
+The highlights will display on any unit as long as the player can see
+the specified ability in their UI.
+
 @bug wrong type, should be `extends agent` instead.
 
 @patch 1.32.0.13369
@@ -27976,16 +27983,73 @@ native BlzSetUnitFacingEx                          takes unit whichUnit, real fa
 
 
 /**
+Creates and returns a new learnable ability highlight.
+
+*IFF order does not match ability* is an error case: returns a special invalid handle,
+that does **not** increase the handle count. Basically, you can check
+if a call failed like this:
+
+```{.lua}
+buttoneffect1 = CreateCommandButtonEffect(FourCC"AHwe", "invalid")
+buttoneffect2 = CreateCommandButtonEffect(FourCC"AHwe", "invalid")
+if buttoneffect1 == buttoneffect2 then
+	-- failed to create
+else
+	-- created both, remove the latter
+	DestroyCommandButtonEffect(buttoneffect2)
+	buttoneffect2 = nil
+end
+```
+
+@note For asynchronous per-player creation, you can use e.g.
+abilityId='Amov' and order="move" as a valid replacement dummy,
+which won't highlight anything, but create and return a new handle.
+
+@note **Example (Lua):** Highlight "Call To Arms" in human castle.
+
+```{.lua}
+htow = CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
+use_calltoarms = CreateCommandButtonEffect(FourCC"Amic", "townbellon")
+```
+
 @patch 1.32.0.13369
 */
 native CreateCommandButtonEffect                   takes integer abilityId, string order returns commandbuttoneffect
 
 /**
+Creates and returns a new upgrade highlight.
+This call doesn't have an error condition.
+
+@note **Example (Lua):** Highlight armor upgrade "Armor plating" (bottom-left)
+
+```{.lua}
+blacksmith = CreateUnit(Player(0), FourCC("hbla"), 256, 1792, 270.0)
+upgrade_Rhar = CreateUpgradeCommandButtonEffect(FourCC"Rhar")
+```
+
 @patch 1.32.0.13369
 */
 native CreateUpgradeCommandButtonEffect            takes integer whichUprgade returns commandbuttoneffect
 
 /**
+Creates and returns a new learnable ability highlight.
+This call doesn't have an error condition.
+
+@note The highlight lights up the red cross (learn new ability icon) only
+if the hero can learn that ability, i.e. has a skill point and not limited by level.
+
+The highlighted ability inside the learning menu is always highlighted,
+until the command button effect is removed.
+
+@note **Example (Lua):**
+
+```{.lua}
+myHero1 = CreateUnit(Player(0), FourCC("Hamg"), -192, 0, 270.0) -- has AHbz, AHab, AHwe, AHmt
+myHero2 = CreateUnit(Player(1), FourCC("Hamg"), 192, 0, 270.0)
+
+learn_AHwe = CreateLearnCommandButtonEffect(FourCC"AHwe")
+```
+
 @patch 1.32.0.13369
 */
 native CreateLearnCommandButtonEffect              takes integer abilityId returns commandbuttoneffect
