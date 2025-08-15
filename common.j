@@ -25732,13 +25732,17 @@ However minimap and the entire bottom UI still show the correct coordinates.
 native BlzGetTriggerPlayerMouseY                   takes nothing returns real
 
 /**
-When used inside a mouse event trigger’s action/condition, it will return the ground location on the map,
-where the cursor points at.
+Creates and returns a new location of the ground (x,y,z) position on the map,
+where the cursor points to.
 
-Returns 0 when pointing at certain UI elements like the top status bar with clock and resources.
+Only valid when used inside a mouse event trigger’s action/condition.
+
+Returns a (0,0, mapZ) location when pointing at certain UI elements like the top status bar with clock and resources.
 However minimap and the entire bottom UI still show the correct coordinates.
 
 @event EVENT_PLAYER_MOUSE_MOVE
+
+@note To avoid leaks, use `RemoveLocation` to destroy the location.
 
 @note See: `EVENT_PLAYER_MOUSE_MOVE` (includes an example), `BlzGetTriggerPlayerMouseX`, `BlzGetTriggerPlayerMouseY`
 
