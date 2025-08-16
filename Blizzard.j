@@ -9871,6 +9871,8 @@ endfunction
 
 @bug Leaks handle `d`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
 
+@bug Unused new trigger in definition of `local trigger t = CreateTrigger()`, it's overwritten below.
+
 @patch 1.00
 */
 function MeleeVictoryDialogBJ takes player whichPlayer, boolean leftGame returns nothing
@@ -9903,6 +9905,8 @@ endfunction
 @bug Leaks handle `t`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
 
 @bug Leaks handle `d`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
+@bug Unused new trigger in definition of `local trigger t = CreateTrigger()`, it's overwritten below.
 
 @patch 1.00
 */
@@ -9940,6 +9944,8 @@ endfunction
 @bug Leaks handle `t`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
 
 @bug Leaks handle `d`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
+@bug Unused new trigger in definition of `local trigger t = CreateTrigger()`, it's overwritten below.
 
 @patch 1.00
 */
@@ -10028,6 +10034,8 @@ endfunction
 @bug Leaks handle `t`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
 
 @bug Leaks handle `d`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
+@bug Unused new trigger in definition of `local trigger t = CreateTrigger()`, it's overwritten below.
 
 @patch 1.00
 */
