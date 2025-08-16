@@ -13347,14 +13347,84 @@ native IsTriggerWaitOnSleeps takes trigger whichTrigger returns boolean
 
 
 /**
-This returns the current unit in calls to the `GroupEnumUnits-`natives.
+Returns (reuses) handle to the current unit passing a `boolexpr` `Filter`,
+returns null when used in an invalid context.
+
+Filters are used in functions such as triggers and `GroupEnumUnits-`natives
+to avoid trigger execution, control addition to a group etc.
+
+@note **Example (Lua):**
+
+```{.lua}
+g = CreateGroup()
+GroupEnumUnitsInRange(
+	g,
+	0, 0,
+	5000,
+	Filter(function()
+		print(GetUnitName(GetFilterUnit()))
+		return true
+	end)
+)
+print(BlzGroupGetSize(g))
+```
+
+@note See: `GetEnumUnit`
 
 @patch 1.00
 */
 constant native GetFilterUnit       takes nothing returns unit
 
 /**
-This returns the current unit in calls to the `ForGroup` native.
+Returns (reuses) handle to the current unit being iterated,
+returns null when used in an invalid context.
+
+Iterations in the game API are any "enumerations", that do
+not rely on a `boolexpr`/`filterfunc` and instead take
+a simple callback function like the `ForGroup` native.
+
+@note **Example (Lua):** First, add units to group "g".
+Then iterate over the group however often you want.
+
+```{.lua}
+g = CreateGroup()
+GroupEnumUnitsInRange(
+	g, 0, 0, 5000,
+	Filter(function() return true end) -- add all encountered units
+)
+ForGroup(g,
+	function()
+		print(GetUnitName(GetEnumUnit()))
+	end
+)
+```
+
+@note Internals: If an enumerator takes both a filter and an action
+function, then the "GetFilter-" calls will continue to work within
+the action function: you're still within the same execution context,
+the filtered entity was populated before and will not be cleared until
+the action function ends.
+However, "GetEnum-" is not populated unless
+the filter returned true and execution has proceeded to the action function.
+
+Pseudocode example:
+
+```
+EnumDestructablesInRect(
+	someRect,
+	boolexprFilter, // GetFilterDestructable is populated
+	actionFunction // GetFilterDestructable and GetEnumDestructable are populated
+)
+```
+
+- positive example: `EnumDestructablesInRect`
+- negative examples:
+    1. `ForceEnumPlayers takes force whichForce, boolexpr filter`
+    2. `ForForce takes force whichForce, code callback`
+
+//TODO: Copy-paste this (macros?) to other GetFilter & GetEnum natives.
+
+@note See: `GetFilterUnit`
 
 @patch 1.00
 */
@@ -13362,14 +13432,45 @@ constant native GetEnumUnit         takes nothing returns unit
 
 
 /**
-Returns handle, or null on failure.
+Returns (reuses) handle to the current destructable passing a `boolexpr` `Filter`,
+returns null when used in an invalid context.
+
+Filters are used in functions such as triggers and enumation (iteration) natives
+to avoid trigger execution etc.
+
+@note **Example (Lua):**
+
+```{.lua}
+myDestr1 = CreateDestructable(FourCC("LTbr"), 96, 0, 180, 1, 0)
+myDestr2 = CreateDestructable(FourCC("LTex"), 192, 0, 180, 1, 0)
+worldBounds = GetWorldBounds()
+EnumDestructablesInRect(worldBounds,
+	Filter(function()
+		print("Filter:", GetDestructableName(GetFilterDestructable()))
+		return true
+	end),
+	function()
+		print("Enum:", GetDestructableName(GetEnumDestructable()))
+	end
+)
+RemoveRect(worldBounds)
+```
+
+@note See: `GetEnumDestructable`
 
 @patch 1.00
 */
 constant native GetFilterDestructable   takes nothing returns destructable
 
 /**
-Returns handle, or null on failure.
+Returns (reuses) handle to the current destructable being iterated,
+returns null when used in an invalid context.
+
+Iterations in the game API are any "enumerations", that do
+not rely on a `boolexpr`/`filterfunc` and instead take
+a simple callback function like the `ForGroup` native.
+
+@note See: `GetFilterDestructable` for an example.
 
 @patch 1.00
 */
@@ -13377,11 +13478,46 @@ constant native GetEnumDestructable     takes nothing returns destructable
 
 
 /**
+Returns (reuses) handle to the current item passing a `boolexpr` `Filter`,
+returns null when used in an invalid context.
+
+Filters are used in functions such as triggers and enumation (iteration) natives
+to avoid trigger execution etc.
+
+@note **Example (Lua):**
+
+```{.lua}
+ilumber = CreateItem(FourCC("lmbr"), 256, 384)
+igold = CreateItem(FourCC("gold"), 256, 450)
+worldBounds = GetWorldBounds()
+EnumItemsInRect(worldBounds,
+	Filter(function()
+		print("Filter:", GetItemName(GetFilterItem()))
+		return true
+	end),
+	function()
+		print("Enum:", GetItemName(GetEnumItem()))
+	end
+)
+RemoveRect(worldBounds)
+```
+
+@note See: `GetEnumItem`
+
 @patch 1.07
 */
 constant native GetFilterItem           takes nothing returns item
 
 /**
+Returns (reuses) handle to the current item being iterated,
+returns null when used in an invalid context.
+
+Iterations in the game API are any "enumerations", that do
+not rely on a `boolexpr`/`filterfunc` and instead take
+a simple callback function like the `ForGroup` native.
+
+@note See: `GetFilterItem` for an example.
+
 @patch 1.07
 */
 constant native GetEnumItem             takes nothing returns item
@@ -13394,11 +13530,47 @@ constant native ParseTags               takes string taggedString returns string
 
 
 /**
+Returns (reuses) handle to the current player passing a `boolexpr` `Filter`,
+returns null when used in an invalid context.
+
+Filters are used in functions such as triggers and enumation (iteration) natives
+to avoid trigger execution, control addition to a force etc.
+
+@note **Example (Lua):**
+
+```{.lua}
+forceAll = CreateForce()
+ForceEnumPlayers(forceAll,
+	Filter(function()
+		print("ForceEnumPlayers Filter:", GetPlayerName(GetFilterPlayer()))
+		return true
+	end)
+)
+ForForce(forceAll,
+	function()
+		print("ForForce Enum:", GetPlayerName(GetEnumPlayer()))
+		return true
+	end
+)
+DestroyForce(forceAll)
+```
+
+@note See: `GetEnumPlayer`
+
 @patch 1.00
 */
 constant native GetFilterPlayer     takes nothing returns player
 
 /**
+Returns (reuses) handle to the current player being iterated,
+returns null when used in an invalid context.
+
+Iterations in the game API are any "enumerations", that do
+not rely on a `boolexpr`/`filterfunc` and instead take
+a simple callback function like the `ForGroup` native.
+
+@note See: `GetFilterPlayer` for an example.
+
 @patch 1.00
 */
 constant native GetEnumPlayer       takes nothing returns player
@@ -15868,7 +16040,7 @@ call CreateItem('lmbr', 256, 384) // Jass
 call CreateItem('gold', 256, 450)
 ```
 ```{.lua}
-ilumber = CreateItem(FourCC("war2"), 256, 384) -- Lua
+ilumber = CreateItem(FourCC("lmbr"), 256, 384) -- Lua
 igold = CreateItem(FourCC("gold"), 256, 450)
 ```
 
