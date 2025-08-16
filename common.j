@@ -14012,6 +14012,7 @@ constant native GetWinningPlayer takes nothing returns player
 
 /**
 Registers and returns a new event for when a unit enters a region.
+Returns null, if region or trigger is null.
 
 @param whichTrigger The trigger to add the event to.
 
@@ -14069,6 +14070,7 @@ constant native GetEnteringUnit takes nothing returns unit
 
 /**
 Registers and returns a new event for when a unit leaves a region.
+Returns null, if region or trigger is null.
 
 @param whichTrigger The trigger to add the event to.
 
