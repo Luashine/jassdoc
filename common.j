@@ -13942,7 +13942,22 @@ native TriggerRegisterGameStateEvent takes trigger whichTrigger, gamestate which
 Creates and returns a new registered event.
 Returns null, if any of the arguments is null.
 
-@note See: `DialogCreate`
+@note **Example (Lua):**
+
+```{.lua}
+myDialog = DialogCreate()
+myButton = DialogAddButton(myDialog, "push the button", 42)
+
+dialogTrig = CreateTrigger()
+dialogEv = TriggerRegisterDialogEvent(dialogTrig, myDialog)
+dialogAction = TriggerAddAction(dialogTrig, function()
+	print("dialog event works!", GetTriggerPlayer(), GetClickedDialog(), GetClickedButton())
+end)
+DialogDisplay(GetLocalPlayer(), myDialog, true)
+```
+
+@note See: `DialogCreate`, `DialogAddButton`,
+`TriggerRegisterDialogButtonEvent`, `GetTriggerPlayer`, `GetClickedDialog`, `GetClickedButton`
 
 @patch 1.00
 */
@@ -13951,6 +13966,16 @@ native TriggerRegisterDialogEvent       takes trigger whichTrigger, dialog which
 /**
 Creates and returns a new registered event.
 Returns null, if any of the arguments is null.
+
+@note Neither `GetClickedDialog` nor `GetClickedButton` is available inside trigger action.
+
+@bug (tested v2.0.3) `GetClickedButton` is not populated in this context.
+While it can be assumed that the trigger is not intended to handle multiple buttons,
+i.e. "write your code differently", it still seems like an oversight that's limiting
+choice by too much.
+
+@note See: `DialogCreate`, `DialogAddButton`,
+`TriggerRegisterDialogEvent`, `TriggerRegisterDialogButtonEvent`, `GetTriggerPlayer`
 
 @patch 1.00
 */
@@ -14263,14 +14288,29 @@ constant native GetTriggeringTrackable takes nothing returns trackable
 // EVENT_DIALOG_BUTTON_CLICK
 
 /**
+Returns (reuses) handle to registered button.
+
+@note Valid inside `TriggerRegisterDialogEvent` action context,
+but not inside `TriggerRegisterDialogButtonEvent`
+
 @event EVENT_DIALOG_BUTTON_CLICK
+
+@note See: `DialogCreate`, `DialogAddButton`,
+`TriggerRegisterDialogEvent`, `TriggerRegisterDialogButtonEvent`
 
 @patch 1.00
 */
 constant native GetClickedButton takes nothing returns button
 
 /**
+Returns (reuses) handle to registered dialog.
+
+@note Valid inside `TriggerRegisterDialogEvent` and `TriggerRegisterDialogButtonEvent` action context.
+
 @event EVENT_DIALOG_BUTTON_CLICK
+
+@note See: `DialogCreate`, `DialogAddButton`,
+`TriggerRegisterDialogEvent`, `TriggerRegisterDialogButtonEvent`
 
 @patch 1.00
 */
@@ -14293,6 +14333,9 @@ constant native GetTournamentFinishSoonTimeRemaining takes nothing returns real
 constant native GetTournamentFinishNowRule takes nothing returns integer
 
 /**
+This is some official battlenet melee PvP stuff.
+I can't test it, but it probably returns (reuses) the player handle as any other native.
+
 @event EVENT_GAME_TOURNAMENT_FINISH_SOON
 
 @patch 1.07
@@ -19939,6 +19982,8 @@ probably other scripted custom elements). A player can only exit the game with A
 @bug The top-bar menu buttons are greyed out when a dialog is shown. If the player presses
 Alt+F4 and then clicks "Cancel", the menu buttons become visible and clickable but do nothing.
 
+@note See: `TriggerRegisterDialogEvent`, `TriggerRegisterDialogButtonEvent`
+
 @patch 1.00
 */
 native DialogCreate                 takes nothing returns dialog
@@ -19989,6 +20034,7 @@ native DialogSetMessage             takes dialog whichDialog, string messageText
 
 /**
 Creates and returns a new menu button.
+Returns null if dialog is null.
 
 You must save the button handle to later compare it to the selected button in
 a `EVENT_DIALOG_BUTTON_CLICK` using `GetClickedButton` and `GetClickedDialog`.
@@ -20034,6 +20080,8 @@ The 13th button will still render correctly, but not work when clicked/hotkey is
 The 14th button will render outside the dialog border background.
 The 15th button will render outside the visible area (you'll see a few pixels of it at the bottom).
 
+@note See: `DialogCreate`, `DialogAddQuitButton`, `TriggerRegisterDialogEvent`, `TriggerRegisterDialogButtonEvent`
+
 @patch 1.00
 */
 native DialogAddButton              takes dialog whichDialog, string buttonText, integer hotkey returns button
@@ -20053,6 +20101,10 @@ When a button with `false` is pressed, you quit the map to game's main menu.
 
 @param hotkey Integer value of the ASCII upper-case character for the hotkey.
 Example: "F" = 70.
+
+
+@note See: `DialogCreate`, `DialogAddButton`,
+`TriggerRegisterDialogEvent`, `TriggerRegisterDialogButtonEvent`
 
 @patch 1.01
 */
