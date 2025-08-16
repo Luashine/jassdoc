@@ -14187,13 +14187,59 @@ native TriggerRegisterTrackableTrackEvent takes trigger whichTrigger, trackable 
 // EVENT_COMMAND_BUTTON_CLICK
 
 /**
+Registers and returns a new event, it runs whenever the specified command button
+is pressed.
+Returns null, if trigger is null.
+
+@note Event can trigger even if you don't have resources or the queue is full.
+
+@note **Example (Lua):** Queue peasant training to trigger the event.
+
+```{.lua}
+htow = htow or CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
+-- Aque is an internal "training queue" ability
+train_hpea = CreateCommandButtonEffect(FourCC"Aque", UnitId2String(FourCC("hpea")))
+
+commandButtonTrig = CreateTrigger()
+commandButtonEv = TriggerRegisterCommandEvent(commandButtonTrig, FourCC"Aque", UnitId2String(FourCC("hpea")) )
+commandButtonAction = TriggerAddAction(commandButtonTrig, function()
+	print("command button event works!", GetTriggerUnit(), GetUnitName(GetTriggerUnit()))
+end)
+```
+
+@note See: `TriggerRegisterUpgradeCommandEvent`,
+`CreateCommandButtonEffect`, `CreateUpgradeCommandButtonEffect`, `CreateLearnCommandButtonEffect`
+
 @patch 1.32.0.13369
 
 @event EVENT_COMMAND_BUTTON_CLICK
+@bug (thru v2.0.3.23038-PTR) EVENT_COMMAND_BUTTON_CLICK is not defined as constant, it's simply a comment in the code.
+API seems unfinished, where's the getter for "whichAbility" or "order"?
 */
 native TriggerRegisterCommandEvent takes trigger whichTrigger, integer whichAbility, string order returns event
 
 /**
+
+@note Event can trigger even if you don't have resources or the queue is full.
+
+@note **Example (Lua):**
+
+```{.lua}
+blacksmith = CreateUnit(Player(0), FourCC("hbla"), 256, 1792, 270.0)
+upgrade_Rhar = CreateUpgradeCommandButtonEffect(FourCC"Rhar")
+commandUpgradeButtonTrig = CreateTrigger()
+commandUpgradeButtonEv = TriggerRegisterUpgradeCommandEvent(commandUpgradeButtonTrig, FourCC"hkee" )
+commandUpgradeButtonAction = TriggerAddAction(commandUpgradeButtonTrig, function()
+	print("command upgrade button event works!", GetTriggerUnit(), GetUnitName(GetTriggerUnit()))
+end)
+```
+
+@bug (thru v2.0.3.23038-PTR) EVENT_COMMAND_BUTTON_CLICK is not defined as constant, it's simply a comment in the code.
+API seems unfinished, where's the getter for "whichAbility" or "order"?
+
+@note See: `TriggerRegisterCommandEvent`,
+`CreateCommandButtonEffect`, `CreateUpgradeCommandButtonEffect`, `CreateLearnCommandButtonEffect`
+
 @patch 1.32.0.13369
 
 @event EVENT_COMMAND_BUTTON_CLICK
@@ -14764,6 +14810,7 @@ constant native GetOrderedUnit takes nothing returns unit
 
 /**
 Returns the numeric order ID constant of the currently issued unit order.
+Returns 0, if used out of context.
 
 @note See: `OrderId`, `OrderId2String`, `GetOrderedUnit`, `GetOrderPointX`, `GetOrderTargetUnit`.
 
@@ -28284,7 +28331,7 @@ native BlzSetUnitFacingEx                          takes unit whichUnit, real fa
 
 
 /**
-Creates and returns a new learnable ability highlight.
+Creates and returns a new ability button highlight.
 
 *IFF order does not match ability* is an error case: returns a special invalid handle,
 that does **not** increase the handle count. Basically, you can check
@@ -28323,6 +28370,9 @@ train_hpea = CreateCommandButtonEffect(FourCC"Aque", UnitId2String(FourCC("hpea"
 
 Highlight building to upgrade into: yet to figure out... Aque doesn't work.
 
+@note See: `TriggerRegisterCommandEvent`, `TriggerRegisterUpgradeCommandEvent`,
+`CreateUpgradeCommandButtonEffect`, `CreateLearnCommandButtonEffect`
+
 @patch 1.32.0.13369
 */
 native CreateCommandButtonEffect                   takes integer abilityId, string order returns commandbuttoneffect
@@ -28337,6 +28387,9 @@ This call doesn't have an error condition.
 blacksmith = CreateUnit(Player(0), FourCC("hbla"), 256, 1792, 270.0)
 upgrade_Rhar = CreateUpgradeCommandButtonEffect(FourCC"Rhar")
 ```
+
+@note See: `TriggerRegisterCommandEvent`, `TriggerRegisterUpgradeCommandEvent`,
+`CreateCommandButtonEffect`, `CreateLearnCommandButtonEffect`
 
 @patch 1.32.0.13369
 */
@@ -28360,6 +28413,9 @@ myHero2 = CreateUnit(Player(1), FourCC("Hamg"), 192, 0, 270.0)
 
 learn_AHwe = CreateLearnCommandButtonEffect(FourCC"AHwe")
 ```
+
+@note See: `TriggerRegisterCommandEvent`, `TriggerRegisterUpgradeCommandEvent`,
+`CreateCommandButtonEffect`, `CreateUpgradeCommandButtonEffect`
 
 @patch 1.32.0.13369
 */
