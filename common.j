@@ -14011,7 +14011,7 @@ constant native GetWinningPlayer takes nothing returns player
 
 
 /**
-Registers when a unit enters a region.
+Registers and returns a new event for when a unit enters a region.
 
 @param whichTrigger The trigger to add the event to.
 
@@ -14046,6 +14046,8 @@ native TriggerRegisterEnterRegion takes trigger whichTrigger, region whichRegion
 // EVENT_GAME_ENTER_REGION
 
 /**
+Returns (reuses) handle to the containing region.
+
 @event EVENT_GAME_ENTER_REGION
 
 @patch 1.00
@@ -14053,6 +14055,9 @@ native TriggerRegisterEnterRegion takes trigger whichTrigger, region whichRegion
 constant native GetTriggeringRegion takes nothing returns region
 
 /**
+Returns (reuses) handle to unit, who enters the region.
+Returns null, if used in an invalid context (outside of trigger action or other event).
+
 @event EVENT_GAME_ENTER_REGION
 
 @patch 1.00
@@ -14063,7 +14068,7 @@ constant native GetEnteringUnit takes nothing returns unit
 
 
 /**
-Registers when a unit leaves a region.
+Registers and returns a new event for when a unit leaves a region.
 
 @param whichTrigger The trigger to add the event to.
 
@@ -14075,7 +14080,7 @@ Registers when a unit leaves a region.
 
 @note Units can leave a region by walking, being dispositioned by other game mechanisms, or programmatically
 (`SetUnitX`, `SetUnitY`, `SetUnitPosition`). Hidden, dead, and locust units can leave as well.
-Removing a unit will not fire the trigger nor the filter.
+Removing or killing a unit will not fire the trigger nor the filter.
 
 @note The filter can be `null` to allow any unit to fire the trigger. If there is a filter, the filter will
 be fired when a unit leaves the region. In this case, the trigger will only be fired if the filter returns `true`
@@ -14097,6 +14102,9 @@ nor the filter. But those units will then be considered outside and can fire lea
 native TriggerRegisterLeaveRegion takes trigger whichTrigger, region whichRegion, boolexpr filter returns event
 
 /**
+Returns (reuses) handle to unit, who leaves the region.
+Returns null, if used in an invalid context (outside of trigger action or other event).
+
 @event EVENT_GAME_LEAVE_REGION
 
 @patch 1.00
