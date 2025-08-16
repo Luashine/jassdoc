@@ -2308,21 +2308,27 @@ Stores the zero-based ID of neutral aggressive player.
 
 
 /**
+Used when a player/team wins.
 @patch 1.00
 */
     constant playergameresult   PLAYER_GAME_RESULT_VICTORY      = ConvertPlayerGameResult(0)
 
 /**
+Used when a player/team loses.
 @patch 1.00
 */
     constant playergameresult   PLAYER_GAME_RESULT_DEFEAT       = ConvertPlayerGameResult(1)
 
 /**
+Is only used to declare a tie between two teams (or players) in a game.
+
 @patch 1.00
 */
     constant playergameresult   PLAYER_GAME_RESULT_TIE          = ConvertPlayerGameResult(2)
 
 /**
+Is only used to remove observers (as non-playing players) from the game.
+
 @patch 1.00
 */
     constant playergameresult   PLAYER_GAME_RESULT_NEUTRAL      = ConvertPlayerGameResult(3)
@@ -3486,11 +3492,31 @@ Allows to spent the other player's resources.
     constant igamestate GAME_STATE_DIVINE_INTERVENTION          = ConvertIGameState(0)
 
 /**
+This game state changes when the (local) player is disconnected or desyncs from
+the running game (does not include `RemovePlayer` calls).
+
+@note TODO: Not all trigger conditions are known, be careful to not use this for saves for now.
+
+@note **Example (Lua):**
+
+Note: `GetTriggerPlayer` is not populated, because this is not a player-caused event.
+
+```{.lua}
+selfDisconnectedTrig = CreateTrigger()
+TriggerAddAction(selfDisconnectedTrig, function()
+	print("Self player left: ", GetPlayerName(GetLocalPlayer()))
+end)
+TriggerRegisterGameStateEvent(selfDisconnectedTrig, GAME_STATE_DISCONNECTED, NOT_EQUAL, 0.0)
+TriggerRegisterGameStateEvent(selfDisconnectedTrig, GAME_STATE_DISCONNECTED, EQUAL, 0.0)
+```
 @patch 1.00
 */
     constant igamestate GAME_STATE_DISCONNECTED                 = ConvertIGameState(1)
 
 /**
+@note Be careful with modifications of time of day within this event.
+It will probably cause an infinite cycle.
+
 @patch 1.00
 */
     constant fgamestate GAME_STATE_TIME_OF_DAY                  = ConvertFGameState(2)
@@ -3885,16 +3911,36 @@ TriggerRegisterGameEvent(trg_gameev, EVENT_GAME_BUILD_SUBMENU)
 
 
 /**
+@note (v2.0.3.23038-PTR) Could not cause this to trigger using `RemovePlayer(Player(1), PLAYER_GAME_RESULT_DEFEAT)`
 @patch 1.00
 */
     constant playerevent EVENT_PLAYER_DEFEAT                    = ConvertPlayerEvent(13)
 
 /**
+@note (v2.0.3.23038-PTR) Could not cause this to trigger using `RemovePlayer(Player(1), PLAYER_GAME_RESULT_VICTORY)`
 @patch 1.00
 */
     constant playerevent EVENT_PLAYER_VICTORY                   = ConvertPlayerEvent(14)
 
 /**
+This event triggers when *another* player leaves, from point of view of the
+continuing game lobby.
+
+@note Event trigger conditions:
+
+- *another* players desyncs
+- *another* players leaves using F10 menu/close game window (after leave confirmation)
+
+When *another* player's game is ended inside `GetLocalPlayer` block using `RemovePlayer(target player, player game result)`:
+
+Note: game pause (essentially disconnect) depends on `IsMapFlagSet(MAP_OBSERVERS_ON_DEATH)`
+
+- `PLAYER_GAME_RESULT_VICTORY`: pauses target's game
+(pause is only skipped if called inside `GetLocalPlayer` block asynchronously), only triggers `EVENT_PLAYER_LEAVE`
+- `PLAYER_GAME_RESULT_DEFEAT`: pauses target's game, only triggers `EVENT_PLAYER_LEAVE`
+- `PLAYER_GAME_RESULT_TIE`: pauses target's game, only triggers `EVENT_PLAYER_LEAVE`
+- `PLAYER_GAME_RESULT_NEUTRAL`: pauses target's game, does **not** trigger `EVENT_PLAYER_LEAVE` either
+
 @patch 1.00
 */
     constant playerevent EVENT_PLAYER_LEAVE                     = ConvertPlayerEvent(15)
@@ -13913,6 +13959,12 @@ native TriggerRegisterDialogButtonEvent takes trigger whichTrigger, button which
 //  EVENT_GAME_STATE_LIMIT
 
 /**
+Returns (reuses) a handle when used inside `TriggerRegisterGameStateEvent` action context.
+Always returns (resuses) a handle when used inside a player chat event.
+
+TODO: Further testing is needed, the API is clearly unfinished. Maybe the returned values
+could be used if saved as constants yourself.
+
 @event EVENT_GAME_STATE_LIMIT
 
 @patch 1.00
@@ -13946,6 +13998,10 @@ native TriggerRegisterGameEvent takes trigger whichTrigger, gameevent whichGameE
 // EVENT_GAME_VICTORY
 
 /**
+Unknown, as I couldn't (v2.0.3.23038-PTR) get the corresponding events to trigger.
+
+@note Returns null inside `EVENT_PLAYER_VICTORY`.
+
 @event EVENT_GAME_VICTORY
 
 @patch 1.00
@@ -14209,6 +14265,30 @@ constant native GetSaveBasicFilename takes nothing returns string
 
 
 /**
+Registers and returns a new event. Returns null, if player or event is null.
+Crashes (throws error in Lua), if trigger is null.
+
+@note **Example (Lua):**
+
+```{.lua}
+otherPlayer_LEAVE_Trig = CreateTrigger()
+TriggerAddAction(otherPlayer_LEAVE_Trig, function()
+	print("EVENT_PLAYER_LEAVE - Other player left: ", GetPlayerName(GetTriggerPlayer()))
+end)
+otherPlayer_DEFEAT_Trig = CreateTrigger()
+TriggerAddAction(otherPlayer_DEFEAT_Trig, function()
+	print("EVENT_PLAYER_DEFEAT - Other player left: ", GetPlayerName(GetTriggerPlayer()))
+end)
+otherPlayer_VICTORY_Trig = CreateTrigger()
+TriggerAddAction(otherPlayer_VICTORY_Trig, function()
+	print("EVENT_PLAYER_VICTORY - Other player left: ", GetPlayerName(GetTriggerPlayer()))
+end)
+for i = 0, GetBJMaxPlayerSlots()-1 do
+	TriggerRegisterPlayerEvent(otherPlayer_LEAVE_Trig,   Player(i), EVENT_PLAYER_LEAVE)
+	TriggerRegisterPlayerEvent(otherPlayer_DEFEAT_Trig,  Player(i), EVENT_PLAYER_DEFEAT)
+	TriggerRegisterPlayerEvent(otherPlayer_VICTORY_Trig, Player(i), EVENT_PLAYER_VICTORY)
+end
+```
 @patch 1.00
 */
 native TriggerRegisterPlayerEvent takes trigger whichTrigger, player  whichPlayer, playerevent whichPlayerEvent returns event
@@ -14218,7 +14298,7 @@ native TriggerRegisterPlayerEvent takes trigger whichTrigger, player  whichPlaye
 
 /**
 @event EVENT_PLAYER_DEFEAT
-
+@event EVENT_PLAYER_LEAVE
 @event EVENT_PLAYER_VICTORY
 
 @patch 1.00
@@ -19043,6 +19123,8 @@ constant native GetPlayerUnitCount      takes player whichPlayer, boolean includ
 constant native GetPlayerTypedUnitCount takes player whichPlayer, string unitName, boolean includeIncomplete, boolean includeUpgrades returns integer
 
 /**
+Used in melee to check how many buildings a player has left for the defeat condition.
+
 @patch 1.00
 */
 constant native GetPlayerStructureCount takes player whichPlayer, boolean includeIncomplete returns integer
