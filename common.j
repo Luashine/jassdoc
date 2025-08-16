@@ -28309,9 +28309,19 @@ which won't highlight anything, but create and return a new handle.
 @note **Example (Lua):** Highlight "Call To Arms" in human castle.
 
 ```{.lua}
-htow = CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
+htow = htow or CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
 use_calltoarms = CreateCommandButtonEffect(FourCC"Amic", "townbellon")
 ```
+
+Highlight unit to train:
+
+```{.lua}
+htow = htow or CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
+-- Aque is an internal "training queue" ability
+train_hpea = CreateCommandButtonEffect(FourCC"Aque", UnitId2String(FourCC("hpea")))
+```
+
+Highlight building to upgrade into: yet to figure out... Aque doesn't work.
 
 @patch 1.32.0.13369
 */
