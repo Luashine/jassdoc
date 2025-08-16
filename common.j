@@ -13658,6 +13658,8 @@ native ExecuteFunc          takes string funcName returns nothing
 /**
 Always returns a new boolean expression that has the result of evaluating logical (expr1 AND expr2).
 
+Lua: Returns a new boolexpr even if operands are null (Jass behavior?).
+
 @note Always returns a new boolexpr in Lua (v2.0.3.22988 and earlier) even when reusing previous `Condition`/`Filter`.
 TODO: What about Jass VM? At least it reuses previously created `Condition`/`Filter`.
 
@@ -13673,6 +13675,8 @@ native And              takes boolexpr operandA, boolexpr operandB returns boole
 /**
 Always returns a new boolean expression that has the result of evaluating logical (expr1 OR expr2).
 
+Lua: Returns a new boolexpr even if operands are null (Jass behavior?).
+
 @note Always returns a new boolexpr in Lua (v2.0.3.22988 and earlier) even when reusing previous `Condition`/`Filter`.
 TODO: What about Jass VM? At least it reuses previously created `Condition`/`Filter`.
 
@@ -13687,6 +13691,8 @@ native Or               takes boolexpr operandA, boolexpr operandB returns boole
 
 /**
 Always returns a new boolean expression that has the result of evaluating logical (NOT expr1).
+
+Lua: Returns a new boolexpr even if operand is null (Jass behavior?).
 
 @note Always returns a new boolexpr in Lua (v2.0.3.22988 and earlier) even when reusing previous `Condition`/`Filter`.
 TODO: What about Jass VM? At least it reuses previously created `Condition`/`Filter`.
@@ -13710,7 +13716,7 @@ The game will call `func()` without arguments and expect a boolean (true/false) 
 However, most functions from blizzard.j destroy passed boolexpr automatically.
 
 @note **Lua:** Always returns a new handle unless the passed parameter is `nil`, in this case
-it MAY return the same handle depending on unknown conditions (consecutive calls are likely to reuse previous handle).
+it MAY return the same handle, if it hasn't been garbage collected yet (consecutive calls are likely to reuse previous handle).
 
 Otherwise you can keep reusing existing conditions.
 
@@ -13754,7 +13760,7 @@ However, most functions from blizzard.j destroy passed boolexpr automatically.
 Otherwise you can keep reusing existing filters.
 
 @note **Lua:** Always returns a new handle unless the passed parameter is `nil`, in this case
-it MAY return the same handle depending on unknown conditions (consecutive calls are likely to reuse previous handle).
+it APPEARS TO ALWAYS return the same handle unless (possibly) garbage collected (consecutive calls definitely reuse previous handle).
 
 **Jass:** Returns same handle when you try to create multiple filters for the same function:
 `Filter(function foo) == Filter(function foo)` ("foo" can be non-constant and constant).
@@ -13806,6 +13812,7 @@ native DestroyBoolExpr  takes boolexpr e returns nothing
 
 /**
 Registers and attaches new event to the trigger. Returns the created event.
+Creates and returns an event even if `opcode` is null, or `varName` is an empty string.
 
 @note `DestroyTrigger` correctly cleans up events.
 If you register many temporary events, you may want to periodically recycle entire triggers. 
@@ -13853,8 +13860,10 @@ native TriggerRegisterTimerEvent takes trigger whichTrigger, real timeout, boole
 // Triggers when the timer you tell it about expires
 
 /**
-Attach timer to trigger. The trigger executes each time when timer expires.
-Usually used on periodic timers.
+Creates and returns a new registered event, by attaching timer to trigger.
+Returns null if either argument is null.
+
+The trigger executes each time when timer expires. Usually used on periodic timers.
 
 Returns the newly created event, which is not used by GUI functions.
 
@@ -13869,7 +13878,9 @@ native TriggerRegisterTimerExpireEvent takes trigger whichTrigger, timer t retur
 
 
 /**
-Registers and attaches new event to the trigger. Returns the created event.
+Creates and returns a new registered event, even if `whichState`/`opcode` is null
+Crashes thread (throws error in Lua), if limitval is not a real.
+Returns null if trigger is null.
 
 The trigger is executed every time the event condition (limitop and value) is fulfilled.
 
@@ -13882,6 +13893,8 @@ native TriggerRegisterGameStateEvent takes trigger whichTrigger, gamestate which
 
 
 /**
+Creates and returns a new registered event.
+Returns null, if any of the arguments is null.
 
 @note See: `DialogCreate`
 
@@ -13890,6 +13903,9 @@ native TriggerRegisterGameStateEvent takes trigger whichTrigger, gamestate which
 native TriggerRegisterDialogEvent       takes trigger whichTrigger, dialog whichDialog returns event
 
 /**
+Creates and returns a new registered event.
+Returns null, if any of the arguments is null.
+
 @patch 1.00
 */
 native TriggerRegisterDialogButtonEvent takes trigger whichTrigger, button whichButton returns event
@@ -13905,6 +13921,9 @@ constant native GetEventGameState takes nothing returns gamestate
 
 
 /**
+Creates and returns a new registered event,
+even if `whichGameEvent` is null. Returns null, if trigger is null.
+
 Registers to execute whichTrigger when a game event occurs.
 Returns a handle to event that represents the registration, you can't do anything with those currently.
 
