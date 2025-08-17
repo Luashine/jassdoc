@@ -4623,26 +4623,31 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
     constant playerunitevent    EVENT_PLAYER_UNIT_SELL_ITEM             = ConvertPlayerUnitEvent(271)
 
 /**
+@note See: `EVENT_UNIT_SPELL_CHANNEL`
 @patch 1.07
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_SPELL_CHANNEL         = ConvertPlayerUnitEvent(272)
 
 /**
+@note See: `EVENT_UNIT_SPELL_CAST`
 @patch 1.07
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_SPELL_CAST            = ConvertPlayerUnitEvent(273)
 
 /**
+@note See: `EVENT_UNIT_SPELL_EFFECT`
 @patch 1.07
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_SPELL_EFFECT          = ConvertPlayerUnitEvent(274)
 
 /**
+@note See: `EVENT_UNIT_SPELL_FINISH`
 @patch 1.07
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_SPELL_FINISH          = ConvertPlayerUnitEvent(275)
 
 /**
+@note See: `EVENT_UNIT_SPELL_ENDCAST`
 @patch 1.07
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_SPELL_ENDCAST         = ConvertPlayerUnitEvent(276)
@@ -4678,26 +4683,48 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
     constant unitevent          EVENT_UNIT_SELL_ITEM                    = ConvertUnitEvent(288)
 
 /**
+It is the first event in the chain when a unit uses an ability.
 @patch 1.07
 */
     constant unitevent          EVENT_UNIT_SPELL_CHANNEL                = ConvertUnitEvent(289)
 
 /**
+Second event in the ability cast chain.
 @patch 1.07
 */
     constant unitevent          EVENT_UNIT_SPELL_CAST                   = ConvertUnitEvent(290)
 
 /**
+Third event in the ability cast chain.
 @patch 1.07
 */
     constant unitevent          EVENT_UNIT_SPELL_EFFECT                 = ConvertUnitEvent(291)
 
 /**
+Fourth event in the ability cast chain.
+
+(Based on Paladin's heal 'AHhb'): Simply an animation that follows after the effect.
+Triggers when this animation completes.
+Can be interrupted by moving the caster unit and will not be triggered in this case.
+
+@bug (tested v2.0.3.23038-PTR with 'AHhb')
+If this is triggered, then some event information is reset/set to other values:
+
+- target location is set to map's (0, 0, Z elevation)
+- target unit/item/destructable are reset to null
+
+These new values then carry on to `EVENT_UNIT_SPELL_ENDCAST`,
+rather than the original spell target.
+
+The most likely explanation: spell finish is internally a partial ability cast.
+
 @patch 1.07
 */
     constant unitevent          EVENT_UNIT_SPELL_FINISH                 = ConvertUnitEvent(292)
 
 /**
+Fifth and last event in the ability cast chain.
+
 @patch 1.07
 */
     constant unitevent          EVENT_UNIT_SPELL_ENDCAST                = ConvertUnitEvent(293)
@@ -14406,6 +14433,21 @@ constant native GetTriggerPlayer takes nothing returns player
 
 
 /**
+Registers and returns the new event.
+Returns null if any of trigger/player/unitevent is null.
+
+@note **Example (Lua):** Triggers when player red selects another unit:
+
+```{.lua}
+targetPlayer = Player(0)
+playerunitTrig = CreateTrigger()
+playerunitEv = TriggerRegisterPlayerUnitEvent(playerunitTrig, targetPlayer, EVENT_PLAYER_UNIT_SELECTED, nil)
+playerunitAction = TriggerAddAction(playerunitTrig, function()
+	local unit = GetTriggerUnit()
+	print("PlayerUnitEvent: selected unit!", GetUnitName(unit), GetTriggerPlayer(), unit)
+end)
+```
+
 @patch 1.00
 */
 native TriggerRegisterPlayerUnitEvent takes trigger whichTrigger, player whichPlayer, playerunitevent whichPlayerUnitEvent, boolexpr filter returns event
@@ -15066,6 +15108,9 @@ constant native GetOrderTargetUnit          takes nothing returns unit
 // EVENT_PLAYER_UNIT_SPELL_ENDCAST
 
 /**
+Returns (reuses) handle to the unit who has cast the ability.
+Never returns null.
+
 @event EVENT_UNIT_SPELL_CHANNEL
 
 @event EVENT_UNIT_SPELL_CAST
@@ -15085,12 +15130,26 @@ constant native GetOrderTargetUnit          takes nothing returns unit
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note Complete testing code with targets and heroes and registered events.
+To test targeting items/destructables,
+you'll need to modify the assassin's poison dart ability to target items & debris too
+or choose another hero/ability.
+
+<https://github.com/Luashine/wc3-test-maps/tree/17ca6a67398bc71c78f871102913714c2a3881d9/spell-event>
+
+@note See: `GetSpellAbility`, `GetSpellAbilityId`,
+`GetSpellTargetLoc`, `GetSpellTargetX`, `GetSpellTargetY`,
+`GetSpellTargetDestructable`, `GetSpellTargetItem`, `GetSpellTargetUnit`
 
 @patch 1.07
 */
 constant native GetSpellAbilityUnit         takes nothing returns unit
 
 /**
+Returns ability type ID (aka rawcode) of the ability cast.
+Never returns 0.
+
 @event EVENT_UNIT_SPELL_CHANNEL
 
 @event EVENT_UNIT_SPELL_CAST
@@ -15110,12 +15169,19 @@ constant native GetSpellAbilityUnit         takes nothing returns unit
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note See: `GetSpellAbilityUnit` for an example, `GetSpellAbility`,
+`GetSpellTargetLoc`, `GetSpellTargetX`, `GetSpellTargetY`,
+`GetSpellTargetDestructable`, `GetSpellTargetItem`, `GetSpellTargetUnit`
 
 @patch 1.07
 */
 constant native GetSpellAbilityId           takes nothing returns integer
 
 /**
+Returns (reuses) handle to the ability instance cast.
+Never returns null.
+
 @event EVENT_UNIT_SPELL_CHANNEL
 
 @event EVENT_UNIT_SPELL_CAST
@@ -15135,13 +15201,29 @@ constant native GetSpellAbilityId           takes nothing returns integer
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note See: `GetSpellAbilityUnit` for an example, `GetSpellAbilityId`,
+`GetSpellTargetLoc`, `GetSpellTargetX`, `GetSpellTargetY`,
+`GetSpellTargetDestructable`, `GetSpellTargetItem`, `GetSpellTargetUnit`
 
 @patch 1.07
 */
 constant native GetSpellAbility             takes nothing returns ability
 
 /**
-@note (TODO) See location-specific notes in `GetOrderPointLoc`.
+Returns:
+- creates and returns a new (x,y,z) location of the target
+- or 0.0 if no positional target existed or
+if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+
+If the spell has a target (unit/item/destructable/location), then
+the location is **your cursor position** over the target, when you
+had issued/queued the order.
+
+Positional but targetless spells (like Mountain King's Thunderclap)
+return map's (0, 0, Z elevation) position.
+
+@note To avoid leaks, use `RemoveLocation` to destroy the location.
 
 @event EVENT_UNIT_SPELL_CHANNEL
 
@@ -15162,12 +15244,23 @@ constant native GetSpellAbility             takes nothing returns ability
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note See: `GetSpellAbilityUnit` for an example, `GetSpellAbility`, `GetSpellAbilityId`,
+`GetSpellTargetX`, `GetSpellTargetY`, `GetOrderPointLoc`
+`GetSpellTargetDestructable`, `GetSpellTargetItem`, `GetSpellTargetUnit`
 
 @patch 1.13
 */
 constant native GetSpellTargetLoc           takes nothing returns location
 
 /**
+Returns:
+- X map coordinate of the target
+- or 0.0 if no positional target existed or
+if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+
+See `GetSpellTargetLoc` for more info or if you want to get the Z coordinate.
+
 @event EVENT_UNIT_SPELL_CHANNEL
 
 @event EVENT_UNIT_SPELL_CAST
@@ -15187,12 +15280,23 @@ constant native GetSpellTargetLoc           takes nothing returns location
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note See: `GetSpellAbilityUnit` for an example, `GetSpellAbility`, `GetSpellAbilityId`,
+`GetSpellTargetLoc`, `GetSpellTargetY`,
+`GetSpellTargetDestructable`, `GetSpellTargetItem`, `GetSpellTargetUnit`
 
 @patch 1.24a
 */
 constant native GetSpellTargetX				takes nothing returns real
 
 /**
+Returns:
+- Y map coordinate of the target
+- or 0.0 if no positional target existed or
+if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+
+See `GetSpellTargetLoc` for more info or if you want to get the Z coordinate.
+
 @event EVENT_UNIT_SPELL_CHANNEL
 
 @event EVENT_UNIT_SPELL_CAST
@@ -15212,13 +15316,19 @@ constant native GetSpellTargetX				takes nothing returns real
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note See: `GetSpellAbilityUnit` for an example, `GetSpellAbility`, `GetSpellAbilityId`,
+`GetSpellTargetLoc`, `GetSpellTargetX`,
+`GetSpellTargetDestructable`, `GetSpellTargetItem`, `GetSpellTargetUnit`
 
 @patch 1.24a
 */
 constant native GetSpellTargetY				takes nothing returns real
 
 /**
-Returns handle, or null on failure.
+Returns (reuses) handle to the targeted destructable,
+or null if spell had no target or target is not a destructable,
+or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
 
 @event EVENT_UNIT_SPELL_CHANNEL
 
@@ -15239,12 +15349,20 @@ Returns handle, or null on failure.
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note See: `GetSpellAbilityUnit` for an example, `GetSpellAbility`, `GetSpellAbilityId`,
+`GetSpellTargetLoc`, `GetSpellTargetX`, `GetSpellTargetY`,
+`GetSpellTargetItem`, `GetSpellTargetUnit`
 
 @patch 1.13
 */
 constant native GetSpellTargetDestructable  takes nothing returns destructable
 
 /**
+Returns (reuses) handle to the targeted item,
+or null if spell had no target or target is not a item,
+or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+
 @event EVENT_UNIT_SPELL_CHANNEL
 
 @event EVENT_UNIT_SPELL_CAST
@@ -15264,12 +15382,20 @@ constant native GetSpellTargetDestructable  takes nothing returns destructable
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note See: `GetSpellAbilityUnit` for an example, `GetSpellAbility`, `GetSpellAbilityId`,
+`GetSpellTargetLoc`, `GetSpellTargetX`, `GetSpellTargetY`,
+`GetSpellTargetDestructable`, `GetSpellTargetUnit`
 
 @patch 1.13
 */
 constant native GetSpellTargetItem          takes nothing returns item
 
 /**
+Returns (reuses) handle to the targeted unit,
+or null if spell had no target or target is not a unit,
+or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+
 @event EVENT_UNIT_SPELL_CHANNEL
 
 @event EVENT_UNIT_SPELL_CAST
@@ -15289,6 +15415,10 @@ constant native GetSpellTargetItem          takes nothing returns item
 @event EVENT_PLAYER_UNIT_SPELL_FINISH
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
+
+@note See: `GetSpellAbilityUnit` for an example, `GetSpellAbility`, `GetSpellAbilityId`,
+`GetSpellTargetLoc`, `GetSpellTargetX`, `GetSpellTargetY`,
+`GetSpellTargetDestructable`, `GetSpellTargetItem`
 
 @patch 1.13
 */
