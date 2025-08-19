@@ -3980,6 +3980,7 @@ will return `""`. Use `TriggerRegisterPlayerChatEvent` instead.
     constant playerunitevent EVENT_PLAYER_UNIT_DEATH                    = ConvertPlayerUnitEvent(20)
 
 /**
+@note Refer to `EVENT_UNIT_DECAY`
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_DECAY                    = ConvertPlayerUnitEvent(21)
@@ -4274,6 +4275,9 @@ Use `GetSummonedUnit` for the new unit and `GetSummoningUnit` for the spell cast
     constant unitevent EVENT_UNIT_DEATH                                 = ConvertUnitEvent(53)
 
 /**
+Fires when a dead unit starts transitioning from the 'death' to a 'decay' animation.
+
+@note See: `GetDecayingUnit` (same as `GetTriggerUnit`), `GetTriggerPlayer` for unit owner.
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_DECAY                                 = ConvertUnitEvent(54)
@@ -14574,6 +14578,8 @@ native TriggerRegisterPlayerUnitEvent takes trigger whichTrigger, player whichPl
 Returns (reuses) handle to the leveling unit (hero) who has just
 levelled up.
 
+Returns null when used in an invalid context.
+
 @note See `EVENT_UNIT_HERO_LEVEL` for an example.
 
 @event EVENT_PLAYER_HERO_LEVEL
@@ -14588,6 +14594,11 @@ constant native GetLevelingUnit takes nothing returns unit
 // EVENT_UNIT_HERO_SKILL
 
 /**
+Returns (reuses) handle to the unit who has learned an ability.
+Same as `GetTriggerUnit` in this context.
+
+Returns null when used in an invalid context.
+
 @event EVENT_PLAYER_HERO_SKILL
 
 @event EVENT_UNIT_HERO_SKILL
@@ -14618,6 +14629,8 @@ constant native GetLearnedSkillLevel takes nothing returns integer
 
 /**
 Returns (reuses) handle to the unit who just became revivable.
+
+Returns null when used in an invalid context.
 
 Same as `GetTriggerUnit` within this context.
 
@@ -14698,9 +14711,44 @@ constant native GetKillingUnit takes nothing returns unit
 // EVENT_PLAYER_UNIT_DECAY
 
 /**
+Returns (reuses) handle to unit who has just started the decay process and animation
+shortly after death.
+
+Returns null when used in an invalid context.
+
 @event EVENT_PLAYER_UNIT_DECAY
 
 @event EVENT_UNIT_DECAY
+
+@note **Example (Lua):**
+
+```{.lua}
+myUnitDead = CreateUnit(Player(0), FourCC"hfoo", 256, 0, 270.0)
+KillUnit(myUnitDead)
+
+do
+	local PLAYERUNITEVENT = EVENT_PLAYER_UNIT_DECAY
+	local trig = CreateTrigger()
+	local regEvent = TriggerRegisterPlayerUnitEvent(trig, Player(0), PLAYERUNITEVENT, nil)
+
+	local trigAction = TriggerAddAction(trig, function()
+		local trigPlayer = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit() -- same as event-specific getters
+		
+		local decayingUnit = GetDecayingUnit()
+		local decayingUnitName = decayingUnit and GetUnitName(decayingUnit)
+		
+		
+		print(string.format("\x25s decayingUnit='\x25s' trigPlayer='\x25s' trigUnit='\x25s'",
+			(eventName:gsub("EVENT_PLAYER_", "")), decayingUnitName, tostring(trigPlayer), tostring(trigUnit)
+		))
+		print(GetTriggerUnit()==GetTriggerUnit())
+		print(GetDecayingUnit()==GetDecayingUnit())
+		print(GetTriggerUnit()==GetDecayingUnit())
+	end)
+end
+print("Player unit decay event registration complete.")
+```
 
 @patch 1.00
 */
