@@ -4138,7 +4138,6 @@ Cheat("greedisgood 9999") -- gold and lumber
 Cheat("warpten") -- fast construction/training
 SetPlayerState(Player(0), PLAYER_STATE_RESOURCE_FOOD_CAP, 77)
 
--- todo: modify resurrection to target hero units too
 spellEvents = {
 "EVENT_PLAYER_HERO_REVIVE_START",
 "EVENT_PLAYER_HERO_REVIVE_CANCEL",
@@ -4489,21 +4488,25 @@ SetHeroLevel(myHero, GetHeroLevel(myHero)+10, true)
                                                                         
 
 /**
+@note Refer to: `EVENT_PLAYER_HERO_REVIVABLE`
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_HERO_REVIVABLE                        = ConvertUnitEvent(80)
 
 /**
+@note Refer to: `EVENT_PLAYER_HERO_REVIVE_START`
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_HERO_REVIVE_START                     = ConvertUnitEvent(81)
 
 /**
+@note Refer to: `EVENT_PLAYER_HERO_REVIVE_CANCEL`
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_HERO_REVIVE_CANCEL                    = ConvertUnitEvent(82)
 
 /**
+@note Refer to: `EVENT_PLAYER_HERO_REVIVE_FINISH`
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_HERO_REVIVE_FINISH                    = ConvertUnitEvent(83)
@@ -14598,6 +14601,8 @@ Returns (reuses) handle to the unit who has learned an ability.
 Same as `GetTriggerUnit` in this context.
 
 Returns null when used in an invalid context.
+
+@note `GetTriggerPlayer` refers to the unit's player owner.
 
 @event EVENT_PLAYER_HERO_SKILL
 
