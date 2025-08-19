@@ -28677,12 +28677,14 @@ htow = htow or CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
 use_calltoarms = CreateCommandButtonEffect(FourCC"Amic", "townbellon")
 ```
 
-Highlight unit to train:
+Highlight unit to train/upgrade:
 
 ```{.lua}
 htow = htow or CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
 -- Aque is an internal "training queue" ability
 train_hpea = CreateCommandButtonEffect(FourCC"Aque", UnitId2String(FourCC("hpea")))
+-- Aupg is an internal ability to initiate a unit (building) upgrade
+upgr_htow = CreateCommandButtonEffect(FourCC"Aupg", UnitId2String(FourCC("hkee")))
 ```
 
 Highlight building to upgrade into: yet to figure out... Aque doesn't work.
