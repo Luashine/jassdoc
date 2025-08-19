@@ -3969,6 +3969,8 @@ will return `""`. Use `TriggerRegisterPlayerChatEvent` instead.
     constant playerunitevent EVENT_PLAYER_UNIT_ATTACKED                 = ConvertPlayerUnitEvent(18)
 
 /**
+@note You probably should destroy the trigger if it's only attached to a single unit
+@note See: `GetRescuer`, `SetUnitRescueRange`, `SetUnitRescuable`; refer to `EVENT_UNIT_RESCUED`
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_RESCUED                  = ConvertPlayerUnitEvent(19)
@@ -4326,6 +4328,9 @@ Fires when a dead unit starts transitioning from the 'death' to a 'decay' animat
     constant unitevent EVENT_UNIT_ATTACKED                              = ConvertUnitEvent(62)
 
 /**
+@note You probably should destroy the trigger if it's only attached to a single unit
+@note See: `GetRescuer`, `SetUnitRescueRange`, `SetUnitRescuable`, `EVENT_PLAYER_UNIT_RESCUED`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_RESCUED                               = ConvertUnitEvent(63)
@@ -14687,6 +14692,51 @@ constant native GetAttacker takes nothing returns unit
 // EVENT_PLAYER_UNIT_RESCUED
 
 /**
+Returns (reuses) handle to the unit, who is being rescued.
+
+Returns null in an invalid context.
+
+@note See: `SetUnitRescueRange`, `SetUnitRescuable`, `EVENT_UNIT_RESCUED`, `EVENT_PLAYER_UNIT_RESCUED`.
+`GetTriggerPlayer` returns rescued unit's current (old) owner and `GetTriggerUnit` the rescued unit.
+
+@note **Example (Lua):**
+
+```{.lua}
+myHero = CreateUnit(Player(0), FourCC"Hamg", 256, 0, 270.0)
+myRescuable = CreateUnit(Player(GetPlayerNeutralPassive()), FourCC"hpea", -1024, 0, 270.0)
+SetUnitRescuable(myRescuable, Player(0), true)
+SetUnitRescueRange(myRescuable, 800)
+
+-- register each event
+do
+	local UNITEVENT = EVENT_UNIT_RESCUED -- fetch global by name
+	local trig = CreateTrigger()
+	local regEvent = TriggerRegisterUnitEvent(trig, myRescuable, UNITEVENT, nil)
+	
+	local trigAction = TriggerAddAction(trig, function()
+		local rescuedOwner = GetTriggerPlayer()
+		local rescuedUnit = GetTriggerUnit()
+		local rescuedUnitName = GetUnitName(rescuedUnit)
+		
+		local saviorUnit = GetRescuer()
+		local saviorUnitName = saviorUnit and GetUnitName(saviorUnit)
+	
+		
+		print(string.format("\x25s savior='\x25s' rescuedOwner='\x25s' rescuedUnit='\x25s'",
+			"UNIT_RESCUED", saviorUnitName, GetPlayerName(rescuedOwner), rescuedUnitName
+		))
+		
+		-- Now execute the rescue by changing ownership
+		local saviorPlayer = GetOwningPlayer(saviorUnit)
+		SetUnitOwner(rescuedUnit, saviorPlayer, true)
+		BlzDisplayChatMessage(saviorPlayer, 0, rescuedUnitName.." says: omg thanks for rescuing me!")
+
+		-- You probably should destroy the trigger if it's only attached to a single unit
+	end)
+end
+print("Player unit decay event registration complete.")
+```
+
 @event EVENT_PLAYER_UNIT_RESCUED
 
 @event EVENT_UNIT_RESCUED
@@ -17504,11 +17554,28 @@ native          ResetUnitLookAt     takes unit whichUnit returns nothing
 
 
 /**
+Allows the target unit to be rescued by another player.
+
+@note Resets to false after the rescue event has been fired.
+(TODO: only for the rescuer player or every previously allowed player?)
+
+@note See: `GetRescuer`, `SetUnitRescueRange`, `EVENT_UNIT_RESCUED`, `EVENT_PLAYER_UNIT_RESCUED`
+
+@param whichUnit unit who can be rescued
+@param byWhichPlayer which player can rescue the unit for themselves?
+@param flag `true` to allow rescue, `false` to disable
+
 @patch 1.00
 */
 native          SetUnitRescuable    takes unit whichUnit, player byWhichPlayer, boolean flag returns nothing
 
 /**
+The activation range for this unit's rescue trigger.
+
+Make sure this is greater than a rescuer's attack range, otherwise it possible
+to kill units without rescuing them.
+
+@note See: `GetRescuer`, `SetUnitRescuable`, `EVENT_UNIT_RESCUED`, `EVENT_PLAYER_UNIT_RESCUED`
 @patch 1.00
 */
 native          SetUnitRescueRange  takes unit whichUnit, real range returns nothing
