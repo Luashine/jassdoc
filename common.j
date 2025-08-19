@@ -4104,33 +4104,107 @@ See description of `EVENT_UNIT_ISSUED_TARGET_ORDER`.
 
 
 /**
+@note Refer to: `EVENT_UNIT_HERO_LEVEL`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_HERO_LEVEL                    = ConvertPlayerUnitEvent(41)
 
 /**
+@note Refer to: `EVENT_UNIT_HERO_SKILL`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_HERO_SKILL                    = ConvertPlayerUnitEvent(42)
 
 
 /**
+Fires when a hero becomes available for revival (e.g. shortly after hero death).
+
+@note See: `GetRevivableUnit` (same as `GetTriggerUnit`)
+
+@note **Example (Lua):** This registers all relevant revive events at once.
+
+```{.lua}
+myHero = CreateUnit(Player(0), FourCC"Hpal", 256, 0, 270.0)
+UnitAddAbility(myHero, FourCC"AHre")
+myHeroDead = CreateUnit(Player(0), FourCC"Hamg", 256, 0, 270.0)
+KillUnit(myHeroDead)
+myUnitDead = CreateUnit(Player(0), FourCC"hfoo", 256, 0, 270.0)
+KillUnit(myUnitDead)
+myAltar = CreateUnit(Player(0), FourCC"halt", 256, 768, 270.0)
+Cheat("greedisgood 9999") -- gold and lumber
+Cheat("warpten") -- fast construction/training
+SetPlayerState(Player(0), PLAYER_STATE_RESOURCE_FOOD_CAP, 77)
+
+-- todo: modify resurrection to target hero units too
+spellEvents = {
+"EVENT_PLAYER_HERO_REVIVE_START",
+"EVENT_PLAYER_HERO_REVIVE_CANCEL",
+"EVENT_PLAYER_HERO_REVIVE_FINISH",
+"EVENT_PLAYER_HERO_REVIVABLE",
+}
+-- register each event
+for _, eventName in pairs(spellEvents) do
+	local PLAYERUNITEVENT = _G[eventName] -- fetch global by name
+	local trig = CreateTrigger()
+	local regEvent = TriggerRegisterPlayerUnitEvent(trig, Player(0), PLAYERUNITEVENT, nil)
+	-- also separate action generated per hero+event to capture eventName as upvalue
+	-- you will not need all this, so just register the needed trigger+event+action once
+	local trigAction = TriggerAddAction(trig, function()
+		local trigPlayer = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit() -- same as event-specific getters
+		
+		local revivableUnit = GetRevivableUnit()
+		local revivableUnitName = revivableUnit and GetUnitName(revivableUnit)
+		local revivingUnit = GetRevivingUnit()
+		local revivingUnitName = revivingUnit and GetUnitName(revivingUnit)
+		local trainedUnit = GetTrainedUnit()
+		local summoningUnit = GetSummoningUnit()
+		local summonedUnit = GetSummonedUnit()
+		
+		
+		print(string.format("\x25s revivableUnit='\x25s' revivingUnit='\x25s'",
+			(eventName:gsub("EVENT_PLAYER_", "")), revivableUnitName, revivingUnitName
+		))
+		print("...revive2", trigPlayer, trigUnit, revivableUnitName)
+		print("HP / pos trigUnit: ".. GetWidgetLife(trigUnit), GetUnitX(trigUnit), GetUnitY(trigUnit))
+	end)
+end
+print("Player unit revive event registration complete.")
+```
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_HERO_REVIVABLE                = ConvertPlayerUnitEvent(43)
 
 
 /**
+Fires when a hero is queued for revival at an altar.
+
+@note Paladin's resurrection on a non-hero unit does NOT count as revive for any of these hero events.
+@note See: `GetRevivingUnit` (same as `GetTriggerUnit`) to get the queued hero; `EVENT_PLAYER_HERO_REVIVABLE` for an example.
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_HERO_REVIVE_START             = ConvertPlayerUnitEvent(44)
 
 /**
+Fires when a hero's revival at an altar is cancelled.
+
+@note See: `GetRevivingUnit` (same as `GetTriggerUnit`) to get the queued hero; `EVENT_PLAYER_HERO_REVIVABLE` for an example.
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_HERO_REVIVE_CANCEL            = ConvertPlayerUnitEvent(45)
 
 /**
+Fires when a hero finishes revival through an altar.
+
+At this point the hero has already been revived at the new location with full HP.
+
+@note See: `GetRevivingUnit` (same as `GetTriggerUnit`) to get the queued hero; `EVENT_PLAYER_HERO_REVIVABLE` for an example.
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_HERO_REVIVE_FINISH            = ConvertPlayerUnitEvent(46)
@@ -4359,11 +4433,52 @@ Examples:
                                                                        
 
 /**
+It is fired when a hero's level increases (and is not limited by max level).
+
+Valid getters:
+
+- `GetTriggerPlayer` (owner of unit)
+- `GetLevelingUnit` and `GetTriggerUnit`
+
+@note **Example (Lua):**
+
+```{.lua}
+myHero = CreateUnit(Player(0), FourCC"Hamg", 256, 0, 270.0)
+heroLevelTrig = CreateTrigger()
+heroLevelEv = TriggerRegisterUnitEvent(heroLevelTrig, myHero, EVENT_UNIT_HERO_LEVEL)
+heroLevelAction = TriggerAddAction(heroLevelTrig, function()
+	print("HERO_LEVEL unit", GetLevelingUnit())
+end)
+SetHeroLevel(myHero, GetHeroLevel(myHero)+1, true)
+```
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_HERO_LEVEL                            = ConvertUnitEvent(78)
 
 /**
+It is fired when the unit (hero) learns a new ability
+(adding an ability via trigger does not count).
+
+Valid getters:
+
+- `GetTriggerPlayer` (owner of unit)
+- `GetLearningUnit` and `GetTriggerUnit`
+
+@note **Example (Lua):**
+
+```{.lua}
+myHero = CreateUnit(Player(0), FourCC"Hamg", 256, 0, 270.0)
+heroSkillTrig = CreateTrigger()
+heroSkillEv = TriggerRegisterUnitEvent(heroSkillTrig, myHero, EVENT_UNIT_HERO_SKILL)
+heroSkillAction = TriggerAddAction(heroSkillTrig, function()
+	print("HERO_SKILL unit", GetLearningUnit())
+end)
+SetHeroLevel(myHero, GetHeroLevel(myHero)+10, true)
+```
+
+@note TODO: Is there a way to get which ability was learned?
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_HERO_SKILL                            = ConvertUnitEvent(79)
@@ -14456,6 +14571,11 @@ native TriggerRegisterPlayerUnitEvent takes trigger whichTrigger, player whichPl
 // EVENT_UNIT_HERO_LEVEL
 
 /**
+Returns (reuses) handle to the leveling unit (hero) who has just
+levelled up.
+
+@note See `EVENT_UNIT_HERO_LEVEL` for an example.
+
 @event EVENT_PLAYER_HERO_LEVEL
 
 @event EVENT_UNIT_HERO_LEVEL
@@ -14497,6 +14617,10 @@ constant native GetLearnedSkillLevel takes nothing returns integer
 // EVENT_PLAYER_HERO_REVIVABLE
 
 /**
+Returns (reuses) handle to the unit who just became revivable.
+
+Same as `GetTriggerUnit` within this context.
+
 @event EVENT_PLAYER_HERO_REVIVABLE
 
 @patch 1.00
@@ -14511,6 +14635,10 @@ constant native GetRevivableUnit takes nothing returns unit
 // EVENT_UNIT_HERO_REVIVE_FINISH
 
 /**
+Returns (reuses) handle to the unit who is being revived.
+
+Same as `GetTriggerUnit` within this context.
+
 @event EVENT_PLAYER_HERO_REVIVE_START
 
 @event EVENT_PLAYER_HERO_REVIVE_CANCEL
@@ -18489,6 +18617,13 @@ Returns:
 
 - true if the addition was successful (hero did not have this ability before)
 - false otherwise (hero already has this ability)
+
+@note **Example (Lua):** adds an item version of the place ward ability.
+
+```{.lua}
+heroWithAbility = CreateUnit(Player(0), FourCC"Ewar", 384, 0, 270.0)
+print(UnitAddAbility(heroWithAbility, FourCC'AIsw'))
+```
 
 @param whichUnit Target unit.
 
