@@ -854,11 +854,21 @@ type itembooleanfield               extends handle
 type itemstringfield                extends handle
 
 /**
+It exists to reflect WorldEditor fields.
+You may find the numeric constants useful.
+
+@bug Unfinished API, completely unused.
+@note See: `BlzGetUnitMovementType` in hidden natives "reforged-hidden.j"
+
 @patch 1.31.0.11889
 */
 type movetype                       extends handle
 
 /**
+It exists to reflect WorldEditor fields.
+You may find the numeric constants useful.
+
+@bug Unfinished API.
 Constants of this type were defined (and their list is incomplete), but this type remains completely unused.
 
 @note See `UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED` to access a unit's attack properties.
@@ -868,31 +878,68 @@ Constants of this type were defined (and their list is incomplete), but this typ
 type targetflag                     extends handle
 
 /**
+It exists to reflect WorldEditor fields.
+You may find the numeric constants useful.
+
+@bug Unfinished API, completely unused.
+
+@note Do not confuse with `defensetype`
+
+@note See: `BlzGetUnitArmorType` in hidden natives "reforged-hidden.j"
+
 @patch 1.31.0.11889
 */
 type armortype                      extends handle
 
 /**
+It exists to reflect WorldEditor fields.
+You may find the numeric constants useful.
+
+@bug Unfinished API, completely unused.
+
+@note See: `BlzGetHeroPrimaryStat`, `BlzGetHeroPrimaryStatById`, `BlzGetHeroStat`,
+`BlzSetHeroPrimaryStat`, `BlzSetHeroStatEx`
+in hidden natives "reforged-hidden.j"
+
 @patch 1.31.0.11889
 */
 type heroattribute                  extends handle
 
 /**
+It exists to reflect WorldEditor fields.
+You may find the numeric constants useful.
+
+@bug Unfinished API, completely unused.
+
+@note Do not confuse with `armortype`
+
 @patch 1.31.0.11889
 */
 type defensetype                    extends handle
 
 /**
+It exists to reflect WorldEditor fields.
+You may find the numeric constants useful.
+
+@bug Unfinished API, completely unused.
 @patch 1.31.0.11889
 */
 type regentype                      extends handle
 
 /**
+It exists to reflect WorldEditor fields.
+You may find the numeric constants useful.
+
+@bug Unfinished API, completely unused.
 @patch 1.31.0.11889
 */
 type unitcategory                   extends handle
 
 /**
+It exists to reflect WorldEditor fields.
+You may find the numeric constants useful.
+
+@bug Unfinished API, completely unused.
 @patch 1.31.0.11889
 */
 type pathingflag                    extends handle
@@ -1437,9 +1484,11 @@ Returns the itemtype that corresponds to the given integer.
 constant native ConvertItemType             takes integer i returns itemtype
 
 /**
-@note Blizzard only defined attack-types 0 to 6 but there is a hidden one:
-`ConvertAttackType(7)`.
-<http://www.hiveworkshop.com/forums/t-269/h-227993/>
+@note Blizzard only defined attack-types 0 to 6 but there are two hidden ones:
+
+- `-1`: used as an error value
+- `7`: hidden, but usable `ConvertAttackType(7)`
+<https://www.hiveworkshop.com/threads/hidden-attack_type-in-the-world-editor.227993/>
 
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
@@ -1853,6 +1902,7 @@ constant native ConvertTargetFlag                       takes integer i returns 
 
 /**
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+@note Unfinished API, see: `armortype`
 
 @pure 
 
@@ -1862,6 +1912,7 @@ constant native ConvertArmorType                        takes integer i returns 
 
 /**
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+@note Unfinished API, see: `heroattribute`
 
 @pure 
 
@@ -1871,6 +1922,7 @@ constant native ConvertHeroAttribute                    takes integer i returns 
 
 /**
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+@note Unfinished API, see: `defensetype`
 
 @pure 
 
@@ -1880,6 +1932,7 @@ constant native ConvertDefenseType                      takes integer i returns 
 
 /**
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+@note Unfinished API, see: `regentype`
 
 @pure 
 
@@ -1889,6 +1942,7 @@ constant native ConvertRegenType                        takes integer i returns 
 
 /**
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+@note Unfinished API, see: `unitcategory`
 
 @pure 
 
@@ -1898,6 +1952,7 @@ constant native ConvertUnitCategory                     takes integer i returns 
 
 /**
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
+@note Unfinished API, see: `pathingflag`
 
 @pure 
 
@@ -3964,6 +4019,74 @@ will return `""`. Use `TriggerRegisterPlayerChatEvent` instead.
 
 
 /**
+When a unit initiates an attack, this is the first event
+to be fired (from the perspective of the attacker).
+
+For player-unit variation, it only fires for the victim's owner player.
+
+It is followed by (after some time and a swing) `EVENT_PLAYER_UNIT_DAMAGING`
+and then `EVENT_PLAYER_UNIT_DAMAGED`.
+
+Valid getters:
+
+- `GetTriggerPlayer` - owner of victim unit
+- `GetTriggerUnit` - victim unit
+- `GetAttacker` - attacking unit
+
+@note The damage type is unknown at this early stage.
+
+@note See: `EVENT_UNIT_ATTACKED`
+
+@note **Example (Lua, 2.0.3):**
+
+```{.lua}
+peasant = CreateUnit(Player(0), FourCC"hpea", 256, 0, 270.0)
+-- assumes blue player is ally and you can control him
+footman = CreateUnit(Player(1), FourCC"hfoo", 384, 0, 270.0)
+
+regEvents = {
+"EVENT_PLAYER_UNIT_DAMAGED",
+"EVENT_PLAYER_UNIT_DAMAGING",
+"EVENT_PLAYER_UNIT_ATTACKED",
+}
+-- register each event
+for slotId = 0, 1 do
+	for _, eventName in pairs(regEvents) do
+		local PLAYERUNITEVENT = _G[eventName]
+		
+		local trig = CreateTrigger()
+		local regEvent = TriggerRegisterPlayerUnitEvent(trig, Player(slotId), PLAYERUNITEVENT, nil)
+
+		local trigAction = TriggerAddAction(trig, function()
+			local trigPlayer = GetTriggerPlayer()
+			local trigUnit = GetTriggerUnit() -- same as event-specific getters
+			local trigUnitName = GetUnitName(trigUnit)
+			
+			local attackerUnit = GetAttacker()
+			local attackerUnitName = attackerUnit and GetUnitName(attackerUnit)
+			
+			print(string.format("Pl \x252d: \x25s trigUnit='\x25s' trigPlayer='\x25s' hp=\x254.1f",
+				slotId, (eventName:gsub("EVENT_PLAYER_", "")),
+				trigUnitName, GetPlayerName(trigPlayer), GetWidgetLife(trigUnit)
+			))
+			print(string.format("...evDamage=\x25.3f, dmgTarget=\x25s, dmgSource=\x25s",
+				GetEventDamage(),
+				tostring(BlzGetEventDamageTarget()),
+				tostring(GetEventDamageSource())
+			))
+			print(string.format("...evDmgType=\x25s, atkType=\x25s", 
+				tostring(BlzGetEventDamageType()):gsub("damagetype: ", ""),
+				tostring(BlzGetEventAttackType()):gsub("attacktype: ", "")
+			))
+			print(string.format("...wpnType=\x25s", 
+				tostring(BlzGetEventWeaponType()):gsub("weapontype: ", "")
+			))
+		end)
+	end
+	print("Player unit attack events registration complete.")
+end
+```
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_ATTACKED                 = ConvertPlayerUnitEvent(18)
@@ -4246,11 +4369,55 @@ Use `GetSummonedUnit` for the new unit and `GetSummoningUnit` for the spell cast
     constant playerunitevent EVENT_PLAYER_UNIT_LOADED                   = ConvertPlayerUnitEvent(51)
 
 /**
+This is the last event in the attack process.
+It is fired after damage calculation.
+
+For player-unit variation, it only fires for the victim's owner player.
+
+The attacker, final damage, and victim are known,
+but damage has not yet been applied: the victim is still at full hp.
+
+The events `EVENT_PLAYER_UNIT_ATTACKED` and `EVENT_PLAYER_UNIT_DAMAGED`
+happened before in this order.
+
+Valid getters:
+
+- `GetTriggerPlayer` - owner of victim unit
+- `GetTriggerUnit`, `BlzGetEventDamageTarget` - victim unit
+- `GetEventDamageSource` - attacking unit
+- `GetEventDamage` - damage to be dealt
+- `BlzGetEventDamageType`, `BlzGetEventAttackType`, `BlzGetEventWeaponType`
+
+@note See: `EVENT_UNIT_DAMAGED`, `GetEventDamage`
+event damage explanation in `BlzSetEventDamage`,
+event example code in `EVENT_UNIT_ATTACKED`
+
 @patch 1.31.0.11889
 */
     constant playerunitevent EVENT_PLAYER_UNIT_DAMAGED                  = ConvertPlayerUnitEvent(308)
 
 /**
+This is the second event in the attack process.
+It is fired before full damage calculation.
+
+For player-unit variation, it only fires for the victim's owner player.
+
+The attacker, raw damage and victim are known at this point.
+
+It is followed by `EVENT_PLAYER_UNIT_DAMAGED` (while `EVENT_PLAYER_UNIT_ATTACKED` happened before).
+
+Valid getters:
+
+- `GetTriggerPlayer` - owner of victim unit
+- `GetTriggerUnit`, `BlzGetEventDamageTarget` - victim unit
+- `GetEventDamageSource` - attacking unit
+- `GetEventDamage` - damage to be dealt
+- `BlzGetEventDamageType`, `BlzGetEventAttackType`, `BlzGetEventWeaponType`
+
+@note See: `EVENT_UNIT_DAMAGING`,
+event damage explanation in `BlzSetEventDamage`,
+event example code in `EVENT_UNIT_ATTACKED`
+
 @patch 1.31.0.11889
 */
     constant playerunitevent EVENT_PLAYER_UNIT_DAMAGING                 = ConvertPlayerUnitEvent(315)
@@ -4261,11 +4428,15 @@ Use `GetSummonedUnit` for the new unit and `GetSummoningUnit` for the spell cast
 
 
 /**
+@note Refer to `EVENT_PLAYER_UNIT_DAMAGED`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_DAMAGED                               = ConvertUnitEvent(52)
 
 /**
+@note Refer to: `EVENT_PLAYER_UNIT_DAMAGING`
+
 @patch 1.31.0.11889
 */
     constant unitevent EVENT_UNIT_DAMAGING                              = ConvertUnitEvent(314)
@@ -4323,6 +4494,8 @@ Fires when a dead unit starts transitioning from the 'death' to a 'decay' animat
     constant unitevent EVENT_UNIT_TARGET_IN_RANGE                       = ConvertUnitEvent(61)
 
 /**
+@note Refer to `EVENT_PLAYER_UNIT_ATTACKED`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_ATTACKED                              = ConvertUnitEvent(62)
@@ -11270,31 +11443,37 @@ Unused.
     // Armor Type
 
 /**
+@note Unfinished API, see: `armortype`
 @patch 1.31.0.11889
 */
     constant armortype      ARMOR_TYPE_WHOKNOWS             = ConvertArmorType(0)
 
 /**
+@note Unfinished API, see: `armortype`
 @patch 1.31.0.11889
 */
     constant armortype      ARMOR_TYPE_FLESH                = ConvertArmorType(1)
 
 /**
+@note Unfinished API, see: `armortype`
 @patch 1.31.0.11889
 */
     constant armortype      ARMOR_TYPE_METAL                = ConvertArmorType(2)
 
 /**
+@note Unfinished API, see: `armortype`
 @patch 1.31.0.11889
 */
     constant armortype      ARMOR_TYPE_WOOD                 = ConvertArmorType(3)
 
 /**
+@note Unfinished API, see: `armortype`
 @patch 1.31.0.11889
 */
     constant armortype      ARMOR_TYPE_ETHREAL              = ConvertArmorType(4)
 
 /**
+@note Unfinished API, see: `armortype`
 @patch 1.31.0.11889
 */
     constant armortype      ARMOR_TYPE_STONE                = ConvertArmorType(5)
@@ -11302,26 +11481,31 @@ Unused.
     // Regeneration Type
 
 /**
+@note Unfinished API, see: `regentype`.
 @patch 1.31.0.11889
 */
     constant regentype      REGENERATION_TYPE_NONE          = ConvertRegenType(0)
 
 /**
+@note Unfinished API, see: `regentype`.
 @patch 1.31.0.11889
 */
     constant regentype      REGENERATION_TYPE_ALWAYS        = ConvertRegenType(1)
 
 /**
+@note Unfinished API, see: `regentype`.
 @patch 1.31.0.11889
 */
     constant regentype      REGENERATION_TYPE_BLIGHT        = ConvertRegenType(2)
 
 /**
+@note Unfinished API, see: `regentype`.
 @patch 1.31.0.11889
 */
     constant regentype      REGENERATION_TYPE_DAY           = ConvertRegenType(3)
 
 /**
+@note Unfinished API, see: `regentype`.
 @patch 1.31.0.11889
 */
     constant regentype      REGENERATION_TYPE_NIGHT         = ConvertRegenType(4)
@@ -11329,61 +11513,73 @@ Unused.
     // Unit Category
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_GIANT             = ConvertUnitCategory(1)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_UNDEAD            = ConvertUnitCategory(2)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_SUMMONED          = ConvertUnitCategory(4)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_MECHANICAL        = ConvertUnitCategory(8)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_PEON              = ConvertUnitCategory(16)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_SAPPER            = ConvertUnitCategory(32)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_TOWNHALL          = ConvertUnitCategory(64)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_ANCIENT           = ConvertUnitCategory(128)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_NEUTRAL           = ConvertUnitCategory(256)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_WARD              = ConvertUnitCategory(512)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_STANDON           = ConvertUnitCategory(1024)
 
 /**
+@note Unfinished API, see: `unitcategory`
 @patch 1.31.0.11889
 */
     constant unitcategory   UNIT_CATEGORY_TAUREN            = ConvertUnitCategory(2048)
@@ -11391,41 +11587,49 @@ Unused.
     // Pathing Flag
 
 /**
+@note Unfinished API, see: `pathingflag`
 @patch 1.31.0.11889
 */
     constant pathingflag    PATHING_FLAG_UNWALKABLE             = ConvertPathingFlag(2)
 
 /**
+@note Unfinished API, see: `pathingflag`
 @patch 1.31.0.11889
 */
     constant pathingflag    PATHING_FLAG_UNFLYABLE              = ConvertPathingFlag(4)
 
 /**
+@note Unfinished API, see: `pathingflag`
 @patch 1.31.0.11889
 */
     constant pathingflag    PATHING_FLAG_UNBUILDABLE            = ConvertPathingFlag(8)
 
 /**
+@note Unfinished API, see: `pathingflag`
 @patch 1.31.0.11889
 */
     constant pathingflag    PATHING_FLAG_UNPEONHARVEST          = ConvertPathingFlag(16)
 
 /**
+@note Unfinished API, see: `pathingflag`
 @patch 1.31.0.11889
 */
     constant pathingflag    PATHING_FLAG_BLIGHTED               = ConvertPathingFlag(32)
 
 /**
+@note Unfinished API, see: `pathingflag`
 @patch 1.31.0.11889
 */
     constant pathingflag    PATHING_FLAG_UNFLOATABLE            = ConvertPathingFlag(64)
 
 /**
+@note Unfinished API, see: `pathingflag`
 @patch 1.31.0.11889
 */
     constant pathingflag    PATHING_FLAG_UNAMPHIBIOUS           = ConvertPathingFlag(128)
 
 /**
+@note Unfinished API, see: `pathingflag`
 @patch 1.31.0.11889
 */
     constant pathingflag    PATHING_FLAG_UNITEMPLACABLE         = ConvertPathingFlag(256)
@@ -14681,6 +14885,9 @@ constant native GetRevivingUnit takes nothing returns unit
 // EVENT_PLAYER_UNIT_ATTACKED
 
 /**
+Returns (reuses) handle to unit, who is carrying out an attack against a victim.
+Returns null, if used outside a valid context.
+
 @event EVENT_PLAYER_UNIT_ATTACKED
 
 @event EVENT_UNIT_ATTACKED
@@ -15839,6 +16046,12 @@ native TriggerRegisterUnitEvent takes trigger whichTrigger, unit whichUnit, unit
 // EVENT_UNIT_DAMAGED
 
 /**
+Returns positive damage when a unit is hurt.
+Returns 0.0 if used out of context.
+
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
 
 @patch 1.00
@@ -15846,7 +16059,15 @@ native TriggerRegisterUnitEvent takes trigger whichTrigger, unit whichUnit, unit
 constant native GetEventDamage takes nothing returns real
 
 /**
+Returns (reuses) handle to the attacker unit in a damage event.
+Returns null, when used out of context.
+
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
+
+@note See: `BlzGetEventDamageTarget`
 
 @patch 1.17a
 */
@@ -15878,6 +16099,9 @@ native TriggerRegisterFilterUnitEvent takes trigger whichTrigger, unit whichUnit
 @event EVENT_UNIT_ACQUIRED_TARGET
 
 @event EVENT_UNIT_TARGET_IN_RANGE
+
+@note Not to be used in damage events.
+Instead see: `GetEventDamageSource`, `BlzGetEventDamageTarget`
 
 @patch 1.00
 */
@@ -27714,6 +27938,9 @@ Set to negative value to heal the target instead of damaging.
 
 @note If you’ll call `UnitDamageTarget` from within a trigger, which reacts to a damage event or triggered by one, it will cause infinite loop and game will crash, so you should handle such scenarios with additional logic.
 
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
 
 @patch 1.29.2.9231
@@ -27721,20 +27948,32 @@ Set to negative value to heal the target instead of damaging.
 native BlzSetEventDamage                           takes real damage returns nothing
 
 /**
-The target unit of the damage event.
-If damage is AoE, your trigger will run separately for each target without known issues.
-This returns the same result as `GetTriggerUnit`.
+Returns (reuses) handle to the victim unit in a damage event.
+Same as `GetTriggerUnit` in this context.
+Returns null, when used out of context.
 
+If damage is AoE, your trigger will run separately for each target without known issues.
+
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
+
+@note See: `GetEventDamageSource`
 
 @patch 1.31.0.11889
 */
 native BlzGetEventDamageTarget 	                   takes nothing returns unit
 
 /**
-Returns attacktype of the damage being taken.
-Spell-damage is `ATTACK_TYPE_NORMAL`.
+Returns one of the attacktype constants, representing the kind of attack.
+Returns `ConvertAttackType(-1)` when used out of context.
 
+@note Spell damage is `ATTACK_TYPE_NORMAL`.
+
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
 
 @patch 1.31.0.11889
@@ -27742,9 +27981,14 @@ Spell-damage is `ATTACK_TYPE_NORMAL`.
 native BlzGetEventAttackType  	                   takes nothing returns attacktype
 
 /**
-Returns damagetype of the damage being taken.
+Returns one of damagetype constants representing the damage being taken.
+Returns `DAMAGE_TYPE_UNKNOWN` when used out of context.
+
 Regular attack is `DAMAGE_TYPE_NORMAL`.
 
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
 
 @patch 1.31.0.11889
@@ -27752,8 +27996,14 @@ Regular attack is `DAMAGE_TYPE_NORMAL`.
 native BlzGetEventDamageType                       takes nothing returns damagetype
 
 /**
-Returns weapontype of a damage being taken. This only affects the sound of impact.
+Returns one of weapontype constants representing the weapon type.
+Returns `WEAPON_TYPE_WHOKNOWS` when used out of context.
 
+This only affects the sound of impact.
+
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
 
 @patch 1.31.0.11889
@@ -27764,6 +28014,9 @@ native BlzGetEventWeaponType  	                   takes nothing returns weaponty
 Set the attacktype of a damage being taken. 
 Can be only used to change attacktype before armor reduction.
 
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
 
 @patch 1.31.0.11889
@@ -27774,6 +28027,9 @@ native BlzSetEventAttackType                       takes attacktype attackType r
 Set the damagetype of a damage being taken. 
 Can be only used to change damagetype before armor reduction.
 
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
 
 @patch 1.31.0.11889
@@ -27784,6 +28040,9 @@ native BlzSetEventDamageType                       takes damagetype damageType r
 Set the weapontype of a damage being taken. 
 Can be used to modify the sound of impact in the event before armor reduction.
 
+@event EVENT_PLAYER_UNIT_DAMAGING
+@event EVENT_PLAYER_UNIT_DAMAGED
+@event EVENT_UNIT_DAMAGING
 @event EVENT_UNIT_DAMAGED
 
 @patch 1.31.0.11889
