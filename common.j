@@ -18074,6 +18074,8 @@ Returns the level of the ability for the unit.
 If the unit has one of them, it has all of them (and vice-versa). Therefore a wisp with 'ANbu'==1 also has 'AHbu'==1.
 See: <https://github.com/lep/jassdoc/issues/152>
 
+@note 'ABnP' can be used to detect building in construction and 'AUnP' for upgrading building 
+
 @patch 1.13
 */
 native          GetUnitAbilityLevel takes unit whichUnit, integer abilcode returns integer
@@ -29246,7 +29248,7 @@ native BlzGetAbilityRealLevelArrayField            takes ability whichAbility, a
 native BlzGetAbilityStringLevelArrayField          takes ability whichAbility, abilitystringlevelarrayfield whichField, integer level, integer index returns string
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29256,7 +29258,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityBooleanField                   takes ability whichAbility, abilitybooleanfield whichField, boolean value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 For example, `ABILITY_IF_BUTTON_POSITION_NORMAL_X`.
 
 See `BlzSetAbilityStringLevelField` for test code.
@@ -29268,7 +29270,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityIntegerField                   takes ability whichAbility, abilityintegerfield whichField, integer value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29278,7 +29280,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityRealField                      takes ability whichAbility, abilityrealfield whichField, real value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 For example, `ABILITY_SF_ICON_RESEARCH`.
 See `BlzSetAbilityStringLevelField` for test code.
 
@@ -29289,7 +29291,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityStringField                    takes ability whichAbility, abilitystringfield whichField, string value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29310,7 +29312,7 @@ native BlzSetAbilityBooleanLevelField              takes ability whichAbility, a
 native BlzSetAbilityIntegerLevelField              takes ability whichAbility, abilityintegerlevelfield whichField, integer level, integer value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29322,7 +29324,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityRealLevelField                 takes ability whichAbility, abilityreallevelfield whichField, integer level, real value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29389,7 +29391,7 @@ print(BlzGetAbilityStringField(abilityB, ABILITY_SF_ICON_RESEARCH))
 native BlzSetAbilityStringLevelField               takes ability whichAbility, abilitystringlevelfield whichField, integer level, string value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29401,7 +29403,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityBooleanLevelArrayField         takes ability whichAbility, abilitybooleanlevelarrayfield whichField, integer level, integer index, boolean value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29413,7 +29415,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityIntegerLevelArrayField         takes ability whichAbility, abilityintegerlevelarrayfield whichField, integer level, integer index, integer value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29425,7 +29427,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityRealLevelArrayField            takes ability whichAbility, abilityreallevelarrayfield whichField, integer level, integer index, real value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29437,7 +29439,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzSetAbilityStringLevelArrayField          takes ability whichAbility, abilitystringlevelarrayfield whichField, integer level, integer index, string value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29449,7 +29451,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzAddAbilityBooleanLevelArrayField         takes ability whichAbility, abilitybooleanlevelarrayfield whichField, integer level, boolean value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29461,7 +29463,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzAddAbilityIntegerLevelArrayField         takes ability whichAbility, abilityintegerlevelarrayfield whichField, integer level, integer value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29473,7 +29475,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzAddAbilityRealLevelArrayField            takes ability whichAbility, abilityreallevelarrayfield whichField, integer level, real value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29485,7 +29487,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzAddAbilityStringLevelArrayField          takes ability whichAbility, abilitystringlevelarrayfield whichField, integer level, string value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29497,7 +29499,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzRemoveAbilityBooleanLevelArrayField      takes ability whichAbility, abilitybooleanlevelarrayfield whichField, integer level, boolean value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29509,7 +29511,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzRemoveAbilityIntegerLevelArrayField      takes ability whichAbility, abilityintegerlevelarrayfield whichField, integer level, integer value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
@@ -29521,7 +29523,7 @@ Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tool
 native BlzRemoveAbilityRealLevelArrayField         takes ability whichAbility, abilityreallevelarrayfield whichField, integer level, real value returns boolean
 
 /**
-@bug v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
+@bug Fixed in PTR 2.0.3.23025; present in v2.0.3.22904, v2.0.3: per-ability instance fields sometimes wrongly apply to all ability instances of the base type.
 See `BlzSetAbilityStringLevelField` for test code.
 
 Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/ability-specific-tooltip-natives-broken-in-v20322978/36601>
