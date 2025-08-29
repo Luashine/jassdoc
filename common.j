@@ -4100,6 +4100,53 @@ end
 
 
 /**
+Fires after a unit has died.
+
+Valid getters:
+
+- `GetDyingUnit`, `GetTriggerUnit` - victim unit
+- `GetTriggerPlayer` - owner of dead unit
+- `GetKillingUnit` - unit who scored the kill
+
+@note **Example (Lua):**
+
+```{.lua}
+regEvents = {
+"EVENT_PLAYER_UNIT_DEATH", -- GetDyingUnit
+}
+-- register each event
+for _, eventName in pairs(regEvents) do
+	local PLAYERUNITEVENT = _G[eventName]
+	
+	local trig = CreateTrigger()
+	local regEvent = TriggerRegisterPlayerUnitEvent(trig, Player(0), PLAYERUNITEVENT, nil)
+
+	local trigAction = TriggerAddAction(trig, function()
+		local trigPlayer = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit() -- same as event-specific getters
+		local trigUnitName = GetUnitName(trigUnit)
+		
+		local dyingUnit = GetDyingUnit()
+		local dyingUnitName = dyingUnit and GetUnitName(dyingUnit)
+		
+		local killingUnit = GetKillingUnit()
+		local killingUnitName = killingUnit and GetUnitName(killingUnit)
+		
+		print(string.format("\x25s trigUnit='\x25s' trigPlayer='\x25s' hp=\x254.1f",
+			(eventName:gsub("EVENT_PLAYER_", "")),
+			trigUnitName, GetPlayerName(trigPlayer), GetWidgetLife(trigUnit)
+		))
+		print(string.format("...dyingUnit=\x25s, killingUnit=\x25s",
+			dyingUnitName,
+			killingUnitName
+		))
+	end)
+end
+print("Player Event registered")
+```
+
+@note See: `EVENT_UNIT_DEATH`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_DEATH                    = ConvertPlayerUnitEvent(20)
@@ -4442,6 +4489,8 @@ event example code in `EVENT_UNIT_ATTACKED`
     constant unitevent EVENT_UNIT_DAMAGING                              = ConvertUnitEvent(314)
 
 /**
+@note Refer to: `EVENT_PLAYER_UNIT_DEATH`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_DEATH                                 = ConvertUnitEvent(53)
@@ -14955,16 +15004,30 @@ constant native GetRescuer  takes nothing returns unit
 // EVENT_PLAYER_UNIT_DEATH
 
 /**
+Returns (reuses) handle to the unit, who has died.
+
+Returns null in an invalid context.
+
 @event EVENT_PLAYER_UNIT_DEATH
 
 @event EVENT_UNIT_DEATH
+
+@note See `EVENT_PLAYER_UNIT_DEATH` for an example; `GetKillingUnit`
 
 @patch 1.00
 */
 constant native GetDyingUnit takes nothing returns unit
 
 /**
+Returns (reuses) handle to the killer unit.
+
+Returns null in an invalid context.
+
 @event EVENT_PLAYER_UNIT_DEATH
+
+@event EVENT_UNIT_DEATH
+
+@note See `EVENT_PLAYER_UNIT_DEATH` for an example; `GetDyingUnit`
 
 @patch 1.00
 */
