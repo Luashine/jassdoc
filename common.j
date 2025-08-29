@@ -24851,7 +24851,7 @@ Although the game can and does randomize e.g. unit sounds.
 @bug (tested v2.0.3.23038-PTR): `is3D=false` parameter is overriden by `WANT3D` flag from label.
 Possibly completely ignored.
 
-@bug (tested v2.0.3.23038-PTR): Crashes the game
+@bug Fixed in v2.0.3.23052-PTR (tested v2.0.3.23038-PTR): Crashes the game
 `sndFromLabel = CreateSoundFromLabel("BloodElfDragonHawkPissed", false, false, false, 50, 50)`
 
 <https://us.forums.blizzard.com/en/warcraft3/t/crash-createsoundfromlabelbloodelfdragonhawkpissed/36976>
@@ -26323,7 +26323,7 @@ SetUbersplatRenderAlways( myUber, true )
 
 @note The API is similar to `image`, see `CreateImage`.
 
-@bug (tested v2.0.3.22988) Attempting to create invalid names may crash the game.
+@bug Fixed in 2.0.3.23052-PTR; tested v2.0.3.22988: Attempting to create invalid names may crash the game.
 <https://us.forums.blizzard.com/en/warcraft3/t/crash-in-createubersplat-constructor/36945>
 
 ```{.lua}
