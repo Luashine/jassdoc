@@ -16213,6 +16213,13 @@ native TriggerRegisterUnitInRange takes trigger whichTrigger, unit whichUnit, re
 
 
 /**
+Always creates and returns a new trigger condition, attaching it to the trigger.
+
+Returns null only if trigger is null.
+
+Trigger conditions are evaluated and, if the conditions are met,
+the registered trigger action(s) are executed.
+
 @note It is often suggested to use trigger conditions instead of actions for increased performance.
 
 While they are indeed faster, conditions lack some of the event data, that is only pushed into trigger
@@ -16224,7 +16231,7 @@ TODO: This needs testing and code examples.
 
 Source: based on v1.26a data, Unryze in Hive Discord <https://discord.com/channels/178569180625240064/311662737015046144/1301657992881504258>
 
-@note See: `TriggerRemoveCondition`, `TriggerClearConditions`, `TriggerAddAction`
+@note See: `TriggerRemoveCondition`, `TriggerClearConditions`, `TriggerAddAction`, `TriggerEvaluate`
 
 @patch 1.00
 */
@@ -16246,7 +16253,12 @@ native TriggerClearConditions takes trigger whichTrigger returns nothing
 
 
 /**
-Adds an action to be called when the given trigger is fired through registered events or through `TriggerExecute`.
+Always creates and returns a new action, registering it to the trigger.
+
+Never returns null,
+although when trigger is null, returns the same special error handle. (tested in Lua v2.0.3.23068-PTR)
+
+The trigger action(s) are called whenever the trigger is fired through registered events or `TriggerExecute`.
 
 @note More than one action can be added to the trigger. The actions run in the order they were added.
 
@@ -28748,11 +28760,15 @@ Limited to something like ~255 bytes.
 native BlzGetTriggerFrameText                      takes nothing returns string
 
 /**
-Create an event that listens to messages sent by player with prefix. (see: `BlzSendSyncData`).
+Always creates and returns a new event that listens to messages sent by player with prefix.
+
+Returns null only if trigger or player is null.
 
 One can create a player SyncEvent for any prefix with `TriggerRegisterPlayerEvent(whichTrigger, whichPlayer, EVENT_PLAYER_SYNC_DATA)`.
 
 `GetTriggerPlayer()` is the message source.
+
+@note See: `BlzSendSyncData`
 
 @param fromServer "should be false".
 
