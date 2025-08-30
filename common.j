@@ -16152,6 +16152,13 @@ constant native GetEventUnitState takes nothing returns unitstate
 
 
 /**
+Creates and returns a new specified unit event, registering it for the unit.
+
+Returns null if any argument is null.
+
+@note See: `EVENT_UNIT_HERO_SKILL` for a basic example,
+`TriggerRegisterFilterUnitEvent` if you want to attach an extra filter.
+
 @patch 1.00
 */
 native TriggerRegisterUnitEvent takes trigger whichTrigger, unit whichUnit, unitevent whichEvent returns event
@@ -16201,6 +16208,45 @@ constant native GetEventDetectingPlayer takes nothing returns player
 
 
 /**
+Creates and returns a new filtered event, registers it to the unit.
+
+Returns null if either trigger/unit/event is null or
+if it doesn't like an event (`EVENT_UNIT_DEATH` doesn't work, yet
+`EVENT_UNIT_LOADED` does).
+
+@note See:
+`TriggerRegisterUnitEvent` doesn't take a filter, but you can simply pass null here instead.
+
+@note **Example (Lua):** Spawn a hero with level 10 and 10 skill points.
+The filter will only allow the trigger to fire for the first 3 skill points
+spent.
+
+```{.lua}
+myHero = CreateUnit(Player(0), FourCC"Hamg", 256, 0, 270.0)
+heroSkillTrig = CreateTrigger()
+heroSkillFilter = Filter(function()
+	local unit = GetFilterUnit()
+	if GetHeroSkillPoints(unit) > 7 then
+		return true
+	else
+		return false
+	end
+end)
+heroSkillEv = TriggerRegisterFilterUnitEvent(heroSkillTrig, myHero, EVENT_UNIT_HERO_SKILL, heroSkillFilter)
+heroSkillAction = TriggerAddAction(heroSkillTrig, function()
+	local skillingUnit = GetLearningUnit()
+	local unitName = GetUnitName(skillingUnit)
+	local learnedSkillId = GetLearnedSkill()
+	local abilName = GetAbilityName(learnedSkillId)
+	local skillPoints = GetHeroSkillPoints(skillingUnit)
+	print(string.format("'\x25s' learned new skill: '\x25s', points left: \x25d", 
+		unitName, abilName, skillPoints
+	))
+end)
+SetHeroLevel(myHero, GetHeroLevel(myHero)+10, true)
+```
+
+@param filter (optional)
 @patch 1.00
 */
 native TriggerRegisterFilterUnitEvent takes trigger whichTrigger, unit whichUnit, unitevent whichEvent, boolexpr filter returns event
