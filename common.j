@@ -15997,7 +15997,10 @@ constant native GetEventPlayerState takes nothing returns playerstate
 
 
 /**
-Registers a chat event.
+Creates and returns a new event that is fired when
+the player sends a matching chat message.
+
+Returns null when trigger or player is null.
 
 @param whichTrigger The trigger to which register the event.
 
@@ -16054,8 +16057,9 @@ constant native GetEventPlayerChatStringMatched takes nothing returns string
 
 
 /**
-Makes the target trigger execute when specified widget dies.
-Returns registered event.
+Creates and returns a new event that is fired when the target widget dies.
+
+Returns null when either trigger or widget is null.
 
 Use `GetTriggerWidget` to retrieve the target. These work too if the widget
 is of the correct sub-type: `GetTriggerUnit`, `GetTriggerDestructable`.
