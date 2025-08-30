@@ -2390,26 +2390,31 @@ Is only used to remove observers (as non-playing players) from the game.
 
 
 /**
+@note Set to true for allies by `SetPlayerAllianceStateAllyBJ`.
 @patch 1.00
 */
     constant alliancetype       ALLIANCE_PASSIVE                = ConvertAllianceType(0)
 
 /**
+@note Set to true for allies by `SetPlayerAllianceStateAllyBJ`.
 @patch 1.00
 */
     constant alliancetype       ALLIANCE_HELP_REQUEST           = ConvertAllianceType(1)
 
 /**
+@note Set to true for allies by `SetPlayerAllianceStateAllyBJ`.
 @patch 1.00
 */
     constant alliancetype       ALLIANCE_HELP_RESPONSE          = ConvertAllianceType(2)
 
 /**
+@note Set to true for allies by `SetPlayerAllianceStateAllyBJ`.
 @patch 1.00
 */
     constant alliancetype       ALLIANCE_SHARED_XP              = ConvertAllianceType(3)
 
 /**
+@note Set to true for allies by `SetPlayerAllianceStateAllyBJ`.
 @patch 1.00
 */
     constant alliancetype       ALLIANCE_SHARED_SPELLS          = ConvertAllianceType(4)
@@ -2424,6 +2429,7 @@ Allows to command units of an other player.
 
 Commands that would spent the other players resources require  `ALLIANCE_SHARED_ADVANCED_CONTROL`.
 
+@note Set to true for "allied units" using `SetPlayerAllianceStateControlBJ`.
 @patch 1.00
 */
     constant alliancetype       ALLIANCE_SHARED_CONTROL         = ConvertAllianceType(6)
@@ -2435,6 +2441,7 @@ Shows the allied resources multiboard.
 
 Allows to spent the other player's resources.
 
+@note Set to true for "allied advanced units" using `SetPlayerAllianceStateFullControlBJ`.
 @patch 1.00
 */
     constant alliancetype       ALLIANCE_SHARED_ADVANCED_CONTROL= ConvertAllianceType(7)
@@ -15927,6 +15934,49 @@ constant native GetSpellTargetUnit          takes nothing returns unit
 
 
 /**
+Creates and returns a new registered event that fires when a player's
+alliance changes.
+
+Returns null only if trigger or player is null.
+When alliance type is null, it still returns a new event.
+
+The event is fired once from the point of view of the "source" player
+and only when the alliance value has changed, e.g. from false to true.
+
+For example: when player red changes "Share Units" in the F11 "Allies" menu
+with player blue, the event is only fired for slot 0 (red), although both
+players are registered for this event.
+
+Valid getter: `GetTriggerPlayer` to retrieve the event source player.
+
+@note `GetTriggerEventId` returns a consistent handle between trigger invocations.
+You could save it as a constant for own use.
+
+@note See: `SetPlayerAlliance`, `GetPlayerAlliance`, `SetPlayerAllianceStateBJ`.
+All of these follow the notion of a "source" and a "target" player.
+
+@note **Example (Lua):**
+
+```{.lua}
+for i = 0, 1 do -- player slots red and blue
+	local registerPlayer = Player(i)
+	
+	local trig = CreateTrigger()
+	local regEvent = TriggerRegisterPlayerAllianceChange(trig, registerPlayer, ALLIANCE_SHARED_CONTROL)
+
+	local trigAction = TriggerAddAction(trig, function()
+		local trigPlayer = GetTriggerPlayer()
+		local playerSlot = i
+		print(string.format("Alliance changed for player registered: \x25d; trigEvent: \x25s",
+			playerSlot
+		))
+	end)
+end
+
+SetPlayerAlliance(Player(0), Player(1), ALLIANCE_SHARED_CONTROL, true)
+SetPlayerAlliance(Player(0), Player(1), ALLIANCE_SHARED_CONTROL, false)
+```
+
 @patch 1.00
 */
 native TriggerRegisterPlayerAllianceChange takes trigger whichTrigger, player whichPlayer, alliancetype whichAlliance returns event
