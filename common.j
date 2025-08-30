@@ -16257,6 +16257,51 @@ constant native GetEventTargetUnit takes nothing returns unit
 
 
 /**
+Creates and returns a new event that fires once when another unit comes close
+to this target unit. The event is not repeated until the other unit leaves
+the trigger range.
+
+Returns null if trigger or unit is null.
+
+Valid getter: `GetTriggerUnit` for the other unit, who approached the registered
+unit. `GetTriggerPlayer` returns null.
+
+@note Spawning units nearby fires the trigger immediately.
+
+However, approaching units' movement is not calculated every game tick.
+Fast units may undercut the desired trigger distance, significantly sometimes
+(e.g. Gryphon Rider's lowest approaching distance was 240, highest 286 and expected 256.0)
+
+@note Target unit can be hidden and it will still trigger this event.
+See: `ShowUnit`
+
+@note **Example (Lua):**
+
+```{.lua}
+do
+	local mySheep = CreateUnit(Player(0), FourCC"nshe", -256, 0, 270.0)
+	sheep = mySheep -- global
+	local myTrig = CreateTrigger()
+	local trigAction = TriggerAddAction(myTrig, function()
+		local approachingUnit = GetTriggerUnit()
+		local approachingUnitName = GetUnitName(approachingUnit)
+		local dx = GetUnitX(mySheep) - GetUnitX(approachingUnit) -- mySheep as upvalue
+		local dy = GetUnitY(mySheep) - GetUnitY(approachingUnit)
+		local dist = SquareRoot(dx * dx + dy * dy)
+		
+		print(string.format("Unit entered range of sheep: \x25s dist: \x25.1f",
+			approachingUnitName, dist
+		))
+	end)
+	local myTrigEvent = TriggerRegisterUnitInRange(myTrig, sheep, 256, nil)
+	local myFootman = CreateUnit(Player(0), FourCC"hfoo", -256, 0, 270.0)
+	footman = myFootman -- global
+end
+```
+
+@param whichUnit target unit to observe for approaching units
+@param range trigger radius in map units (note: doesn't crash if negative)
+@param filter optional
 @patch 1.00
 */
 native TriggerRegisterUnitInRange takes trigger whichTrigger, unit whichUnit, real range, boolexpr filter returns event
