@@ -15990,6 +15990,31 @@ SetPlayerAlliance(Player(0), Player(1), ALLIANCE_SHARED_CONTROL, false)
 native TriggerRegisterPlayerAllianceChange takes trigger whichTrigger, player whichPlayer, alliancetype whichAlliance returns event
 
 /**
+Creates and returns a new registered event, that is run whenever a player's
+state changes and satisfies the limitop filter and value.
+
+Returns null only if trigger or player is null.
+
+This event is fired *after* the changes have taken place.
+
+@note **Example (Lua):** This will run when player's gold changes
+any time it passes the limitop of >=500. You can use the cheat code
+"greedisgood <value>" with negative or positive values to trigger it.
+
+```{.lua}
+plState_trig = CreateTrigger()
+pl = Player(0)
+regEvent = TriggerRegisterPlayerStateEvent(plState_trig, pl, PLAYER_STATE_RESOURCE_GOLD, GREATER_THAN_OR_EQUAL, 500)
+plState_act = TriggerAddAction(plState_trig, function()
+	local trigPlayer = GetTriggerPlayer()
+	local whichState = GetEventPlayerState()
+	print(whichState)
+	print("player gold:", GetPlayerState(trigPlayer, whichState))
+end)
+```
+
+@note See: `GetEventPlayerState`
+
 @patch 1.00
 */
 native TriggerRegisterPlayerStateEvent takes trigger whichTrigger, player whichPlayer, playerstate whichState, limitop opcode, real limitval returns event
@@ -15997,6 +16022,11 @@ native TriggerRegisterPlayerStateEvent takes trigger whichTrigger, player whichP
 // EVENT_PLAYER_STATE_LIMIT
 
 /**
+Returns handle to a constant playerstate, which changed in the currently
+triggered event.
+
+@note See: `TriggerRegisterPlayerStateEvent`
+
 @event EVENT_PLAYER_STATE_LIMIT
 
 @patch 1.00
