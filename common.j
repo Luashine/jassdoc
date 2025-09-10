@@ -16179,6 +16179,44 @@ constant native GetTriggerUnit takes nothing returns unit
 
 
 /**
+Creates and returns a new registered event based on unit state changes.
+Returns null only if trigger or unit is null.
+
+@note The event runs only once *after* the
+limitop and value filter is surpassed. The same limitop filter will not
+trigger again until its current range is exited. Example:
+
+- limitop is `GREATER_THAN_OR_EQUAL` and value is `200`.
+- Register event, spawn a unit with 250 HP
+- Change unit HP to 205: nothing happens
+- Change unit HP to 190: nothing happens (though we just left the range)
+- Change unit HP to 200: event is fired (entered the range)
+- Change unit HP to 250: nothing happens
+
+@note **Example (Lua):**
+
+```{.lua}
+do
+	local myPeon = CreateUnit(Player(0), FourCC"opeo", -256, 0, 270.0)
+	peon = myPeon -- global
+	local myTrig = CreateTrigger()
+	local trigAction = TriggerAddAction(myTrig, function()
+		local trigUnit = GetTriggerUnit()
+		local trigUnitName = GetUnitName(trigUnit)
+		print(GetUnitState(myPeon, GetEventUnitState()))
+	end)
+	local myTrigEvent1 = TriggerRegisterUnitStateEvent(myTrig, myPeon, UNIT_STATE_LIFE, LESS_THAN_OR_EQUAL, 230)
+	local myTrigEvent2 = TriggerRegisterUnitStateEvent(myTrig, myPeon, UNIT_STATE_LIFE, GREATER_THAN_OR_EQUAL, 230)
+	local myFootman = CreateUnit(Player(0), FourCC"hfoo", -256, 0, 270.0)
+	footman = myFootman -- global
+end
+
+SetUnitState(peon, UNIT_STATE_LIFE, 231)
+SetUnitState(peon, UNIT_STATE_LIFE, 192)
+```
+
+@note See: `GetEventUnitState`
+
 @patch 1.00
 */
 native TriggerRegisterUnitStateEvent takes trigger whichTrigger, unit whichUnit, unitstate whichState, limitop opcode, real limitval returns event
@@ -16186,6 +16224,10 @@ native TriggerRegisterUnitStateEvent takes trigger whichTrigger, unit whichUnit,
 // EVENT_UNIT_STATE_LIMIT
 
 /**
+Returns handle to a defined unit state constant.
+
+@note See: `TriggerRegisterUnitStateEvent` for an example.
+
 @event EVENT_UNIT_STATE_LIMIT
 
 @patch 1.00
