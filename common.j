@@ -4166,11 +4166,15 @@ print("Player Event registered")
 
 
 /**
+Unknown, not used in any of Blizzard's maps in Reforged (2.0.3).
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_DETECTED                 = ConvertPlayerUnitEvent(22)
 
 /**
+Unknown, not used in any of Blizzard's maps in Reforged (2.0.3).
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_HIDDEN                   = ConvertPlayerUnitEvent(23)
@@ -4511,6 +4515,8 @@ Fires when a dead unit starts transitioning from the 'death' to a 'decay' animat
     constant unitevent EVENT_UNIT_DECAY                                 = ConvertUnitEvent(54)
 
 /**
+Unknown, not used in any of Blizzard's maps in Reforged (2.0.3).
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_DETECTED                              = ConvertUnitEvent(55)
@@ -15183,6 +15189,8 @@ constant native GetTrainedUnit takes nothing returns unit
 // EVENT_PLAYER_UNIT_DETECTED
 
 /**
+Unknown, not used in any of Blizzard's own maps.
+
 @event EVENT_PLAYER_UNIT_DETECTED
 
 @patch 1.00
@@ -16204,6 +16212,8 @@ constant native GetEventDamageSource takes nothing returns unit
 // EVENT_UNIT_DETECTED
 
 /**
+Unknown, not used in any of Blizzard's own maps.
+
 @event EVENT_UNIT_DETECTED
 
 @patch 1.00
