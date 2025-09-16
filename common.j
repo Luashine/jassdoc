@@ -4546,11 +4546,98 @@ Unknown, not used in any of Blizzard's maps in Reforged (2.0.3).
     //                                                                  
 
 /**
+This event is fired once whenever the registered unit automatically
+finds a new possible attack target within its acquisition range.
+
+It is not fired at all when you manually order an attack target.
+Instead it is fired when the unit is idle or moving due to move-attack order.
+Therefore it is not fired again until the current attack order stops.
+
+@note Getters:
+
+- `GetTriggerPlayer` - owner of registered unit (attacker)
+- `GetTriggerUnit` - attacking unit
+- `GetEventTargetUnit` - victim unit
+
+@note Event order:
+
+1. `EVENT_UNIT_ACQUIRED_TARGET`
+2. `EVENT_UNIT_TARGET_IN_RANGE`
+
+@note **Example (Lua):**
+
+```{.lua}
+acqTrig = CreateTrigger()
+rangeTrig = CreateTrigger()
+
+acqEvent = TriggerRegisterUnitEvent(acqTrig, archer, EVENT_UNIT_ACQUIRED_TARGET)
+rangeEvent = TriggerRegisterUnitEvent(rangeTrig, archer, EVENT_UNIT_TARGET_IN_RANGE)
+
+acqAction = TriggerAddAction(acqTrig, function()
+	local trigPlayer = GetTriggerPlayer()
+	print(trigPlayer)
+	local trigUnit = GetTriggerUnit()
+	local trigUnitName = GetUnitName(trigUnit)
+	local targetUnit = GetEventTargetUnit()
+	local targetUnitName = GetUnitName(targetUnit)
+	
+	local dx = GetUnitX(targetUnit) - GetUnitX(trigUnit)
+	local dy = GetUnitY(targetUnit) - GetUnitY(trigUnit)
+	local dist = SquareRoot(dx * dx + dy * dy)
+	
+	print(string.format("Target \x25s acquired by \x25s. dist=\x25.1f",
+		targetUnitName, trigUnitName, dist
+	))
+end)
+rangeAction = TriggerAddAction(acqTrig, function()
+	local trigPlayer = GetTriggerPlayer()
+	print(trigPlayer)
+	local trigUnit = GetTriggerUnit()
+	local trigUnitName = GetUnitName(trigUnit)
+	local targetUnit = GetEventTargetUnit()
+	local targetUnitName = GetUnitName(targetUnit)
+	
+	local dx = GetUnitX(targetUnit) - GetUnitX(trigUnit)
+	local dy = GetUnitY(targetUnit) - GetUnitY(trigUnit)
+	local dist = SquareRoot(dx * dx + dy * dy)
+	
+	print(string.format("Target \x25s is in range of \x25s. dist=\x25.1f",
+		targetUnitName, trigUnitName, dist
+	))
+end)
+```
+
+@note See: `EVENT_UNIT_TARGET_IN_RANGE`, `GetEventTargetUnit`,
+`TriggerRegisterUnitEvent`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_ACQUIRED_TARGET                       = ConvertUnitEvent(60)
 
 /**
+This event is fired once whenever the registered unit automatically
+finds a new possible attack target within its acquisition range
+(the event appears to be called immediately after `EVENT_UNIT_ACQUIRED_TARGET`
+even if its outside of the immediate attack range).
+
+It is not fired at all when you manually order an attack target.
+Instead it is fired when the unit is idle or moving due to move-attack order.
+Therefore it is not fired again until the current attack order stops.
+
+@note Getters:
+
+- `GetTriggerPlayer` - owner of registered unit (attacker)
+- `GetTriggerUnit` - attacking unit
+- `GetEventTargetUnit` - victim unit
+
+@note Event order:
+
+1. `EVENT_UNIT_ACQUIRED_TARGET`
+2. `EVENT_UNIT_TARGET_IN_RANGE`
+
+@note See: `EVENT_UNIT_ACQUIRED_TARGET` for an example, `GetEventTargetUnit`,
+`TriggerRegisterUnitEvent`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_TARGET_IN_RANGE                       = ConvertUnitEvent(61)
@@ -16341,11 +16428,17 @@ native TriggerRegisterFilterUnitEvent takes trigger whichTrigger, unit whichUnit
 // EVENT_UNIT_TARGET_IN_RANGE
 
 /**
+Returns (reuses) handle to the victim unit being acquired/targeted
+in an attack.
+
 @event EVENT_UNIT_ACQUIRED_TARGET
 
 @event EVENT_UNIT_TARGET_IN_RANGE
 
-@note Not to be used in damage events.
+@note See: `EVENT_UNIT_TARGET_IN_RANGE` for an example,
+`EVENT_UNIT_ACQUIRED_TARGET`, `TriggerRegisterUnitEvent`
+
+Not to be used in damage events.
 Instead see: `GetEventDamageSource`, `BlzGetEventDamageTarget`
 
 @patch 1.00
