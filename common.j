@@ -4192,16 +4192,142 @@ Unknown, not used in any of Blizzard's maps in Reforged (2.0.3).
 
 
 /**
+This event is fired when a new building construction is started by a worker.
+
+Note: it does not fire for upgrades.
+
+@note **Example (Lua):** Start building something.
+
+The test is setup as follows: player unit events are registered.
+When player starts construction of a new unit, register new events
+attached to the new structure (as unit events).
+
+```{.lua}
+myPlayer = Player(0)
+peasant = CreateUnit(myPlayer, FourCC"hpea", 0, 0, 270.0)
+
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_GOLD, 10000)
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_LUMBER, 10000)
+
+-- EVENT_PLAYER_UNIT_CONSTRUCT_START
+trigConstructing = CreateTrigger()
+actConstructing = TriggerAddAction(trigConstructing, function()
+	local owner = GetTriggerPlayer()
+	local trigUnit = GetTriggerUnit()
+	local trigUnitName = GetUnitName(trigUnit)
+	local constructing = GetConstructingStructure()
+	local constructingName = GetUnitName(constructing)
+	
+	print(string.format("PlayerUnitEv '\x25s' has just started building '\x25s' (same as trig unit? \x25s)",
+		GetPlayerName(owner), constructingName, trigUnit==constructing))
+		
+	regUnitConstructionEvents(constructing)
+end)
+eventConstructing = TriggerRegisterPlayerUnitEvent(trigConstructing, myPlayer, EVENT_PLAYER_UNIT_CONSTRUCT_START, nil)
+--
+
+-- EVENT_PLAYER_UNIT_CONSTRUCT_FINISH
+trigPUFinish = CreateTrigger()
+actPUFinish = TriggerAddAction(trigPUFinish, function()
+	local owner = GetTriggerPlayer()
+	local trigUnit = GetTriggerUnit()
+	local trigUnitName = GetUnitName(trigUnit)
+	local structure = GetConstructedStructure()
+	local structureName = GetUnitName(structure)
+	
+	print(string.format("PlayerUnitEv '\x25s' finished construction of '\x25s' (same as trig unit? \x25s)",
+		GetPlayerName(owner), structureName, trigUnit==structure))
+end)
+eventPUFinish = TriggerRegisterPlayerUnitEvent(trigPUFinish, myPlayer, EVENT_PLAYER_UNIT_CONSTRUCT_FINISH, nil)
+--
+
+-- EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL
+trigPUCancel = CreateTrigger()
+actPUCancel = TriggerAddAction(trigPUCancel, function()
+	local owner = GetTriggerPlayer()
+	local trigUnit = GetTriggerUnit()
+	local trigUnitName = GetUnitName(trigUnit)
+	local structure = GetCancelledStructure()
+	local structureName = GetUnitName(structure)
+	
+	print(string.format("PlayerUnitEv '\x25s' cancelled construction of '\x25s' (same as trig unit? \x25s)",
+		GetPlayerName(owner), structureName, trigUnit==structure))
+end)
+eventPUCancel = TriggerRegisterPlayerUnitEvent(trigPUCancel, myPlayer, EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL, nil)
+--
+
+-- Register unit events "on demand"
+function regUnitConstructionEvents(whichUnit)
+	-- This code does NOT clean up the created triggers at all!
+	-- use only for testing purposes
+	
+	-- EVENT_UNIT_CONSTRUCT_FINISH
+	trigUnitCancel = CreateTrigger()
+	actUnitCancel = TriggerAddAction(trigUnitCancel, function()
+		local owner = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit()
+		local trigUnitName = GetUnitName(trigUnit)
+		local structure = GetConstructedStructure()
+		local structureName = GetUnitName(structure)
+		
+		print(string.format("UnitEv '\x25s' finished construction of '\x25s' (same as trig unit? \x25s)",
+			GetPlayerName(owner), structureName, trigUnit==structure))
+		
+		DestroyTrigger(GetTriggeringTrigger())
+	end)
+	eventUnitCancel = TriggerRegisterUnitEvent(trigUnitCancel, whichUnit, EVENT_UNIT_CONSTRUCT_FINISH)
+	--
+	
+	-- EVENT_UNIT_CONSTRUCT_CANCEL
+	trigUnitCancel = CreateTrigger()
+	actUnitCancel = TriggerAddAction(trigUnitCancel, function()
+		local owner = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit()
+		local trigUnitName = GetUnitName(trigUnit)
+		local structure = GetCancelledStructure()
+		local structureName = GetUnitName(structure)
+		
+		print(string.format("UnitEv '\x25s' cancelled construction of '\x25s' (same as trig unit? \x25s)",
+			GetPlayerName(owner), structureName, trigUnit==structure))
+	end)
+	eventUnitCancel = TriggerRegisterUnitEvent(trigUnitCancel, whichUnit, EVENT_UNIT_CONSTRUCT_CANCEL)
+	--
+end
+```
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_CONSTRUCT_START          = ConvertPlayerUnitEvent(26)
 
 /**
+This event is fired when a newly constructing unit/building is cancelled.
+The cancelled unit is still available in this context.
+
+@note Getters:
+
+- `GetCancelledStructure`, `GetTriggerUnit` - cancelled building
+- `GetPlayerName` - building's owner
+
+@note Runs before `EVENT_UNIT_CONSTRUCT_CANCEL`
+
+@note See: `EVENT_PLAYER_UNIT_CONSTRUCT_START` for an example.
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL         = ConvertPlayerUnitEvent(27)
 
 /**
+This event is fired when a newly constructing unit/building is completed.
+
+@note Getters:
+
+- `GetConstructedStructure`, `GetTriggerUnit` - completed building
+- `GetPlayerName` - building's owner
+
+@note Runs before `EVENT_UNIT_CONSTRUCT_FINISH`
+
+@note See: `EVENT_PLAYER_UNIT_CONSTRUCT_START` for an example.
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_CONSTRUCT_FINISH         = ConvertPlayerUnitEvent(28)
@@ -4659,11 +4785,31 @@ Therefore it is not fired again until the current attack order stops.
                                                                         
 
 /**
+This event is fired when a newly constructing unit/building is cancelled.
+The cancelled unit is still available in this context.
+
+@note To work, it must be registered for the constructing unit,
+for example using `EVENT_PLAYER_UNIT_CONSTRUCT_START`.
+
+@note Runs after `EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL`
+
+@note See: `EVENT_PLAYER_UNIT_CONSTRUCT_START` for an example.
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_CONSTRUCT_CANCEL                      = ConvertUnitEvent(64)
 
 /**
+This event is fired when a newly constructing unit/building is completed.
+
+@note To work, it must be registered for the constructing unit,
+for example using `EVENT_PLAYER_UNIT_CONSTRUCT_START`.
+
+@note Runs after `EVENT_PLAYER_UNIT_CONSTRUCT_FINISH`
+
+@note See: `EVENT_PLAYER_UNIT_CONSTRUCT_START` for an example,
+`EVENT_UNIT_CONSTRUCT_FINISH` for an explanation.
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_CONSTRUCT_FINISH                      = ConvertUnitEvent(65)
@@ -15185,6 +15331,16 @@ constant native GetDecayingUnit takes nothing returns unit
 // EVENT_PLAYER_UNIT_CONSTRUCT_START
 
 /**
+Returns (reuses) handle to the building that has just started being built
+(created as a game unit).
+
+@note Getter:
+
+- `GetTriggerUnit`, `GetConstructingStructure` - new building
+- `GetTriggerPlayer` - building's owner
+
+@note See: `EVENT_PLAYER_UNIT_CONSTRUCT_START` for an example
+
 @event EVENT_PLAYER_UNIT_CONSTRUCT_START
 
 @patch 1.00
@@ -15195,7 +15351,7 @@ constant native GetConstructingStructure takes nothing returns unit
 // EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL
 
 /**
-@event EVENT_PLAYER_UNIT_CONSTRUCT_FINISH
+Returns (reuses) handle to the building whose construction has been cancelled.
 
 @event EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL
 
@@ -15206,11 +15362,9 @@ constant native GetConstructingStructure takes nothing returns unit
 constant native GetCancelledStructure takes nothing returns unit
 
 /**
+Returns (reuses) handle to the building whose construction has finished.
+
 @event EVENT_PLAYER_UNIT_CONSTRUCT_FINISH
-
-@event EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL
-
-@event EVENT_UNIT_CONSTRUCT_CANCEL
 
 @event EVENT_UNIT_CONSTRUCT_FINISH
 
