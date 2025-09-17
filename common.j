@@ -4630,11 +4630,15 @@ At this point the hero has already been revived at the new location with full HP
     constant playerunitevent EVENT_PLAYER_HERO_REVIVE_FINISH            = ConvertPlayerUnitEvent(46)
 
 /**
-Runs when something summons a new unit under specified player's control.
+Runs when a player's unit summons a new unit.
 
-Use `GetSummonedUnit` for the new unit and `GetSummoningUnit` for the spell caster.
+@note Getters:
 
-@note See: `EVENT_UNIT_SUMMON`
+- `GetSummonedUnit`, `GetTriggerUnit` - newly spawned unit
+- `GetTriggerPlayer` - owner of the summoned unit
+- `GetSummoningUnit` - the spell caster (summoner).
+
+@note See: `GetSummoningUnit` for an example, `EVENT_UNIT_SUMMON`.
 
 @note `GetTriggerUnit` is equivalent to `GetSummonedUnit`.
 
@@ -5097,16 +5101,20 @@ SetHeroLevel(myHero, GetHeroLevel(myHero)+10, true)
                                                                         
 
 /**
-Runs when a unit summons another unit.
+Runs when the registered unit summons a new unit.
 
-Use `GetSummoningUnit` to get the spell caster.
+@note Getters:
+
+- `GetSummoningUnit`, `GetTriggerUnit` - the spell caster (summoner).
+- `GetTriggerPlayer` - owner of the summoner
 
 @note `GetSummonedUnit` returns null, probably because the event happens before
 the new unit is spawned.
 
-@note `GetTriggerUnit` is equivalent to `GetSummoningUnit`.
+v2.0.3.23101: returns some invalid "unit" handle. See function's description.
 
-@note See: `EVENT_PLAYER_UNIT_SUMMON`
+@note See: `GetSummoningUnit` for an example,
+use `EVENT_PLAYER_UNIT_SUMMON` to retrieve the summoned unit.
 
 @patch 1.00
 */
@@ -15570,7 +15578,8 @@ constant native GetDetectedUnit takes nothing returns unit
 // EVENT_PLAYER_UNIT_SUMMONED
 
 /**
-Returns the unit who casted the summoning spell.
+Returns (reuses) handle to the unit who has who casted the summoning spell
+and summoned someone. For example, a hero.
 
 @event EVENT_PLAYER_UNIT_SUMMON
 
@@ -15578,16 +15587,63 @@ Returns the unit who casted the summoning spell.
 
 @note See: `GetSummonedUnit`.
 
+@note **Example (Lua):** Spawn a serpent ward using the hero to trigger.
+
+```{.lua}
+myPlayer = Player(0)
+shaman = CreateUnit(myPlayer, FourCC"Oshd", 0, 0, 270.0)
+SetHeroLevel(shaman, GetHeroLevel(shaman)+10, true)
+
+-- this uses one and the same action function for PLAYER_UNIT and UNIT_ events.
+-- please don't do this and separate them cleanly
+for i, eventName in ipairs({"EVENT_UNIT_SUMMON", "EVENT_PLAYER_UNIT_SUMMON"}) do
+	local isPlayerUnitEvent = eventName:find("PLAYER_UNIT") and true or false
+	local eventType = _G[eventName]
+	local eventNameShort = eventName:gsub("EVENT_PLAYER_UNIT_", "evPU-"):gsub("EVENT_UNIT_", "evU-")
+	
+	trigTemp = CreateTrigger()
+	actTemp = TriggerAddAction(trigTemp, function()
+		local owner = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit()
+		local trigUnitName = GetUnitName(trigUnit)
+		local summoningUnit = GetSummoningUnit()
+		local summoningUnitName = GetUnitName(summoningUnit)
+		local summonedUnit = GetSummonedUnit()
+		local summonedUnitName = GetUnitName(summonedUnit)
+		
+		print(string.format("\x25s: '\x25s' 's unit '\x25s' summons: '\x25s'",
+			eventNameShort, GetPlayerName(owner), summoningUnitName, summonedUnitName))
+		print("trigger unit:", trigUnitName)
+		
+		print(GetSummoningUnit(), GetSummoningUnit()==GetSummoningUnit(), GetUnitX(summoningUnit))
+		
+		-- in EVENT_UNIT_SUMMON
+		-- summoned unit returns some weird "unit" object that's definitely not a real unit
+		print(GetSummonedUnit(), GetSummonedUnit()==GetSummonedUnit(), GetUnitX(summonedUnit))
+	end)
+	if isPlayerUnitEvent then
+		tempEvent = TriggerRegisterPlayerUnitEvent(trigTemp, myPlayer, eventType, nil)
+	else
+		tempEvent = TriggerRegisterUnitEvent(trigTemp, shaman, eventType)
+	end
+end
+```
+
 @patch 1.00
 */
 constant native GetSummoningUnit    takes nothing returns unit
 
 /**
-Returns the newly spawned unit.
+Returns (reuses) handle to the newly spawned unit as a result of a summoning spell.
+For example, a ward.
+
+@bug v2.0.3.23101 (see lep/jassdoc#136): it's not intended to be used inside
+`EVENT_UNIT_SUMMON` but when you do, it returns some random object as a "unit"
+handle. This handle is then reused between trigger invocations.
 
 @event EVENT_PLAYER_UNIT_SUMMON
 
-@note See: `GetSummoningUnit`.
+@note See: `GetSummoningUnit` for an example.
 
 @patch 1.00
 */
