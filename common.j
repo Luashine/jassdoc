@@ -4663,6 +4663,46 @@ Runs when a player's unit summons a new unit.
 
 
 /**
+It's fired when a registered player's unit is loaded into a cargo unit.
+
+@note Getters:
+
+- `GetLoadedUnit`, `GetTriggerUnit` - unit who is now inside a cargo
+- `GetTriggerPlayer` - owner of the loaded unit, player registered for this event
+- `GetTransportUnit` - transporter unit
+
+@note Unfinished API. An "unloaded" event does not exist.
+
+@note **Example (Lua):**
+
+```{.lua}
+do
+	local eventName = "EVENT_PLAYER_UNIT_LOADED"
+	local eventType = _G[eventName]
+	local eventNameShort = eventName:gsub("EVENT_PLAYER_UNIT_", "")
+	trigTemp = CreateTrigger()
+	actTemp = TriggerAddAction(trigTemp, function()
+		local owner = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit()
+		local trigUnitName = GetUnitName(trigUnit)
+		
+		local transportUnit = GetTransportUnit()
+		local transportUnitName = GetUnitName(transportUnit)
+		
+		local loadedUnit = GetLoadedUnit()
+		local loadedUnitName = GetUnitName(loadedUnit)
+		
+		print(string.format("\x25s: '\x25s' 's '\x25s' has loaded '\x25s'",
+			eventNameShort, GetPlayerName(owner), transportUnitName, loadedUnitName))
+		print("trigger unit: ", trigUnitName)
+		
+		print(GetTransportUnit(), GetTransportUnit()==GetTransportUnit())
+		print(GetLoadedUnit(), GetLoadedUnit()==GetLoadedUnit())
+	end)
+	tempEvent = TriggerRegisterPlayerUnitEvent(trigTemp, myPlayer, eventType, nil)
+end
+```
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_LOADED                   = ConvertPlayerUnitEvent(51)
@@ -15652,6 +15692,10 @@ constant native GetSummonedUnit     takes nothing returns unit
 // EVENT_PLAYER_UNIT_LOADED
 
 /**
+Returns (reuses) handle to the cargo unit who has taken aboard some other unit.
+
+@note See: `EVENT_PLAYER_UNIT_LOADED` for an example, `GetLoadedUnit`
+
 @event EVENT_PLAYER_UNIT_LOADED
 
 @patch 1.00
@@ -15659,6 +15703,10 @@ constant native GetSummonedUnit     takes nothing returns unit
 constant native GetTransportUnit    takes nothing returns unit
 
 /**
+Returns (reuses) handle to the unit loaded aboard a cargo transporter.
+
+@note See: `EVENT_PLAYER_UNIT_LOADED` for an example, `GetTransportUnit`.
+
 @event EVENT_PLAYER_UNIT_LOADED
 
 @patch 1.00
