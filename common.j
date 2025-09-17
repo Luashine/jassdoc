@@ -4366,16 +4366,69 @@ This event is fired when a newly constructing unit/building is completed.
 
 
 /**
+Event is fired when a new research is started.
+
+@note Getters:
+
+- `GetResearched` - type ID (rawcode) of the research
+- `GetResearchingUnit`, `GetTriggerUnit` - unit that does the research
+- `GetTriggerPlayer` - owner of the research building
+
+@note **Example (Lua):** Start a research to trigger the events.
+
+```{.lua}
+myPlayer = Player(0)
+blacksmith = CreateUnit(myPlayer, FourCC"hbla", 0, -512, 270.0)
+
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_GOLD, 10000)
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_LUMBER, 10000)
+
+for i, eventName in ipairs({
+"EVENT_PLAYER_UNIT_RESEARCH_START",
+"EVENT_PLAYER_UNIT_RESEARCH_CANCEL",
+"EVENT_PLAYER_UNIT_RESEARCH_FINISH",
+}) do
+	local eventType = _G[eventName]
+	local eventNameShort = eventName:gsub("EVENT_PLAYER_UNIT_", "")
+	trigTemp = CreateTrigger()
+	actTemp = TriggerAddAction(trigTemp, function()
+		local owner = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit()
+		local trigUnitName = GetUnitName(trigUnit)
+		local researcher = GetResearchingUnit()
+		local researcherName = GetUnitName(researcher)
+		
+		local researchingTechId = GetResearched()
+		local researchingIdText = string.pack(">I4", researchingTechId)
+		
+		print(string.format("\x25s: '\x25s' has started '\x25s' in '\x25s'",
+			eventNameShort, GetPlayerName(owner), researchingIdText, researcherName))
+		
+	end)
+	tempEvent = TriggerRegisterPlayerUnitEvent(trigTemp, myPlayer, eventType, nil)
+end
+```
+
+@note See: `EVENT_PLAYER_UNIT_RESEARCH_CANCEL`, `EVENT_PLAYER_UNIT_RESEARCH_FINISH`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_RESEARCH_START           = ConvertPlayerUnitEvent(35)
 
 /**
+Event is fired when an ongoing research is cancelled.
+
+Refer to `EVENT_PLAYER_UNIT_RESEARCH_START`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_RESEARCH_CANCEL          = ConvertPlayerUnitEvent(36)
 
 /**
+Event is fired when an ongoing research is completed.
+
+Refer to `EVENT_PLAYER_UNIT_RESEARCH_START`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_RESEARCH_FINISH          = ConvertPlayerUnitEvent(37)
@@ -15380,6 +15433,10 @@ constant native GetConstructedStructure takes nothing returns unit
 // EVENT_PLAYER_UNIT_RESEARCH_FINISH
 
 /**
+Returns (reuses) handle to the unit/building that started a research.
+
+@note See `EVENT_PLAYER_UNIT_RESEARCH_START` for an example.
+
 @event EVENT_PLAYER_UNIT_RESEARCH_START
 
 @event EVENT_PLAYER_UNIT_RESEARCH_CANCEL
