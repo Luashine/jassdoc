@@ -4350,16 +4350,74 @@ This event is fired when a newly constructing unit/building is completed.
 
 
 /**
+It's fired when a player starts the production of a new unit inside a building.
+
+@note See: `EVENT_PLAYER_UNIT_TRAIN_FINISH` for a code example.
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_TRAIN_START              = ConvertPlayerUnitEvent(32)
 
 /**
+It's fired when a player cancels the production of a new unit inside a building.
+
+@note See: `EVENT_PLAYER_UNIT_TRAIN_FINISH` for a code example.
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_TRAIN_CANCEL             = ConvertPlayerUnitEvent(33)
 
 /**
+It's fired right after a new unit has been trained in a player's building
+and spawned.
+
+@note Getters:
+
+- `GetTrainedUnit` - handle to trained unit (only available in FINISH,
+because the unit has been spawned)
+- `GetTrainedUnitType` - type ID of unit (rawcode)
+- `GetTriggerUnit` - building that trained the unit
+- `GetTriggerPlayer` - owner of the building
+
+@note See: `EVENT_PLAYER_UNIT_TRAIN_START`, `EVENT_PLAYER_UNIT_TRAIN_CANCEL`,
+`EVENT_UNIT_TRAIN_START`, `EVENT_UNIT_TRAIN_CANCEL`, `EVENT_UNIT_TRAIN_FINISH`
+
+@note **Example (Lua):** Shows the unit who has been trained.
+Use cheat "warpten" to speed up training.
+
+```{.lua}
+myPlayer = Player(0)
+barracks = CreateUnit(myPlayer, FourCC"hbar", 0, -768, 270.0)
+farm1 = CreateUnit(myPlayer, FourCC"hhou", 256, -768, 270.0)
+farm2 = CreateUnit(myPlayer, FourCC"hhou", 384, -768, 270.0)
+farm3 = CreateUnit(myPlayer, FourCC"hhou", 512, -768, 270.0)
+
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_GOLD, 10000)
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_LUMBER, 10000)
+
+do
+	local eventName = "EVENT_PLAYER_UNIT_TRAIN_FINISH"
+	local eventType = _G[eventName]
+	local eventNameShort = eventName:gsub("EVENT_PLAYER_UNIT_", "")
+	trigTemp = CreateTrigger()
+	actTemp = TriggerAddAction(trigTemp, function()
+		local owner = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit()
+		local trigUnitName = GetUnitName(trigUnit)
+		local trainedUnit = GetTrainedUnit()
+		local trainedUnitName = GetUnitName(trainedUnit)
+		
+		local trainedTypeId = GetTrainedUnitType()
+		local trainedIdText = string.pack(">I4", trainedTypeId)
+		
+		print(string.format("\x25s: '\x25s' has trained '\x25s'/'\x25s' in '\x25s'",
+			eventNameShort, GetPlayerName(owner), trainedIdText, trainedUnitName, trigUnitName))
+		
+	end)
+	tempEvent = TriggerRegisterPlayerUnitEvent(trigTemp, myPlayer, eventType, nil)
+end
+```
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_TRAIN_FINISH             = ConvertPlayerUnitEvent(34)
@@ -15462,6 +15520,12 @@ constant native GetResearched takes nothing returns integer
 // EVENT_PLAYER_UNIT_TRAIN_CANCEL
 
 /**
+Returns the type of unit (rawcode) that is being trained.
+
+@note See: `GetTrainedUnit` to retrieve the unit handle
+after it is trained and spawned;
+`EVENT_PLAYER_UNIT_TRAIN_FINISH` has a code example.
+
 @event EVENT_PLAYER_UNIT_TRAIN_START
 
 @event EVENT_PLAYER_UNIT_TRAIN_CANCEL
@@ -15479,6 +15543,11 @@ constant native GetTrainedUnitType takes nothing returns integer
 // EVENT_PLAYER_UNIT_TRAIN_FINISH
 
 /**
+Returns (reuses) handle to the unit has been trained and spawned.
+
+@note See: `GetTrainedUnitType` to retrieve the training unit type;
+`EVENT_PLAYER_UNIT_TRAIN_FINISH` has a code example.
+
 @event EVENT_PLAYER_UNIT_TRAIN_FINISH
 
 @event EVENT_UNIT_TRAIN_FINISH
