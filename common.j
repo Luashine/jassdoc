@@ -13991,6 +13991,9 @@ Removes the trigger and (needs confirmation) is supposed to clear up associated 
 @bug Do not destroy the current running Trigger (when waits are involved) as
 it can cause handle stack corruption as documented [here](http://www.wc3c.net/showthread.php?t=110519).
 
+@bug (1.26-2.0.3.23101) has the same leak where actions aren't destroyed,
+see: `TriggerClearActions`
+
 @patch 1.00
 */
 native DestroyTrigger   takes trigger whichTrigger returns nothing
@@ -16770,12 +16773,18 @@ Removes all actions from a trigger.
 @bug If the actions of the trigger are currently running, hereby removed actions still pending to be called will still be called. In contrast to
 `TriggerRemoveAction`, this will be the case regardless if there is a `TriggerSleepAction` after `TriggerClearActions` or not.
 
-@bug (v1.26a, newer versions too afaik) This leaks internally, because the game does not free the handle
+@bug (v1.26a-v2.0.3.23101 etc.) This leaks internally, because the game does not free the handle
 Unlike `TriggerRemoveAction`, `TriggerRemoveCondition`, `TriggerClearConditions`, which do call "CAgent::Remove".
+
+Note, in Lua this will prevent the garbage collection of the action function
+and objects it references (upvalues) too.
 
 You can use `TriggerRemoveAction` instead.
 
 Source: Unryze, Hive Discord <https://discord.com/channels/178569180625240064/311662737015046144/1301657105975214190>
+
+Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/destroytrigger-triggerclearactions-leak/37169>
+and example code: <https://github.com/Luashine/wc3-test-maps/tree/master/TriggerClearActions-leak>
 
 @note See: `TriggerAddAction`, `TriggerRemoveAction`
 
