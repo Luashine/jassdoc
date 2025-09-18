@@ -1849,6 +1849,11 @@ constant native ConvertUnitWeaponStringField            takes integer i returns 
 /**
 @note Previously created handles are always reused. (tested in v2.0.3.22988 Lua)
 
+@note Do not work:
+
+- 'ista' aka "stackMax" aka "Stats - Max Stacks": always returns 0
+(tested inventory and ground, v2.0.3.23101)
+
 @pure 
 
 @patch 1.31.0.11889
