@@ -5367,6 +5367,48 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
     constant playerunitevent    EVENT_PLAYER_UNIT_SELL                  = ConvertPlayerUnitEvent(269)
 
 /**
+It's fired after the registered player (recipient) becomes the new owner of
+a unit.
+
+@note Getters:
+
+- `GetChangingUnit`, `GetTriggerUnit` - unit who changed hands
+- `GetTriggerPlayer` - new (current) owner (equivalent to `GetOwningPlayer`)
+- `GetChangingUnitPrevOwner` - previous owner
+
+@note See: `SetUnitOwner`, `EVENT_PLAYER_UNIT_RESCUED`, `EVENT_UNIT_RESCUED`
+
+@note **Example (Lua):** The wisp is spawned as owner by blue and immediately
+changed to red's ownership.
+
+```{.lua}
+wisp = CreateUnit(Player(1), FourCC"ewsp", -256, 0, 270.0)
+
+for i = 0, 1 do
+	local myPlayer = Player(i)
+	local eventName = "EVENT_PLAYER_UNIT_CHANGE_OWNER"
+	local eventType = _G[eventName]
+	local eventNameShort = eventName:gsub("EVENT_PLAYER_UNIT_", "")
+	trigTemp = CreateTrigger()
+	actTemp = TriggerAddAction(trigTemp, function()
+		local ownerNew = GetTriggerPlayer()
+		local trigUnit = GetTriggerUnit()
+		local trigUnitName = GetUnitName(trigUnit)
+		
+		local changingUnit = GetChangingUnit()
+		local changingUnitName = GetUnitName(changingUnit)
+		
+		local ownerOld = GetChangingUnitPrevOwner()
+		
+		print(string.format("\x25s (pSlot=\x25d): '\x25s'->'\x25s' changed owner to '\x25s'",
+			eventNameShort, i, GetPlayerName(ownerOld), changingUnitName, GetPlayerName(ownerNew)))
+	end)
+	tempEvent = TriggerRegisterPlayerUnitEvent(trigTemp, myPlayer, eventType, nil)
+end
+
+SetUnitOwner(wisp, Player(0), true)
+```
+
 @patch 1.07
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_CHANGE_OWNER          = ConvertPlayerUnitEvent(270)
@@ -15789,6 +15831,12 @@ constant native GetSoldItem         takes nothing returns item
 // EVENT_PLAYER_UNIT_CHANGE_OWNER
 
 /**
+Returns (reuses) handle to the unit who has changed player ownership.
+
+Returns null when used in an invalid context.
+
+@note See: `GetChangingUnitPrevOwner`
+
 @event EVENT_PLAYER_UNIT_CHANGE_OWNER
 
 @patch 1.07
@@ -15796,6 +15844,12 @@ constant native GetSoldItem         takes nothing returns item
 constant native GetChangingUnit             takes nothing returns unit
 
 /**
+Returns constant handle to player who owned the unit before the change.
+
+Returns null when used in an invalid context.
+
+@note See: `GetChangingUnit`
+
 @event EVENT_PLAYER_UNIT_CHANGE_OWNER
 
 @patch 1.07
@@ -20855,6 +20909,10 @@ constant native GetPlayerTechCount      takes player whichPlayer, integer techid
 
 
 /**
+Unknown. Not used anywhere, doesn't do anything?
+
+@note See: `SetUnitOwner`
+
 @patch 1.07
 */
 native SetPlayerUnitsOwner takes player whichPlayer, integer newOwner returns nothing
