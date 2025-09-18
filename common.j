@@ -16121,6 +16121,7 @@ constant native BlzGetManipulatedItemWasAbsorbed takes nothing returns boolean
 Source is the item that is losing charges.
 
 @event EVENT_PLAYER_UNIT_STACK_ITEM
+@event EVENT_UNIT_STACK_ITEM
 
 @patch 1.32.10.18820
 */
@@ -16130,6 +16131,7 @@ constant native BlzGetStackingItemSource takes nothing returns item
 Target is the item getting charges.
 
 @event EVENT_PLAYER_UNIT_STACK_ITEM
+@event EVENT_UNIT_STACK_ITEM
 
 @patch 1.32.10.18820
 */
@@ -16137,6 +16139,7 @@ constant native BlzGetStackingItemTarget takes nothing returns item
 
 /**
 @event EVENT_PLAYER_UNIT_STACK_ITEM
+@event EVENT_UNIT_STACK_ITEM
 
 @patch 1.32.10.18820
 */
