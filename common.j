@@ -5362,6 +5362,143 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
 
 
 /**
+It's fired after a shop owned by the registered player sells a **unit** to someone.
+
+The unit has been spawned and is available at this point.
+
+@note Getters:
+
+- `GetTriggerPlayer` - owner of the shop unit (usually neutral-passive player)
+- `GetSellingUnit`, `GetTriggerUnit` - shop unit
+- `GetBuyingUnit` - unit who did the purchase
+- `GetSoldUnit` - purchased unit
+
+@note Event order:
+
+1. `EVENT_PLAYER_UNIT_SELL`
+2. `EVENT_UNIT_SELL`
+
+@note See: `EVENT_PLAYER_UNIT_SELL_ITEM`
+
+@note **Example (Lua):** This is an exhaustive testing code snippet.
+Two events fire whenever you buy something from the spawned shops.
+
+```{.lua}
+mercenaryCamp = CreateUnit(Player(GetPlayerNeutralPassive()), FourCC"nmer", 0, 512, 270.0)
+goblinMerchant = CreateUnit(Player(GetPlayerNeutralPassive()), FourCC"ngme", 384, 512, 270.0)
+myPlayer = Player(0)
+archmage = CreateUnit(myPlayer, FourCC"Hamg", 0, 128, 270.0)
+
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_GOLD, 10000)
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_LUMBER, 10000)
+SetPlayerState(myPlayer, PLAYER_STATE_RESOURCE_FOOD_CAP, 77)
+
+-- event fires when a neutral passive building sells something
+do
+	local slotId = GetPlayerNeutralPassive()
+	local regPlayer = Player(slotId)
+	
+	for i, eventName in ipairs({"EVENT_PLAYER_UNIT_SELL", "EVENT_PLAYER_UNIT_SELL_ITEM"}) do
+		local eventType = _G[eventName]
+		local eventNameShort = eventName:gsub("EVENT_PLAYER_UNIT_", "evPU_"):gsub("EVENT_UNIT_", "evU_")
+		trigTemp = CreateTrigger()
+		actTemp = TriggerAddAction(trigTemp, function()
+			local trigPlayer = GetTriggerPlayer()
+			local trigUnit = GetTriggerUnit()
+			local trigUnitName = GetUnitName(trigUnit)
+			
+			local sellingUnit = GetSellingUnit()
+			local sellingUnitName = GetUnitName(sellingUnit)
+			
+			local buyingUnit = GetBuyingUnit()
+			local buyingUnitName = GetUnitName(buyingUnit)
+			
+			local soldUnit = GetSoldUnit()
+			local soldUnitName = GetUnitName(soldUnit)
+			
+			local soldItem = GetSoldItem()
+			local soldItemName = GetItemName(soldItem)
+			
+			print(string.format("\x25s (pSlot=\x25d): trigPlayer/Unit: '\x25s'/'\x25s'",
+				eventNameShort, slotId, GetPlayerName(trigPlayer), trigUnitName))
+			print(string.format("sellingUnit='\x25s'; buyingUnit='\x25s'; x,y=(\x25.1f, \x25.1f)",
+				sellingUnitName, buyingUnitName, GetUnitX(buyingUnit), GetUnitY(buyingUnit)))
+			if soldUnit then
+				print(string.format("soldUnit='\x25s', x,y=(\x25.1f, \x25.1f)",
+					soldUnitName, GetUnitX(soldUnit), GetUnitY(soldUnit)))
+			elseif soldItem then
+				print(string.format("soldItem='\x25s', x,y=(\x25.1f, \x25.1f)",
+					soldItemName, GetItemX(soldItem), GetItemY(soldItem)))
+			end
+			
+			print("selling", GetSellingUnit(), GetSellingUnit()==GetSellingUnit())
+			print("buying", GetBuyingUnit(), GetBuyingUnit()==GetBuyingUnit())
+			print("soldUnit", GetSoldUnit(), GetSoldUnit()==GetSoldUnit())
+			print("soldItem", GetSoldItem(), GetSoldItem()==GetSoldItem())
+		end)
+		tempEvent = TriggerRegisterPlayerUnitEvent(trigTemp, regPlayer, eventType, nil)
+	end
+end
+
+-- event fires when one of the two spawned neutral shops (specific units) sell something
+for i = 1, 2 do
+	local slotId
+	local registeredUnit
+	if i > 0 then
+		slotId = GetPlayerNeutralPassive()
+		if i == 1 then
+			registeredUnit = mercenaryCamp
+		elseif i == 2 then
+			registeredUnit = goblinMerchant
+		end
+	end
+	local registeredUnitName = GetUnitName(registeredUnit)
+	
+	for i, eventName in ipairs({"EVENT_UNIT_SELL", "EVENT_UNIT_SELL_ITEM"}) do
+		local regPlayer = Player(slotId)
+		
+		local eventType = _G[eventName]
+		local eventNameShort = eventName:gsub("EVENT_PLAYER_UNIT_", "evPU_"):gsub("EVENT_UNIT_", "evU_")
+		trigTemp = CreateTrigger()
+		actTemp = TriggerAddAction(trigTemp, function()
+			local trigPlayer = GetTriggerPlayer()
+			local trigUnit = GetTriggerUnit()
+			local trigUnitName = GetUnitName(trigUnit)
+			
+			local sellingUnit = GetSellingUnit()
+			local sellingUnitName = GetUnitName(sellingUnit)
+			
+			local buyingUnit = GetBuyingUnit()
+			local buyingUnitName = GetUnitName(buyingUnit)
+			
+			local soldUnit = GetSoldUnit()
+			local soldUnitName = GetUnitName(soldUnit)
+			
+			local soldItem = GetSoldItem()
+			local soldItemName = GetItemName(soldItem)
+			
+			print(string.format("\x25s (regUnit=\x25s): trigPlayer/Unit: '\x25s'/'\x25s'",
+				eventNameShort, registeredUnitName, GetPlayerName(trigPlayer), trigUnitName))
+			print(string.format("sellingUnit='\x25s'; buyingUnit='\x25s'; x,y=(\x25.1f, \x25.1f)",
+				sellingUnitName, buyingUnitName, GetUnitX(buyingUnit), GetUnitY(buyingUnit)))
+			if soldUnit then
+				print(string.format("soldUnit='\x25s', x,y=(\x25.1f, \x25.1f)",
+					soldUnitName, GetUnitX(soldUnit), GetUnitY(soldUnit)))
+			elseif soldItem then
+				print(string.format("soldItem='\x25s', x,y=(\x25.1f, \x25.1f)",
+					soldItemName, GetItemX(soldItem), GetItemY(soldItem)))
+			end
+						
+			print("selling", GetSellingUnit(), GetSellingUnit()==GetSellingUnit())
+			print("buying", GetBuyingUnit(), GetBuyingUnit()==GetBuyingUnit())
+			print("soldUnit", GetSoldUnit(), GetSoldUnit()==GetSoldUnit())
+			print("soldItem", GetSoldItem(), GetSoldItem()==GetSoldItem())
+		end)
+		tempEvent = TriggerRegisterUnitEvent(trigTemp, registeredUnit, eventType)
+	end
+end
+```
+
 @patch 1.07
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_SELL                  = ConvertPlayerUnitEvent(269)
@@ -5414,6 +5551,24 @@ SetUnitOwner(wisp, Player(0), true)
     constant playerunitevent    EVENT_PLAYER_UNIT_CHANGE_OWNER          = ConvertPlayerUnitEvent(270)
 
 /**
+It's fired after the registered unit (a shop) sells an **item** to someone.
+
+The item has been spawned and is available at this point.
+
+@note Getters:
+
+- `GetTriggerPlayer` - owner of the shop unit (usually neutral-passive player)
+- `GetSellingUnit`, `GetTriggerUnit` - shop unit
+- `GetBuyingUnit` - unit who did the purchase
+- `GetSoldItem` - purchased item
+
+@note Event order:
+
+1. `EVENT_PLAYER_UNIT_SELL_ITEM`
+2. `EVENT_UNIT_SELL_ITEM`
+
+@note See: `EVENT_PLAYER_UNIT_SELL` for a code example.
+
 @patch 1.07
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_SELL_ITEM             = ConvertPlayerUnitEvent(271)
@@ -5464,16 +5619,22 @@ SetUnitOwner(wisp, Player(0), true)
 
 
 /**
+@note Refer to `EVENT_PLAYER_UNIT_SELL`
+
 @patch 1.07
 */
     constant unitevent          EVENT_UNIT_SELL                         = ConvertUnitEvent(286)
 
 /**
+@note Refer to `EVENT_PLAYER_UNIT_CHANGE_OWNER`
+
 @patch 1.07
 */
     constant unitevent          EVENT_UNIT_CHANGE_OWNER                 = ConvertUnitEvent(287)
 
 /**
+@note Refer to `EVENT_PLAYER_UNIT_SELL_ITEM`
+
 @patch 1.07
 */
     constant unitevent          EVENT_UNIT_SELL_ITEM                    = ConvertUnitEvent(288)
@@ -15793,15 +15954,31 @@ constant native GetLoadedUnit       takes nothing returns unit
 // EVENT_PLAYER_UNIT_SELL
 
 /**
+Returns (reuses) handle to the shop unit that has sold a unit/item.
+
+Returns null when used in an invalid context.
+
+@note See `EVENT_PLAYER_UNIT_SELL` for a description and an example.
+
 @event EVENT_PLAYER_UNIT_SELL
 
 @event EVENT_UNIT_SELL
+
+@event EVENT_PLAYER_UNIT_SELL_ITEM
+
+@event EVENT_UNIT_SELL_ITEM
 
 @patch 1.07
 */
 constant native GetSellingUnit      takes nothing returns unit
 
 /**
+Returns (reuses) handle to the unit purchased from a shop.
+
+Returns null when used in an invalid context.
+
+@note See `EVENT_PLAYER_UNIT_SELL` for a description and an example.
+
 @event EVENT_PLAYER_UNIT_SELL
 
 @event EVENT_UNIT_SELL
@@ -15811,9 +15988,19 @@ constant native GetSellingUnit      takes nothing returns unit
 constant native GetSoldUnit         takes nothing returns unit
 
 /**
+Returns (reuses) handle to the customer unit that has bought a unit/item from a shop.
+
+Returns null when used in an invalid context.
+
+@note See `EVENT_PLAYER_UNIT_SELL` for a description and an example.
+
 @event EVENT_PLAYER_UNIT_SELL
 
 @event EVENT_UNIT_SELL
+
+@event EVENT_PLAYER_UNIT_SELL_ITEM
+
+@event EVENT_UNIT_SELL_ITEM
 
 @patch 1.07
 */
@@ -15822,7 +16009,15 @@ constant native GetBuyingUnit       takes nothing returns unit
 // EVENT_PLAYER_UNIT_SELL_ITEM
 
 /**
+Returns (reuses) handle to the item purchased from a shop.
+
+Returns null when used in an invalid context.
+
+@note See `EVENT_PLAYER_UNIT_SELL` for a description and an example.
+
 @event EVENT_PLAYER_UNIT_SELL_ITEM
+
+@event EVENT_UNIT_SELL_ITEM
 
 @patch 1.07
 */
