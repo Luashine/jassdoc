@@ -15211,6 +15211,9 @@ native TriggerRegisterPlayerEvent takes trigger whichTrigger, player  whichPlaye
 // EVENT_PLAYER_VICTORY
 
 /**
+Returns constant handle to player, when an event can be attributed to a player.
+Otherwise it may return null in an invalid context.
+
 @event EVENT_PLAYER_DEFEAT
 @event EVENT_PLAYER_LEAVE
 @event EVENT_PLAYER_VICTORY
@@ -15279,6 +15282,8 @@ Returns null when used in an invalid context.
 constant native GetLearningUnit      takes nothing returns unit
 
 /**
+Returns `0` when used in an invalid context.
+
 @event EVENT_PLAYER_HERO_SKILL
 
 @event EVENT_UNIT_HERO_SKILL
@@ -15288,6 +15293,8 @@ constant native GetLearningUnit      takes nothing returns unit
 constant native GetLearnedSkill      takes nothing returns integer
 
 /**
+Returns `0` when used in an invalid context.
+
 @event EVENT_PLAYER_HERO_SKILL
 
 @event EVENT_UNIT_HERO_SKILL
@@ -15323,6 +15330,8 @@ Returns (reuses) handle to the unit who is being revived.
 
 Same as `GetTriggerUnit` within this context.
 
+Returns null when used in an invalid context.
+
 @event EVENT_PLAYER_HERO_REVIVE_START
 
 @event EVENT_PLAYER_HERO_REVIVE_CANCEL
@@ -15343,7 +15352,8 @@ constant native GetRevivingUnit takes nothing returns unit
 
 /**
 Returns (reuses) handle to unit, who is carrying out an attack against a victim.
-Returns null, if used outside a valid context.
+
+Returns null when used in an invalid context.
 
 @event EVENT_PLAYER_UNIT_ATTACKED
 
@@ -15358,7 +15368,7 @@ constant native GetAttacker takes nothing returns unit
 /**
 Returns (reuses) handle to the unit, who is being rescued.
 
-Returns null in an invalid context.
+Returns null when used in an invalid context.
 
 @note See: `SetUnitRescueRange`, `SetUnitRescuable`, `EVENT_UNIT_RESCUED`, `EVENT_PLAYER_UNIT_RESCUED`.
 `GetTriggerPlayer` returns rescued unit's current (old) owner and `GetTriggerUnit` the rescued unit.
@@ -15414,7 +15424,7 @@ constant native GetRescuer  takes nothing returns unit
 /**
 Returns (reuses) handle to the unit, who has died.
 
-Returns null in an invalid context.
+Returns null when used in an invalid context.
 
 @event EVENT_PLAYER_UNIT_DEATH
 
@@ -15496,6 +15506,8 @@ constant native GetDecayingUnit takes nothing returns unit
 Returns (reuses) handle to the building that has just started being built
 (created as a game unit).
 
+Returns null when used in an invalid context.
+
 @note Getter:
 
 - `GetTriggerUnit`, `GetConstructingStructure` - new building
@@ -15515,6 +15527,8 @@ constant native GetConstructingStructure takes nothing returns unit
 /**
 Returns (reuses) handle to the building whose construction has been cancelled.
 
+Returns null when used in an invalid context.
+
 @event EVENT_PLAYER_UNIT_CONSTRUCT_CANCEL
 
 @event EVENT_UNIT_CONSTRUCT_CANCEL
@@ -15525,6 +15539,8 @@ constant native GetCancelledStructure takes nothing returns unit
 
 /**
 Returns (reuses) handle to the building whose construction has finished.
+
+Returns null when used in an invalid context.
 
 @event EVENT_PLAYER_UNIT_CONSTRUCT_FINISH
 
@@ -15541,6 +15557,8 @@ constant native GetConstructedStructure takes nothing returns unit
 /**
 Returns (reuses) handle to the unit/building that started a research.
 
+Returns null when used in an invalid context.
+
 @note See `EVENT_PLAYER_UNIT_RESEARCH_START` for an example.
 
 @event EVENT_PLAYER_UNIT_RESEARCH_START
@@ -15554,6 +15572,10 @@ Returns (reuses) handle to the unit/building that started a research.
 constant native GetResearchingUnit takes nothing returns unit
 
 /**
+Returns the type of research (rawcode) that is being researched.
+
+Returns `0` when used in an invalid context.
+
 @event EVENT_PLAYER_UNIT_RESEARCH_START
 
 @event EVENT_PLAYER_UNIT_RESEARCH_CANCEL
@@ -15569,6 +15591,8 @@ constant native GetResearched takes nothing returns integer
 
 /**
 Returns the type of unit (rawcode) that is being trained.
+
+Returns `0` when used in an invalid context.
 
 @note See: `GetTrainedUnit` to retrieve the unit handle
 after it is trained and spawned;
@@ -15593,6 +15617,8 @@ constant native GetTrainedUnitType takes nothing returns integer
 /**
 Returns (reuses) handle to the unit has been trained and spawned.
 
+Returns null when used in an invalid context.
+
 @note See: `GetTrainedUnitType` to retrieve the training unit type;
 `EVENT_PLAYER_UNIT_TRAIN_FINISH` has a code example.
 
@@ -15608,6 +15634,7 @@ constant native GetTrainedUnit takes nothing returns unit
 
 /**
 Unknown, not used in any of Blizzard's own maps.
+Returns null (invalid context).
 
 @event EVENT_PLAYER_UNIT_DETECTED
 
@@ -15620,6 +15647,8 @@ constant native GetDetectedUnit takes nothing returns unit
 /**
 Returns (reuses) handle to the unit who has who casted the summoning spell
 and summoned someone. For example, a hero.
+
+Returns null when used in an invalid context.
 
 @event EVENT_PLAYER_UNIT_SUMMON
 
@@ -15677,6 +15706,8 @@ constant native GetSummoningUnit    takes nothing returns unit
 Returns (reuses) handle to the newly spawned unit as a result of a summoning spell.
 For example, a ward.
 
+Returns null when used in an invalid context.
+
 @bug v2.0.3.23101 (see lep/jassdoc#136): it's not intended to be used inside
 `EVENT_UNIT_SUMMON` but when you do, it returns some random object as a "unit"
 handle. This handle is then reused between trigger invocations.
@@ -15694,6 +15725,8 @@ constant native GetSummonedUnit     takes nothing returns unit
 /**
 Returns (reuses) handle to the cargo unit who has taken aboard some other unit.
 
+Returns null when used in an invalid context.
+
 @note See: `EVENT_PLAYER_UNIT_LOADED` for an example, `GetLoadedUnit`
 
 @event EVENT_PLAYER_UNIT_LOADED
@@ -15704,6 +15737,8 @@ constant native GetTransportUnit    takes nothing returns unit
 
 /**
 Returns (reuses) handle to the unit loaded aboard a cargo transporter.
+
+Returns null when used in an invalid context.
 
 @note See: `EVENT_PLAYER_UNIT_LOADED` for an example, `GetTransportUnit`.
 
