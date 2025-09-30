@@ -20036,6 +20036,10 @@ myTree = CreateDestructable(FourCC("LTlt"), 128, 256, 180, 1, 0)
 checkRallyPoint(castle)
 ```
 
+@note There's no native to get "rallyX/Y". It's due to the type system and, in fact, not a bug.
+If you don't get a location in return, it means the rally point is instead a destructable or unit.
+There's nothing inbetween. On the other hand, `GetSpellTargetX` and `GetSpellTargetY` do exist.
+
 @note See `GetUnitRallyUnit`, `GetUnitRallyDestructable`
 @patch 1.13
 */
