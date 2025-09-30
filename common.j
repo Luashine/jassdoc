@@ -22466,6 +22466,45 @@ Creates and returns handle to hashtable. Returns null on error.
 
 @note See `FlushParentHashtable` to clear and remove a hashtable, `FlushChildHashtable`, `InitGameCache`
 
+@note These types can all be stored simultaneously within one hashtable at the
+exact same keys:
+
+- string
+- real
+- integer
+- boolean
+- handle, **however** all different handle types share the same one storage slot.
+You can only store one handle at a time at a key-pair. Subsequent stores will
+overwrite the previous handle.
+
+```{.lua}
+function overloadHtLoadPrint()
+	print("player", LoadPlayerHandle(overloadHt, 222, 333))
+	print("loc", LoadLocationHandle(overloadHt, 222, 333))
+	print("group", LoadGroupHandle(overloadHt, 222, 333))
+	print("str", LoadStr(overloadHt, 222, 333))
+	print("real", LoadReal(overloadHt, 222, 333))
+	print("int", LoadInteger(overloadHt, 222, 333))
+	print("bool", LoadBoolean(overloadHt, 222, 333))
+end
+function overloadHtSave()
+	SavePlayerHandle(overloadHt, 222, 333, Player(1))
+	SaveLocationHandle(overloadHt, 222, 333, Location(13,37))
+	SaveGroupHandle(overloadHt, 222, 333, CreateGroup())
+	SaveStr(overloadHt, 222, 333, "myString")
+	SaveReal(overloadHt, 222, 333, 1337.42)
+	SaveInteger(overloadHt, 222, 333, 13377)
+	SaveBoolean(overloadHt, 222, 333, true)
+end
+
+overloadHt = InitHashtable()
+overloadHtLoadPrint() -- show all default values, nothing stored
+overloadHtSave()
+-- retrieves all basic value types, but for handles
+-- only group's handle is retrieved
+overloadHtLoadPrint()
+```
+
 @patch 1.24a
 */
 native  InitHashtable    takes nothing returns hashtable
