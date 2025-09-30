@@ -16304,6 +16304,8 @@ constant native BlzGetStackingItemTargetPreviousCharges takes nothing returns in
 /**
 Returns (reuses) handle to the unit that received the order.
 
+Returns null when used in an invalid context.
+
 Same as `GetTriggerUnit` in this context.
 
 @note When you order a group of units, each of them receives the order at the same time.
@@ -16461,6 +16463,8 @@ Creates and returns a new location for the current point order (anywhere on map 
 Returns 0,0,0 for other event types. If you want to get the position of the target for a target order,
 get that target object first.
 
+Returns null when used in an invalid context.
+
 @note Returned location must be removed with `RemoveLocation` to avoid leaks.
 
 @note When this is used improperly, it returns a location with (0,0,0) which is different from
@@ -16481,6 +16485,8 @@ constant native GetOrderPointLoc takes nothing returns location
 /**
 Returns (reuses) handle to the target widget (unit/item/destructable) for the current order.
 
+Returns null when used in an invalid context.
+
 @note See: `GetOrderTargetDestructable`, `GetOrderTargetItem`, `GetOrderTargetUnit`.
 
 @event EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER
@@ -16494,7 +16500,7 @@ constant native GetOrderTarget              takes nothing returns widget
 /**
 Returns (reuses) handle to the targetted destructable, if the order target is a destructable.
 
-Returns null on failure.
+Returns null when used in an invalid context.
 
 @note See: `GetOrderTarget`, `GetOrderTargetItem`, `GetOrderTargetUnit`.
 
@@ -16509,6 +16515,8 @@ constant native GetOrderTargetDestructable  takes nothing returns destructable
 /**
 Returns (reuses) handle to the targetted item, if the order target is an item.
 
+Returns null when used in an invalid context.
+
 @note See: `GetOrderTarget`, `GetOrderTargetDestructable`, `GetOrderTargetUnit`.
 
 @event EVENT_PLAYER_UNIT_ISSUED_TARGET_ORDER
@@ -16521,6 +16529,8 @@ constant native GetOrderTargetItem          takes nothing returns item
 
 /**
 Returns (reuses) handle to the targetted unit, if the order target is a unit.
+
+Returns null when used in an invalid context or target is not a unit.
 
 @note See: `GetOrderTarget`, `GetOrderTargetDestructable`, `GetOrderTargetItem`.
 
@@ -16545,7 +16555,8 @@ constant native GetOrderTargetUnit          takes nothing returns unit
 
 /**
 Returns (reuses) handle to the unit who has cast the ability.
-Never returns null.
+
+Returns null when used in an invalid context.
 
 @event EVENT_UNIT_SPELL_CHANNEL
 
@@ -16584,7 +16595,8 @@ constant native GetSpellAbilityUnit         takes nothing returns unit
 
 /**
 Returns ability type ID (aka rawcode) of the ability cast.
-Never returns 0.
+
+Returns `0` when used in an invalid context.
 
 @event EVENT_UNIT_SPELL_CHANNEL
 
@@ -16616,7 +16628,8 @@ constant native GetSpellAbilityId           takes nothing returns integer
 
 /**
 Returns (reuses) handle to the ability instance cast.
-Never returns null.
+
+Returns null when used in an invalid context.
 
 @event EVENT_UNIT_SPELL_CHANNEL
 
@@ -16648,9 +16661,11 @@ constant native GetSpellAbility             takes nothing returns ability
 
 /**
 Returns:
+
 - creates and returns a new (x,y,z) location of the target
-- or 0.0 if no positional target existed or
+- or 0,0 if no positional target existed or
 if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+- or null if used in an invalid context
 
 If the spell has a target (unit/item/destructable/location), then
 the location is **your cursor position** over the target, when you
@@ -16693,7 +16708,8 @@ constant native GetSpellTargetLoc           takes nothing returns location
 Returns:
 - X map coordinate of the target
 - or 0.0 if no positional target existed or
-if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target or
+if used in an invalid context.
 
 See `GetSpellTargetLoc` for more info or if you want to get the Z coordinate.
 
@@ -16727,9 +16743,11 @@ constant native GetSpellTargetX				takes nothing returns real
 
 /**
 Returns:
+
 - Y map coordinate of the target
 - or 0.0 if no positional target existed or
-if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target or
+if used in an invalid context.
 
 See `GetSpellTargetLoc` for more info or if you want to get the Z coordinate.
 
@@ -16762,9 +16780,12 @@ See `GetSpellTargetLoc` for more info or if you want to get the Z coordinate.
 constant native GetSpellTargetY				takes nothing returns real
 
 /**
-Returns (reuses) handle to the targeted destructable,
-or null if spell had no target or target is not a destructable,
-or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+Returns:
+
+- (reuses) handle to the targeted destructable
+- null if spell had no target or target is not a destructable,
+or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target
+or if used in an invalid context.
 
 @event EVENT_UNIT_SPELL_CHANNEL
 
@@ -16795,9 +16816,12 @@ or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
 constant native GetSpellTargetDestructable  takes nothing returns destructable
 
 /**
-Returns (reuses) handle to the targeted item,
-or null if spell had no target or target is not a item,
-or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+Returns:
+
+- (reuses) handle to the targeted item
+- null if spell had no target or target is not a item,
+or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target
+or if used in an invalid context.
 
 @event EVENT_UNIT_SPELL_CHANNEL
 
@@ -16828,9 +16852,12 @@ or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
 constant native GetSpellTargetItem          takes nothing returns item
 
 /**
-Returns (reuses) handle to the targeted unit,
-or null if spell had no target or target is not a unit,
-or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target.
+Returns
+
+- (reuses) handle to the targeted unit,
+- null if spell had no target or target is not a unit,
+or if `EVENT_UNIT_SPELL_FINISH` had triggered and unset the target
+or if used in an invalid context.
 
 @event EVENT_UNIT_SPELL_CHANNEL
 
