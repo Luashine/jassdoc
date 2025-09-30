@@ -4671,6 +4671,8 @@ technically the item is still in the inventory.
 3. (if consumable item used up and charges reduce to 0) `EVENT_PLAYER_UNIT_DROP_ITEM`
 4. (if consumable item used up and charges reduce to 0) `EVENT_UNIT_DROP_ITEM`
 
+@note See `EVENT_PLAYER_UNIT_PICKUP_ITEM` for a code example.
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_DROP_ITEM                = ConvertPlayerUnitEvent(48)
@@ -4693,6 +4695,112 @@ owned by the registered player.
 2. (if item is stackable and has just stacked) `EVENT_UNIT_STACK_ITEM`
 3. (after new item has been inserted) `EVENT_PLAYER_UNIT_PICKUP_ITEM`
 4. (after new item has been inserted) `EVENT_UNIT_PICKUP_ITEM`
+
+@note **Example (Lua):** Complete testing code for all item events for debugging.
+
+```{.lua}
+-- Create an item in Object Editor:
+-- 1. Items -> Charged -> 'wswd' aka Invisible Warden
+-- 2. New name: "Stackable wards"
+-- 3. New ID: 'iswa'
+-- 4. Set 'ista' aka stackMax to 8
+-- 5. Set 'iuse' aka uses to 2
+-- 6. Change map's game constant: "ItemStackingEnabled" set to true (it's 70% scrolled down, under XPFactor)
+spawnedItems = {}
+do
+	local x, y = 130, -140
+	for i, rawcode in ipairs({"iswa","iswa","iswa","iswa"}) do
+		for i = 1, 8 do
+			tempItem = CreateItem(FourCC(rawcode), x, y)
+			table.insert(spawnedItems, tempItem)
+			y = y - 64
+		end
+		x = x + 128
+		y = -140
+	end
+end
+myPlayer = Player(0)
+archmage = CreateUnit(myPlayer, FourCC"Hamg", 0, 128, 270.0)
+
+do
+	local regPlayer = GetOwningPlayer(archmage)
+	local regUnit = archmage
+	assert(regUnit)
+	
+	for i, eventName in ipairs({
+		"EVENT_PLAYER_UNIT_STACK_ITEM",  "EVENT_UNIT_STACK_ITEM",
+		"EVENT_PLAYER_UNIT_DROP_ITEM",   "EVENT_UNIT_DROP_ITEM",
+		"EVENT_PLAYER_UNIT_PICKUP_ITEM", "EVENT_UNIT_PICKUP_ITEM",
+		"EVENT_PLAYER_UNIT_USE_ITEM",    "EVENT_UNIT_USE_ITEM"
+	}) do
+		local eventType = _G[eventName]
+		local isPlayerEvent = eventName:find("EVENT_PLAYER") and true or false
+		local eventNameShort = eventName:gsub("EVENT_PLAYER_UNIT_", "evPU_"):gsub("EVENT_UNIT_", "evU_")
+		trigTemp = CreateTrigger()
+		actTemp = TriggerAddAction(trigTemp, function()
+			local trigPlayer = GetTriggerPlayer()
+			local trigUnit = GetTriggerUnit()
+			local trigUnitName = GetUnitName(trigUnit)
+			
+			local manipulatingUnit = GetManipulatingUnit()
+			local manipulatingUnitName = GetUnitName(manipulatingUnit)
+			
+			local manipulatedItem = GetManipulatedItem()
+			local manipulatedItemName = GetItemName(manipulatedItem)
+			
+			local absorbingItem = BlzGetAbsorbingItem()
+			local absorbingItemName = GetItemName(absorbingItem)
+			
+			local stackingSource = BlzGetStackingItemSource()
+			local stackingSourceName = GetItemName(stackingSource)
+			
+			local stackingTarget = BlzGetStackingItemTarget()
+			local stackingTargetName = GetItemName(stackingTarget)
+			
+			local unitItemsCharges = {}
+			for s = 0, UnitInventorySize(regUnit)-1, 1 do
+				local item = UnitItemInSlot(regUnit, s)
+				local charges = item and GetItemCharges(item) or "-"
+				table.insert(unitItemsCharges, charges)
+			end
+			
+			print(string.format("\x25s: trigPlayer/Unit: '\x25s'/'\x25s', charges: \x25s",
+				eventNameShort, GetPlayerName(trigPlayer), trigUnitName, table.concat(unitItemsCharges, "/")))
+			print(string.format("manipulatingUnit='\x25s'; manipulatedItem='\x25s';x,y=(\x25.1f, \x25.1f)",
+				manipulatingUnitName, manipulatedItemName, GetItemX(manipulatedItem), GetItemY(manipulatedItem)))
+			
+			if manipulatingUnit == nil and manipulatedItem == nil then
+				print("GetManipulatingUnit and GetManipulatedItem are both null!")
+			else
+				print("GetManipulatingUnit", tostring(manipulatingUnit), GetManipulatingUnit()==GetManipulatingUnit())
+				print("GetManipulatedItem", tostring(manipulatedItem), GetManipulatedItem()==GetManipulatedItem())
+			end
+			
+			if absorbingItem then
+				gAbsorbing = absorbingItem
+				print(string.format("absorbingItem='\x25s';x,y=(\x25.1f, \x25.1f)",
+					absorbingItem, GetItemX(absorbingItem), GetItemY(absorbingItem)))
+				print("BlzGetAbsorbingItem", tostring(absorbingItem), BlzGetAbsorbingItem()==BlzGetAbsorbingItem())
+			end
+			if stackingSource then
+				print(string.format("stackingSource='\x25s';x,y=(\x25.1f, \x25.1f)",
+					stackingSource, GetItemX(stackingSource), GetItemY(stackingSource)))
+				print("StackingSource", tostring(stackingSource), BlzGetStackingItemSource()==BlzGetStackingItemSource())
+			end
+			if stackingTarget then
+				print(string.format("stackingTarget='\x25s';x,y=(\x25.1f, \x25.1f)",
+					stackingTarget, GetItemX(stackingTarget), GetItemY(stackingTarget)))
+				print("StackingTarget", tostring(stackingTarget), BlzGetStackingItemTarget()==BlzGetStackingItemTarget())
+			end
+		end)
+		if isPlayerEvent then
+			tempEvent = TriggerRegisterPlayerUnitEvent(trigTemp, regPlayer, eventType, nil)
+		else
+			tempEvent = TriggerRegisterUnitEvent(trigTemp, regUnit, eventType)
+		end
+	end
+end
+```
 
 @patch 1.00
 */
@@ -5224,6 +5332,8 @@ use `EVENT_PLAYER_UNIT_SUMMON` to retrieve the summoned unit.
 /**
 Refer to `EVENT_PLAYER_UNIT_DROP_ITEM`
 
+@note See `EVENT_PLAYER_UNIT_PICKUP_ITEM` for a code example.
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_DROP_ITEM                             = ConvertUnitEvent(85)
@@ -5248,12 +5358,16 @@ it may return a fake item handle in this event.
 3. (after new item has been inserted) `EVENT_PLAYER_UNIT_PICKUP_ITEM`
 4. (after new item has been inserted) `EVENT_UNIT_PICKUP_ITEM`
 
+@note See `EVENT_PLAYER_UNIT_PICKUP_ITEM` for a code example.
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_PICKUP_ITEM                           = ConvertUnitEvent(86)
 
 /**
 Refer to `EVENT_PLAYER_UNIT_USE_ITEM`
+
+@note See `EVENT_PLAYER_UNIT_PICKUP_ITEM` for a code example.
 
 @patch 1.00
 */
@@ -5717,6 +5831,8 @@ See <https://us.forums.blizzard.com/en/warcraft3/t/fake-item-handles-returned-by
 3. (after new item has been inserted) `EVENT_PLAYER_UNIT_PICKUP_ITEM`
 4. (after new item has been inserted) `EVENT_UNIT_PICKUP_ITEM`
 
+@note See `EVENT_PLAYER_UNIT_PICKUP_ITEM` for a code example.
+
 @patch 1.32.10.18820
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_STACK_ITEM            = ConvertPlayerUnitEvent(319)
@@ -5812,6 +5928,8 @@ Refer to `EVENT_PLAYER_UNIT_PICKUP_ITEM`
 
 @bug `GetManipulatedItem`, `GetManipulatingUnit` are null.
 See <https://us.forums.blizzard.com/en/warcraft3/t/fake-item-handles-returned-by-getters-in-item-events/37224>
+
+@note See `EVENT_PLAYER_UNIT_PICKUP_ITEM` for a code example.
 
 @patch 1.32.10.18820
 */
