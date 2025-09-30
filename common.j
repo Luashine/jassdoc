@@ -29664,11 +29664,26 @@ A TOC file contains a list, Each line is a path to a fdf (not case sensitve).
 native BlzLoadTOCFile                              takes string TOCFile returns boolean
 
 /**
-Create a new Frame using a Frame-BluePrint name (fdf) as child of owner.
-BluePrint needs to be loaded over TOC & fdf.
-Owner and BluePrint have to be from the Frame family.
+Always creates and returns a new frame, based on a frame blueprint name (see fdf)
+as a child of owner.
+
+In case of failure returns framehandle to world frame when:
+
+- `name` is invalid (e.g. empty string)
+- or `owner` is invalid (e.g. null)
+
+Blueprint needs to be loaded over TOC & fdf.
+Owner and Blueprint have to be from the frame family.
 Can only create rootFrames (not subFrames).
 Created Frames are stored into the game's Frame-Storage, `BlzGetFrameByName(name, createContext)`. Overwrites occupied slots.
+
+@note **Example (Lua):** One frame is a child to GAME_UI frame, so it is near
+the center. The other is tied to minimap and thus appears at the bottom left.
+
+```{.lua}
+exampleCenter = BlzCreateFrame("ScriptDialogButton", BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 0, 0)
+exampleMinimap = BlzCreateFrame("ScriptDialogButton", BlzGetOriginFrame(ORIGIN_FRAME_MINIMAP, 0), 0, 0)
+```
 
 @patch 1.31.0.11889
 */
@@ -29684,8 +29699,19 @@ Like `BlzCreateFrame` but for the SimpleFrame family, Frame "SIMPLExxxx".
 native BlzCreateSimpleFrame                        takes string name, framehandle owner, integer createContext returns framehandle
 
 /**
-Create & Define a new (Simple)Frame.
+Creates (and defines) and returns a new (simple) frame.
+
+Returns (reuses) a static error handle only if `typeName` is invalid (e.g. empty string).
+
 Can use a root-(Simple)Frame-BluePrint with inherits, when that is done it needs to be a loaded BluePrint.
+
+@note **Example (Lua):** Creates a barebones visible frame at the minimap's
+bottom-left corner.
+
+```{.lua}
+myFrame = BlzCreateFrameByType("GLUETEXTBUTTON", "a-name",
+	BlzGetOriginFrame(ORIGIN_FRAME_MINIMAP, 0), "ScriptDialogButton", 0)
+```
 
 @patch 1.31.0.11889
 */
@@ -29772,12 +29798,16 @@ Returns visibility status of frame.
 native BlzFrameIsVisible                           takes framehandle frame returns boolean
 
 /**
+Returns (reuses) handle to the specified frame, if it is found.
+
+Otherwise, returns (reuses) a static error handle when either name or context is wrong.
+
 Requires a string for the frame name that you want to retrieve (get), and an integer (which in most cases should be 0) that specifies the index of the frame that you want to get (for example for inventory slots you have 6, from 0-5).
 
 Read from the internal Frame-Storage.
 The first time a Frame enters the map's script it takes a handleId.
 
-Example: `BlzGetFrameByName("SimpleHeroLevelBar", 0)`.
+Example: `BlzGetFrameByName("SimpleHeroLevelBar", 0)` or `BlzGetFrameByName("ConsoleUI", 0)`.
 
 @note Refer to fdf files for frame names.
 
@@ -30002,6 +30032,17 @@ native BlzFrameSetLevel                            takes framehandle frame, inte
 native BlzFrameSetParent                           takes framehandle frame, framehandle parent returns nothing
 
 /**
+Returns (reuses) handle to the parent frame, if it is found.
+
+Otherwise, returns (reuses) a static error handle when passed handle is invalid.
+
+@note Curiously, it returns distinct handles when you pass either
+GAME_UI frame or WORLD_FRAME as an argument.
+
+@note **Example:** Returns handle to game's UI frame.
+
+`BlzFrameGetParent( BlzGetFrameByName("ConsoleUIBackdrop", 0) )`
+
 @patch 1.31.0.11889
 */
 native BlzFrameGetParent                           takes framehandle frame returns framehandle
@@ -30035,20 +30076,49 @@ native BlzFrameSetTextAlignment                    takes framehandle frame, text
 /**
 Ignores String/Texture.
 
+@note See: `BlzFrameGetChild`
+
 @patch 1.32.10.18820
 */
 native BlzFrameGetChildrenCount                    takes framehandle frame returns integer
 
 /**
-Valid Indexes are 0 to `BlzFrameGetChildrenCount` - 1.
-Ignores String/Texture.
-Breaks `BlzGetOriginFrame` when the same frame is first get using `BlzFrameGetChild`.
+Returns (reuses) handle to the specified frame, if it is found.
+Example, "ConsoleUIBackdrop" frame: `BlzFrameGetChild( BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), 2 )`
+
+Otherwise, returns (reuses) a static error handle when passed handle is invalid or a frame was not found.
+There seem to be two distinct "static error handles":
+
+1. `BlzFrameGetChild( BlzGetOriginFrame(ORIGIN_FRAME_WORLD_FRAME, 0), 2 )` or `BlzFrameGetChild( BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), -2 )`
+2. `BlzFrameGetChild( nil, 2 )`
+
+@note Ignores String/Texture.
+@note Breaks `BlzGetOriginFrame` when the same frame is first get using `BlzFrameGetChild`.
+
+@param index zero-indexed, valid indeces are: 0 to (`BlzFrameGetChildrenCount` - 1)
+
+@note **Example (Lua):** Iterate and show names of all children of GAME_UI frame.
+
+```{.lua}
+do
+	local parentFrame = BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)
+	local count = BlzFrameGetChildrenCount(parentFrame)
+	for i = 0, count-1, 1 do
+		local child = BlzFrameGetChild(parentFrame, i)
+		print(i, BlzFrameGetName(child), child)
+	end
+end
+```
 
 @patch 1.32.10.18820
 */
 native BlzFrameGetChild                            takes framehandle frame, integer index returns framehandle
 
 /**
+Creates and returns a new registered event, even if `eventId` is null (or an invalid constant ID type).
+
+Returns null, if trigger or frame handle are null.
+
 The event starts for all players when one player triggers it.
 
 The Event Getter functions. 
@@ -30062,16 +30132,59 @@ The Event Getter functions.
 `BlzGetTriggerFrameValue` & `BlzGetTriggerFrameText` are only set when the
 FrameEventEvent has use of them.
 
+@note **Example (Lua):** Adapted from Tasyen's tutorial
+<https://www.hiveworkshop.com/pastebin/e23909d8468ff4942ccea268fbbcafd1.20598#FrameExampleTextButtonNoFDF>
+
+```{.lua}
+-- create a new Button which inherits from "ScriptDialogButton"
+myClickyButton = BlzCreateFrameByType("GLUETEXTBUTTON", "MyScriptDialogButton",
+	BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0), "ScriptDialogButton", 0)
+-- place the Button above chat input
+BlzFrameSetAbsPoint(myClickyButton, FRAMEPOINT_CENTER, 0.4, 0.2)
+-- set the Button's text
+BlzFrameSetText(myClickyButton, "My Button Text")
+
+-- create the trigger handling the Button Clicking
+myClickyTrigger = CreateTrigger()
+
+-- register the Click event
+myClickyEvent = BlzTriggerRegisterFrameEvent(myClickyTrigger, myClickyButton, FRAMEEVENT_CONTROL_CLICK)
+
+-- run this action when the button is clicked
+myClickyAction = TriggerAddAction(myClickyTrigger, function()
+	local frame = BlzGetTriggerFrame()
+	print(BlzFrameGetName(frame), "was clicked")
+	
+	print(BlzGetTriggerFrame(), BlzGetTriggerFrame()==BlzGetTriggerFrame())
+	print(BlzGetTriggerFrameEvent(), BlzGetTriggerFrameEvent()==BlzGetTriggerFrameEvent())
+end)
+```
+
+@note See: `BlzGetTriggerFrame`, `BlzGetTriggerFrameEvent`
+
 @patch 1.31.0.11889
 */
 native BlzTriggerRegisterFrameEvent                takes trigger whichTrigger, framehandle frame, frameeventtype eventId returns event
 
 /**
+Returns (reuses) handle to triggering frame.
+
+@note (bug?) Returns (reuses) a frame handle when used from within
+a chat event or an expiring timer. (tested in v2.0.3.23101)
+
+@note See: `BlzTriggerRegisterFrameEvent` for an example, `BlzGetTriggerFrameEvent`
+
 @patch 1.31.0.11889
 */
 native BlzGetTriggerFrame                          takes nothing returns framehandle
 
 /**
+Returns one of the frame event type constants.
+
+Returns `ConvertFrameEventType(0)` when used in an invalid context.
+
+@note See: `BlzTriggerRegisterFrameEvent` for an example, `BlzGetTriggerFrame`
+
 @patch 1.31.0.11889
 */
 native BlzGetTriggerFrameEvent                     takes nothing returns frameeventtype
@@ -30079,6 +30192,8 @@ native BlzGetTriggerFrameEvent                     takes nothing returns frameev
 /**
 Returns the user input value of the triggered frame. (Slider, popupmenu, scrollbar...)
 One has to use this native to sync user input, if that is needed.
+
+Returns `0.0` when used in an invalid context.
 
 @note This is a hidden native in PTR 1.31 (has to be declared to be usable in Jass).
 
@@ -30091,6 +30206,8 @@ Returns the user input text of the triggered frame. (EditBox)
 One has to use this native to sync user input, if that is needed.
 
 Limited to something like ~255 bytes.
+
+@note Returns the locally entered text in a local player's chat event.
 
 @note This is a hidden native in PTR 1.31 (has to be declared to be usable in Jass).
 
