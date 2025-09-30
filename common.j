@@ -4761,6 +4761,8 @@ do
 end
 ```
 
+@note See: `EVENT_PLAYER_UNIT_LOADED`, `EVENT_UNIT_LOADED`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_LOADED                   = ConvertPlayerUnitEvent(51)
@@ -5259,6 +5261,8 @@ Refer to `EVENT_PLAYER_UNIT_USE_ITEM`
 
 
 /**
+Refer to `EVENT_PLAYER_UNIT_LOADED`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_LOADED                                = ConvertUnitEvent(88)
@@ -16050,6 +16054,7 @@ Returns null when used in an invalid context.
 @note See: `EVENT_PLAYER_UNIT_LOADED` for an example, `GetLoadedUnit`
 
 @event EVENT_PLAYER_UNIT_LOADED
+@event EVENT_UNIT_LOADED
 
 @patch 1.00
 */
@@ -16063,6 +16068,7 @@ Returns null when used in an invalid context.
 @note See: `EVENT_PLAYER_UNIT_LOADED` for an example, `GetTransportUnit`.
 
 @event EVENT_PLAYER_UNIT_LOADED
+@event EVENT_UNIT_LOADED
 
 @patch 1.00
 */
