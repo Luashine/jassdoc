@@ -4652,16 +4652,69 @@ Runs when a player's unit summons a new unit.
     constant playerunitevent EVENT_PLAYER_UNIT_SUMMON                   = ConvertPlayerUnitEvent(47)
 
 /**
+It's called before a unit drops an item or when a consumable item is used up
+(charges are reduced to 0).
+
+The new item position is not yet available at this point:
+technically the item is still in the inventory.
+
+@note Getters:
+
+- `GetManipulatedItem` - dropped/used item
+- `GetManipulatingUnit`, `GetTriggerUnit` - unit who used the item
+- `GetTriggerPlayer` - owner of unit
+
+@note Event order:
+
+1. `EVENT_PLAYER_UNIT_USE_ITEM`
+2. `EVENT_UNIT_USE_ITEM`
+3. (if consumable item used up and charges reduce to 0) `EVENT_PLAYER_UNIT_DROP_ITEM`
+4. (if consumable item used up and charges reduce to 0) `EVENT_UNIT_DROP_ITEM`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_DROP_ITEM                = ConvertPlayerUnitEvent(48)
 
 /**
+It's fired after the item has been picked up and inserted into the inventory by any unit
+owned by the registered player.
+
+@note Getters:
+
+- `GetManipulatedItem` - inventory item (picked up item or stacked into item)
+- `GetManipulatingUnit`, `GetTriggerUnit` - unit who picked up the item
+- `GetTriggerPlayer` - owner of unit
+- `BlzGetAbsorbingItem` - stacked into item if item stacking has happened
+(tested v2.0.3.23101, 2.0.3.23150-PTR)
+
+@note Event order:
+
+1. (if item is stackable and has just stacked) `EVENT_PLAYER_UNIT_STACK_ITEM`
+2. (if item is stackable and has just stacked) `EVENT_UNIT_STACK_ITEM`
+3. (after new item has been inserted) `EVENT_PLAYER_UNIT_PICKUP_ITEM`
+4. (after new item has been inserted) `EVENT_UNIT_PICKUP_ITEM`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_PICKUP_ITEM              = ConvertPlayerUnitEvent(49)
 
 /**
+It's fired after the item has been used and, if a consumable, after the charge has
+been reduced.
+
+@note Getters:
+
+- `GetManipulatedItem` - used item
+- `GetManipulatingUnit`, `GetTriggerUnit` - unit who used the item
+- `GetTriggerPlayer` - owner of unit
+
+@note Event order:
+
+1. `EVENT_PLAYER_UNIT_USE_ITEM`
+2. `EVENT_UNIT_USE_ITEM`
+3. (if consumable item used up and charges reduce to 0) `EVENT_PLAYER_UNIT_DROP_ITEM`
+4. (if consumable item used up and charges reduce to 0) `EVENT_UNIT_DROP_ITEM`
+
 @patch 1.00
 */
     constant playerunitevent EVENT_PLAYER_UNIT_USE_ITEM                 = ConvertPlayerUnitEvent(50)
@@ -5167,16 +5220,39 @@ use `EVENT_PLAYER_UNIT_SUMMON` to retrieve the summoned unit.
                                                                         
 
 /**
+Refer to `EVENT_PLAYER_UNIT_DROP_ITEM`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_DROP_ITEM                             = ConvertUnitEvent(85)
 
 /**
+Refer to `EVENT_PLAYER_UNIT_PICKUP_ITEM`
+
+@note Getters:
+
+- `GetManipulatedItem` - inventory item (picked up item or stacked into item)
+- `GetManipulatingUnit`, `GetTriggerUnit` - unit who picked up the item
+- `GetTriggerPlayer` - owner of unit
+- `BlzGetAbsorbingItem` - returns a garbage handle (tested v2.0.3.23101, 2.0.3.23150-PTR).
+
+@bug tested in v2.0.3.23101, 2.0.3.23150-PTR: see `BlzGetAbsorbingItem`,
+it may return a fake item handle in this event.
+
+@note Event order:
+
+1. (if item is stackable and has just stacked) `EVENT_PLAYER_UNIT_STACK_ITEM`
+2. (if item is stackable and has just stacked) `EVENT_UNIT_STACK_ITEM`
+3. (after new item has been inserted) `EVENT_PLAYER_UNIT_PICKUP_ITEM`
+4. (after new item has been inserted) `EVENT_UNIT_PICKUP_ITEM`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_PICKUP_ITEM                           = ConvertUnitEvent(86)
 
 /**
+Refer to `EVENT_PLAYER_UNIT_USE_ITEM`
+
 @patch 1.00
 */
     constant unitevent EVENT_UNIT_USE_ITEM                              = ConvertUnitEvent(87)
@@ -5614,6 +5690,29 @@ The item has been spawned and is available at this point.
     constant playerunitevent    EVENT_PLAYER_UNIT_PAWN_ITEM             = ConvertPlayerUnitEvent(277)
 
 /**
+It's fired after the item has been picked up into the inventory by any unit
+owned by the registered player and after the item stacking has occurred.
+
+@note Item stacking must be explicitly enabled by changing map's game constant "ItemStackingEnabled" to true.
+
+@note Getters:
+
+- `BlzGetStackingItemSource` - item losing charges
+- `BlzGetStackingItemTarget` - item gaining charges
+- `GetTriggerUnit` - unit who picked up the item
+- `GetTriggerPlayer` - owner of unit
+- `BlzGetStackingItemTargetPreviousCharges`
+
+@bug `GetManipulatedItem`, `GetManipulatingUnit` are null.
+See <https://us.forums.blizzard.com/en/warcraft3/t/fake-item-handles-returned-by-getters-in-item-events/37224>
+
+@note Event order:
+
+1. (if item is stackable and has just stacked) `EVENT_PLAYER_UNIT_STACK_ITEM`
+2. (if item is stackable and has just stacked) `EVENT_UNIT_STACK_ITEM`
+3. (after new item has been inserted) `EVENT_PLAYER_UNIT_PICKUP_ITEM`
+4. (after new item has been inserted) `EVENT_UNIT_PICKUP_ITEM`
+
 @patch 1.32.10.18820
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_STACK_ITEM            = ConvertPlayerUnitEvent(319)
@@ -5697,6 +5796,19 @@ Fifth and last event in the ability cast chain.
     constant unitevent          EVENT_UNIT_PAWN_ITEM                    = ConvertUnitEvent(294)
 
 /**
+Refer to `EVENT_PLAYER_UNIT_PICKUP_ITEM`
+
+@note Getters:
+
+- `BlzGetStackingItemSource` - returns a garbage handle (bug)
+- `BlzGetStackingItemTarget` - returns null (bug)
+- `GetTriggerUnit` - unit who picked up the item
+- `GetTriggerPlayer` - owner of unit
+- `BlzGetStackingItemTargetPreviousCharges`
+
+@bug `GetManipulatedItem`, `GetManipulatingUnit` are null.
+See <https://us.forums.blizzard.com/en/warcraft3/t/fake-item-handles-returned-by-getters-in-item-events/37224>
+
 @patch 1.32.10.18820
 */
     constant unitevent          EVENT_UNIT_STACK_ITEM                   = ConvertUnitEvent(318)
@@ -16061,6 +16173,14 @@ constant native GetChangingUnitPrevOwner    takes nothing returns player
 // EVENT_PLAYER_UNIT_USE_ITEM
 
 /**
+Returns (reuses) handle to the unit who interacted with the item.
+
+Returns null when used in an invalid context.
+
+@bug (tested v2.0.3.23101, 2.0.3.23150-PTR) Note: `GetManipulatedItem` and `GetManipulatingUnit`
+are not populated in events `EVENT_UNIT_STACK_ITEM` and `EVENT_PLAYER_UNIT_STACK_ITEM`.
+<https://github.com/Luashine/wc3-test-maps/blob/master/ItemEvents-GetterFakeHandle/README.md>
+
 @event EVENT_PLAYER_UNIT_DROP_ITEM
 
 @event EVENT_PLAYER_UNIT_PICKUP_ITEM
@@ -16078,6 +16198,14 @@ constant native GetChangingUnitPrevOwner    takes nothing returns player
 constant native GetManipulatingUnit takes nothing returns unit
 
 /**
+Returns (reuses) handle to the event's item. See respective events for meaning.
+
+Returns null when used in an invalid context.
+
+@bug (tested v2.0.3.23101, 2.0.3.23150-PTR) Note: `GetManipulatedItem` and `GetManipulatingUnit`
+are not populated in events `EVENT_UNIT_STACK_ITEM` and `EVENT_PLAYER_UNIT_STACK_ITEM`.
+<https://github.com/Luashine/wc3-test-maps/blob/master/ItemEvents-GetterFakeHandle/README.md>
+
 @event EVENT_PLAYER_UNIT_DROP_ITEM
 
 @event EVENT_PLAYER_UNIT_PICKUP_ITEM
@@ -16098,17 +16226,31 @@ constant native GetManipulatedItem  takes nothing returns item
 // Returns null if the item was a powerup and not a stacking item.
 
 /**
-For EVENT_PLAYER_UNIT_PICKUP_ITEM, returns the item absorbing the picked up item in case it is stacking.
-Returns null if the item was a powerup and not a stacking item.
+Returns (reuses) handle to the item.
+For `EVENT_PLAYER_UNIT_PICKUP_ITEM`, returns the item absorbing the picked up item in case it is stacking.
+
+Returns null if the item was a powerup and not a stacking item,
+or when used in an invalid context.
+
+@bug tested in v2.0.3.23101, 2.0.3.23150-PTR: Returns a fake item handle in `EVENT_UNIT_PICKUP_ITEM`.
+<https://github.com/Luashine/wc3-test-maps/tree/master/ItemEvents-GetterFakeHandle>
+and <https://us.forums.blizzard.com/en/warcraft3/t/fake-item-handles-returned-by-getters-in-item-events/37224>
 
 @event EVENT_PLAYER_UNIT_PICKUP_ITEM
+@event EVENT_UNIT_PICKUP_ITEM
+
+@note See: `EVENT_PLAYER_UNIT_STACK_ITEM`, `EVENT_UNIT_STACK_ITEM` and
+`BlzGetStackingItemSource`, `BlzGetStackingItemTarget`
 
 @patch 1.32.10.18820
 */
 constant native BlzGetAbsorbingItem takes nothing returns item
 
 /**
+Returns `false` when used in an invalid context.
+
 @event EVENT_PLAYER_UNIT_PICKUP_ITEM
+@event EVENT_UNIT_PICKUP_ITEM
 
 @patch 1.32.10.18820
 */
@@ -16118,28 +16260,40 @@ constant native BlzGetManipulatedItemWasAbsorbed takes nothing returns boolean
 // Source is the item that is losing charges, Target is the item getting charges.
 
 /**
-Source is the item that is losing charges.
+Returns (reuses) handle to the source item. "Source" is the item that is losing charges.
+
+Returns null when used in an invalid context.
 
 @event EVENT_PLAYER_UNIT_STACK_ITEM
 @event EVENT_UNIT_STACK_ITEM
+
+@note See: `BlzGetStackingItemTarget`, `BlzGetStackingItemTargetPreviousCharges`
 
 @patch 1.32.10.18820
 */
 constant native BlzGetStackingItemSource takes nothing returns item
 
 /**
-Target is the item getting charges.
+Returns (reuses) handle to the target item. "Target" is the item that is gaining charges.
+
+Returns null when used in an invalid context.
 
 @event EVENT_PLAYER_UNIT_STACK_ITEM
 @event EVENT_UNIT_STACK_ITEM
+
+@note See: `BlzGetStackingItemTargetPreviousCharges`, `BlzGetStackingItemSource`
 
 @patch 1.32.10.18820
 */
 constant native BlzGetStackingItemTarget takes nothing returns item
 
 /**
+Returns `0` when used in an invalid context.
+
 @event EVENT_PLAYER_UNIT_STACK_ITEM
 @event EVENT_UNIT_STACK_ITEM
+
+@note See: `BlzGetStackingItemTarget`, `BlzGetStackingItemSource`
 
 @patch 1.32.10.18820
 */
