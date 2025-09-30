@@ -29570,6 +29570,15 @@ native BlzShowUnitTeamGlow                         takes unit whichUnit, boolean
 /**
 Get a `framehandle` by specifying a specific `originframetype` and index (in most cases it should be 0 (first index), however it can go above 0 when using originframetypes such as `ORIGIN_FRAME_HERO_BUTTON`)
 
+Returns:
+
+- (reuses) handle to the specified frame.
+- or framehandle to `ORIGIN_FRAME_GAME_UI` if `frameType` is null (because it has origin frame type 0).
+- or framehandle to `ORIGIN_FRAME_WORLD_FRAME` (origin frame type 17)
+if `frameType` is currently unavailable (like `ORIGIN_FRAME_PORTRAIT_HP_TEXT`)
+or invalid (origin frame type 23 and above, see `ConvertOriginFrameType`)
+or `frameType` is valid, but the `index` frame does not exist.
+
 The one with indices above 0 are:
 
 	// The ability buttons at the right bottom corner
