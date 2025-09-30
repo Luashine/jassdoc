@@ -19999,6 +19999,7 @@ native          SetUnitUseFood      takes unit whichUnit, boolean useFood return
 
 /**
 Returns:
+
 - null, if rally point is not a map location (default)
 - creates and returns new location, if a point on terrain is set.
 
@@ -20035,13 +20036,14 @@ myTree = CreateDestructable(FourCC("LTlt"), 128, 256, 180, 1, 0)
 checkRallyPoint(castle)
 ```
 
-@note See `GetUnitRallyUnit`, `GetUnitRallyUnit`
+@note See `GetUnitRallyUnit`, `GetUnitRallyDestructable`
 @patch 1.13
 */
 constant native GetUnitRallyPoint           takes unit whichUnit returns location
 
 /**
 Returns:
+
 - null, if rally point is not a unit
 - returns handle of unit that is set as rally target (building itself by default)
 
@@ -20055,6 +20057,7 @@ constant native GetUnitRallyUnit            takes unit whichUnit returns unit
 
 /**
 Returns:
+
 - null, if rally point is not a destructable
 - returns handle of destructable that is set as rally target (a tree)
 
