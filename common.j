@@ -29638,6 +29638,15 @@ Unaffected: Mouse, Command Buttons, Chat, Messages, TimerDialog, Multiboard, Lea
 native BlzHideOriginFrames                         takes boolean enable returns nothing
 
 /**
+Packs four color channel bytes into a 32-bit integer in the ARGB order (MSB -> LSB respectively).
+
+@note See description for `integer` type, because the Jass and Lua VMs only
+operate on 32-bit signed integer representation.
+
+@param a alpha value 0-255 (mod 256)
+@param r red value 0-255 (mod 256)
+@param g green value 0-255 (mod 256)
+@param b blue value 0-255 (mod 256)
 @pure 
 
 @patch 1.31.0.11889
