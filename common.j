@@ -23863,6 +23863,19 @@ Use `DestroyTextTag` or make it temporary with `SetTextTagPermanent` and an appr
 destroyed ID will be re-used first. You can also envision that 100 IDs counting up from 0 to 99 are pushed to the stack at the beginning of the game and ID 99 will
 be popped first.
 
+@note **Example (Lua):** Creates a text tag at 0;1024.
+
+```{.lua}
+	myTexttag = CreateTextTag()
+	if GetHandleId(myTexttag) == 0 then
+		print("error: all texttag slots are in use!")
+	end
+	
+	SetTextTagText(myTexttag, "make dummy texttag", 0.05)
+	SetTextTagPos(myTexttag, 0, 1024, 0)
+	SetTextTagColor(myTexttag, 127, 127, 255, 127)
+```
+
 @patch 1.07
 */
 native CreateTextTag                takes nothing returns texttag
@@ -23887,7 +23900,7 @@ Sets the text of a text tag.
 
 To make a new line, you can use the literal "\n" new line character (0x0a LF; and "\r\n" counts as one line break).
 
-@param height The new font size.
+@param height The new font size in screen size units, for example `0.05`.
 
 @note The `height` is independent from the camera distance, relative to the screen.
 
@@ -23913,6 +23926,8 @@ height | chars per line | max lines
 
 
 @note Text tags are not rendered when the game is paused (e.g. Single player and F10 menu is open).
+
+@note See: `TextTagSize2Height`
 
 @patch 1.07
 */
