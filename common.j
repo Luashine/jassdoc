@@ -15422,6 +15422,8 @@ end)
 
 @event EVENT_GAME_TRACKABLE_HIT
 
+@note See: `CreateTrackable`, `TriggerRegisterTrackableTrackEvent`
+
 @patch 1.00
 */
 native TriggerRegisterTrackableHitEvent takes trigger whichTrigger, trackable t returns event
@@ -15461,6 +15463,8 @@ end)
 ```
 
 @event EVENT_GAME_TRACKABLE_TRACK
+
+@note See: `CreateTrackable`, `TriggerRegisterTrackableHitEvent`
 
 @patch 1.00
 */
@@ -24306,6 +24310,8 @@ function CreateTrackableZ takes string trackableModelPath, real x, real y, real 
     return t
 endfunction
 ```
+
+@note See: `TriggerRegisterTrackableHitEvent` for an example, `TriggerRegisterTrackableTrackEvent`
 
 @patch 1.00
 */
