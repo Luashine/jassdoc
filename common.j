@@ -27282,6 +27282,8 @@ matches the current terrain height of the target point. Later changes to the ter
 [screenshot](https://www.hiveworkshop.com/attachments/lightninglist-png.116282/)
 and [test map](https://www.hiveworkshop.com/threads/lightning-test-v1-0.204927/).
 
+@note **Example (Lua):** `myLightning = AddLightning("DRAL", false, -512, 1024, 512, 2048)`
+
 @patch 1.17a
 */
 native AddLightning                 takes string codeName, boolean checkVisibility, real x1, real y1, real x2, real y2 returns lightning
@@ -27311,6 +27313,16 @@ currently has visibility of at least one of the endpoints of the to be created l
 @note For lightning types see:
 [screenshot](https://www.hiveworkshop.com/attachments/lightninglist-png.116282/)
 and [test map](https://www.hiveworkshop.com/threads/lightning-test-v1-0.204927/).
+
+@note **Example (Lua):**
+
+```{.lua}
+-- DRAL is life drain, green lightning
+myLightning = AddLightning("DRAL", false, -512, 1024, 512, 2048)
+-- DRAM is mana drain, blue lightning, appears to be above green
+myLightningEx = AddLightningEx("DRAM", false, -512, 1024, 0, 512, 2048, 512)
+```
+
 
 @patch 1.18a
 */
