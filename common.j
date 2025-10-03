@@ -22720,6 +22720,7 @@ native  SaveFogStateHandle				takes hashtable table, integer parentKey, integer 
 native  SaveFogModifierHandle			takes hashtable table, integer parentKey, integer childKey, fogmodifier whichFogModifier returns boolean
 
 /**
+@note A corresponding `LoadAgentHandle` function does not exist.
 @patch 1.24a
 */
 native  SaveAgentHandle					takes hashtable table, integer parentKey, integer childKey, agent whichAgent returns boolean
