@@ -27614,6 +27614,12 @@ and the preview version of selection circles. This list is non-exhaustive.
 @note Images are so-called pseudo-handles, they have a separate handle stack for their own exclusive use.
 They can be handled asynchronously.
 
+@bug (tested 2.0.3.23150-PTR) Game crashes when you pass a huge negative value for size parameters.
+Lua, see where I mistook sizeX for map position:
+`CreateImage([[ReplaceableTextures\Selection\SpellAreaOfEffect.blp]], -1536,768,1, 0,0,200, 0,0,0, 1)`
+
+Bug report: <https://us.forums.blizzard.com/en/warcraft3/t/crash-in-createimage-constructor/37237>
+
 @patch 1.18a
 */
 native CreateImage                  takes string file, real sizeX, real sizeY, real sizeZ, real posX, real posY, real posZ, real originX, real originY, real originZ, integer imageType returns image
