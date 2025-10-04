@@ -73,11 +73,35 @@ type destructable       extends     widget
 type item               extends     widget
 
 /**
+Ability represents a specific instance of an ability that a unit/item has.
+Technically, a unit/item can have multiple ability instances of the same type ID.
+
+@note **Lifecycle.** These handles do not have and don't need an explicit destructor,
+because their lifecycle is tied to unit's/item's lifecycle.
+
+For as long as a unit (item too?) is alive, the handle ID returned for a particular
+ability instance will be reused. When the unit is removed from the game, the
+ability instances will be properly cleared too and their handles freed.
+
+Therefore, you are only advised to make sure you remove references to these
+handles on your end.
+**Jass:** `set varAbility = null`,
+and in **Lua** (if it's not a local) `varAbility = nil`
+
+See `RemoveUnit` and `RemoveItem`. Do note though, item's abilities seem to be
+kind of dynamic, i.e. you can only retrieve them when a unit has the item equipped.
+This is either a missing API or an implementation detail.
+
+More info and Lua testing code:
+<https://github.com/Luashine/wc3-test-maps/tree/master/Ability-Destructor>
+
 @patch 1.07
 */
 type ability            extends     agent
 
 /**
+Unfinished API, completely unused.
+
 @patch 1.07
 */
 type buff               extends     ability
@@ -16779,6 +16803,10 @@ Returns null when used in an invalid context.
 
 @event EVENT_PLAYER_UNIT_SPELL_ENDCAST
 
+@note The `ability` handles do not have and don't need an explicit destructor,
+because their lifecycle is tied to unit's/item's lifecycle.
+See `ability`, `RemoveUnit`, `RemoveItem`.
+
 @note See: `GetSpellAbilityUnit` for an example, `GetSpellAbilityId`,
 `GetSpellTargetLoc`, `GetSpellTargetX`, `GetSpellTargetY`,
 `GetSpellTargetDestructable`, `GetSpellTargetItem`, `GetSpellTargetUnit`
@@ -30580,6 +30608,10 @@ Reuses previous handle if it exists. Returns null on error.
 
 @param abilId target ability type ID aka rawcode aka FourCC
 
+@note The `ability` handles do not have and don't need an explicit destructor,
+because their lifecycle is tied to unit's/item's lifecycle.
+See `ability`, `RemoveUnit`, `RemoveItem`.
+
 @note See `BlzGetItemAbilityByIndex` for an example.
 
 @patch 1.31.0.11889
@@ -30596,6 +30628,10 @@ this returns null.
 @note Last added ability is at index 0, older abilities are pushed up.
 
 @param index begins at 0
+
+@note The `ability` handles do not have and don't need an explicit destructor,
+because their lifecycle is tied to unit's/item's lifecycle.
+See `ability`, `RemoveUnit`, `RemoveItem`.
 
 @note See `BlzGetItemAbilityByIndex` for an example.
 
@@ -31204,6 +31240,11 @@ printItemAbilities(auraItem, "aura item, janggo of endurance") -- only shows up 
 printItemAbilities(dmgItem, "damage item, claws") -- only shows up on hero
 printItemAbilities(hpRegItem, "hp reg item, scroll of regen") -- shows up on hero and item
 ```
+
+@note The `ability` handles do not have and don't need an explicit destructor,
+because their lifecycle is tied to unit's/item's lifecycle.
+See `ability`, `RemoveUnit`, `RemoveItem`.
+
 @patch 1.31.0.11889
 */
 native BlzGetItemAbilityByIndex                    takes item whichItem, integer index returns ability
@@ -31217,6 +31258,10 @@ Reuses previous handle if it exists. Returns null on error or if the specified i
 @note This function assumes an item only has one ability instance of the specific type ID.
 
 @param abilCode target ability type ID aka rawcode aka FourCC
+
+@note The `ability` handles do not have and don't need an explicit destructor,
+because their lifecycle is tied to unit's/item's lifecycle.
+See `ability`, `RemoveUnit`, `RemoveItem`.
 
 @note See: `BlzGetItemAbilityByIndex` for an example.
 
