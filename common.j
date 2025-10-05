@@ -26177,11 +26177,13 @@ Creates and returns a new sound handle.
 @param is3D 3D Sounds can be played on particular areas of the map. They are at
 their loudest when the camera is close to the sound's coordinates.
 
-@param fadeInRate How quickly the sound fades in. The higher the number, the
-faster the sound fades in. Maximum number is 127.
+@param fadeInRate How quickly the sound volume increases during fade in.
+The higher the number, the faster the sound fades in. Maximum value is 127.
+Example: 15-30.
 
-@param fadeOutRate How quickly the sound fades out. The higher the number, the
-faster the sound fades out. Maximum number is 127.
+@param fadeOutRate How quickly the sound volume lowers during fade out.
+The higher the number, the faster the sound fades out. Maximum value is 127.
+Example: 15-30.
 
 @param eaxSetting EAX is an acronym for environmental audio extensions. In the
 sound editor, this corresponds to the "Effect" setting.
@@ -26252,6 +26254,8 @@ for i = 1, 70 do
 end
 ```
 
+@note See: `StartSoundEx` and `StopSound` to make use of fade in/out.
+
 @patch 1.00
 */
 native CreateSound                  takes string fileName, boolean looping, boolean is3D, boolean stopwhenoutofrange, integer fadeInRate, integer fadeOutRate, string eaxSetting returns sound
@@ -26286,11 +26290,9 @@ StartSound(sndFromLabel)
 @param is3D 3D Sounds can be played on particular areas of the map. They are at
 their loudest when the camera is close to the sound's coordinates.
 
-@param fadeInRate How quickly the sound fades in. The higher the number,
-the faster the sound fades in. Maximum number is 127.
+@param fadeInRate refer to `CreateSound`
 
-@param fadeOutRate How quickly the sound fades out. The higher the number,
-the faster the sound fades out. Maximum number is 127.
+@param fadeOutRate refer to `CreateSound`
 
 @param SLKEntryName the label out of one of the SLK-files, whose settings should be
 used, e.g. values like volume, pitch, pitch variance, priority, channel, min distance, max distance, distance cutoff or eax.
@@ -26314,6 +26316,9 @@ native CreateSoundFilenameWithLabel takes string fileName, boolean looping, bool
 
 /**
 Creates and returns a new sound handle.
+
+@param fadeInRate refer to `CreateSound`
+@param fadeOutRate refer to `CreateSound`
 
 @note (Lua, tested 2.0.3) The returned sound handle may be reused.
 
@@ -26347,6 +26352,9 @@ native CreateSoundFromLabel         takes string soundLabel, boolean looping, bo
 
 /**
 Creates and returns a new sound handle.
+
+@param fadeInRate refer to `CreateSound`
+@param fadeOutRate refer to `CreateSound`
 
 @note (Lua, tested 2.0.3) The returned sound handle may be reused.
 
@@ -26531,9 +26539,11 @@ Starts playing a sound.
 @note An officially exported native in: 1.33.0 (checked v1.33.0.18897 PTR).
 Unofficially available in: 1.32 (not declared a native, but visible in Lua).
 
-@bug The `fadeIn` parameter does nothing (unused); thus equivalent to `StartSound`.
-
 @note The only difference to StartSound is the optional fadeIn (boolean).
+
+@param fadeIn
+- true: slowly turns up the volume with `fadeInRate` speed as specified in sound constructor
+- false: playback starts at full specified volume
 
 @patch 1.32.10.19202
 */
@@ -26544,16 +26554,23 @@ Stops the sound.
 
 @param soundHandle The sound to stop.
 
-@param killWhenDone The sound gets destroyed if true.
+@param killWhenDone true: destroy the sound too; false: only stop the sound.
 
-@param fadeOut turns down the volume with `fadeOutRate` as stated in constructor.
+@param fadeOut
+- true: slowly turns down the volume with `fadeOutRate` speed as specified in sound constructor
+- false: stops playback immediately
+
+@note See: `KillSoundWhenDone`
 
 @patch 1.00
 */
 native StopSound                    takes sound soundHandle, boolean killWhenDone, boolean fadeOut returns nothing
 
 /**
-Destroys the handle when the sound has finished playing.
+Destroys the sound when it has finished playing
+or immediately, if it is not playing.
+
+@note See: `StopSound` with parameter `killWhenDone` set to true.
 
 @patch 1.00
 */
@@ -26622,6 +26639,10 @@ native PlayMusicEx                  takes string musicName, integer frommsecs, i
 
 /**
 Stops the current music.
+
+@param fadeOut
+- true: slowly turns down the volume
+- false: stops playback immediately
 
 @patch 1.00
 */
