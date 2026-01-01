@@ -24325,6 +24325,8 @@ to the common workarounds see the `trackable` documentation.
 @bug It is not possible to destroy or modify a trackable once created.
 Consider the API unfinished.
 
+<https://us.forums.blizzard.com/en/warcraft3/t/trackable-api-is-missing-destructor/37519>
+
 @param trackableModelPath The path to the model the trackable should use. Models
 with team colours will use the neutral-hostile team colour. To create an
 invisible trackable provide the empty string `""`.
