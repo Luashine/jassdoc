@@ -25153,6 +25153,33 @@ However there's a workaround using [Frame API](https://www.hiveworkshop.com/thre
 
 @bug Do not use this in a global initialisation as it crashes the game there.
 
+@note **Example (Lua, 2.0.3)**:
+
+```{.lua}
+myMb = CreateMultiboard()
+myMbRows = 2
+myMbColumns = 2
+
+MultiboardSetTitleText(myMb, "=== Some title text ===")
+MultiboardSetTitleTextColor(myMb, 200, 200, 64, 127)
+MultiboardSetColumnCount(myMb, myMbRows)
+MultiboardSetRowCount(myMb, myMbColumns)
+
+for r = 0, myMbRows-1 do
+	for c = 0, myMbColumns-1 do
+		local mbi = MultiboardGetItem(myMb, r, c)
+		MultiboardSetItemValue(mbi, tostring(r) .. "," .. tostring(c))
+		
+		MultiboardSetItemWidth(mbi, 0.075)
+		
+		MultiboardReleaseItem(mbi)
+	end
+end
+
+MultiboardDisplay(myMb, true)
+MultiboardMinimize(myMb, false) -- force width update
+```
+
 @patch 1.07
 */
 native CreateMultiboard                 takes nothing returns multiboard
@@ -25545,7 +25572,7 @@ widths.
 *Result:* The second row will not fit inside the table and overflow to the right,
 beyond the visible area.
 
-**Summary:** To set the multiboard width, set the width of columns in the first row.
+**Summary:** To set the multiboard overall width, set the width of columns in the first row.
 
 @bug Although the column width is set immediately and items in the same row are
 moved left/right, the multiboard is not redrawn to accomodate the new width.
