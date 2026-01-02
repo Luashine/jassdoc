@@ -22080,6 +22080,8 @@ a `EVENT_DIALOG_BUTTON_CLICK` using `GetClickedButton` and `GetClickedDialog`.
 
 New buttons are added to the bottom of the menu.
 
+@note A destructor for buttons doesn't exist. Use `DialogClear` or `DialogDestroy` instead.
+
 @param whichDialog Target dialog to add the button to.
 
 @param buttonText Custom text.
@@ -24604,10 +24606,13 @@ native IsQuestEnabled      takes quest whichQuest returns boolean
 
 
 /**
-Creates and returns a new item/requirement for a quest displayed above the description text field of the quest
-in the quest menu.
+Creates and returns a new item/requirement for a quest. It is displayed in the quest menu
+above the description text field of the quest.
+
+Returns null only if `whichQuest` is null.
 
 @note There doesn't exist a destructor to remove an individual `questitem`.
+Instead, remove the parent quest with `DestroyQuest`.
 
 @param whichQuest The quest to add the requirement to.
 
@@ -24623,6 +24628,36 @@ quest items, it cannot be scrolled precisely enough to be able to scroll exactly
 
 @note The quest item will only be rendered after the quest is reselected, the quest menu is re-opened, or
 when an update is forced (see `ForceQuestDialogUpdate`).
+
+@bug (tested v2.0.3.23175) Always creates a new valid quest item even if the
+parent quest has been destroyed before.
+
+<https://us.forums.blizzard.com/en/warcraft3/t/jass-questcreateitem-succeeds-despite-destroyed-parent/37520>
+
+```{.lua}
+myQuest = CreateQuest()
+QuestSetTitle(myQuest, "some quest title")
+QuestSetDescription(myQuest, "a default quest description is needed to avoid a crash")
+QuestSetIconPath(myQuest, [[ReplaceableTextures\CommandButtons\BTNSeal.blp]])
+
+myQuestItem = QuestCreateItem(myQuest)
+QuestItemSetDescription(myQuestItem, "This is an individual quest item. You have completed it by reading this.")
+QuestItemSetCompleted(myQuestItem, true)
+
+-- expected: true
+print("original questitem completed after creation: ", IsQuestItemCompleted(myQuestItem))
+DestroyQuest(myQuest)
+-- expected: false
+print("original questitem completed after destruction: ", IsQuestItemCompleted(myQuestItem))
+
+-- expected: no questitem creation
+-- actual: new questitem returned
+myQuestItem2 = QuestCreateItem(myQuest)
+QuestItemSetCompleted(myQuestItem2, true)
+-- expected: false
+-- actual: true; new questitem exists independently of the destroyed parent
+print("new questitem completed attached to destroyed parent: ", IsQuestItemCompleted(myQuestItem2))
+```
 
 @patch 1.00
 */
@@ -24665,6 +24700,8 @@ native QuestItemSetCompleted    takes questitem whichQuestItem, boolean complete
 
 /**
 Returns the completed state of a quest item (see `QuestItemSetCompleted`).
+
+Returns false if the handle is null or invalid.
 
 @param whichQuestItem The quest item to query.
 
