@@ -18395,6 +18395,22 @@ native          IsItemIdPawnable takes integer itemId returns boolean
 
 /**
 @note Includes hidden items on the Ground. `IsItemVisible` & `SetItemVisible`
+
+@note **Example (Lua):**
+Spawn an item and enumerate all ground items.
+
+```{.lua}
+function myItemEnumFunc()
+	local it = GetEnumItem()
+	print(GetItemX(it), GetItemY(it), GetItemName(it))
+end
+
+myItem = CreateItem(FourCC("belv"), 305, 380)
+worldBounds = GetWorldBounds()
+EnumItemsInRect(worldBounds, nil, myItemEnumFunc)
+RemoveRect(worldBounds)
+```
+
 @patch 1.07
 */
 native          EnumItemsInRect     takes rect r, boolexpr filter, code actionFunc returns nothing
@@ -19005,6 +19021,16 @@ Sets a unit's player color accent (tinting).
 
 @note If the unit has a special effect attached, the new tinting is applied to the effect's model too.
 
+@note **Example (Lua):**
+Create two units owned by red and set one's color to pink.
+
+```{.lua}
+u1 = CreateUnit(Player(0), FourCC("hfoo"), -200, 0, 90)
+u2 = CreateUnit(Player(0), FourCC("hfoo"), 0, 0, 90)
+
+SetUnitColor(u1, PLAYER_COLOR_PINK)
+```
+
 @bug Visual bug (tested v1.32.10): if you create two units of the same type (Normal and Colored)
 and set Colored's color to a different color, then clicking between the two units
 will not change the portrait color. The portrait will only update correctly if you
@@ -19056,6 +19082,16 @@ To imagine the final result of changing vertex colors, it is helpful to think of
 @param alpha opacity (clamped to 0-255). A value of 255 is total opacity (fully visible). A value of 0 is total transparency; the model will be invisible, but you'll still see the shadow, HP bar etc.
 
 @note Also changes the colors of attached custom special effects.
+
+@note **Example (Lua):**
+Make second unit 50% transparent with dark green-blue color
+
+```lua
+u1 = CreateUnit(Player(0), FourCC("hfoo"), -200, 0, 90)
+u2 = CreateUnit(Player(0), FourCC("hfoo"), 0, 0, 90)
+
+SetUnitVertexColor(u1, 0, 255, 127, 127)
+```
 
 @bug Tested 1.36.2 SD: If the unit has some secondary models/animations, these are not affected.
 E.g. the skulls surrounding Blood Mage are fully visible despite low alpha setting:
@@ -19476,6 +19512,15 @@ Requirements:
 
 @param abilcode Abilities' raw code identifier.
 
+@note **Example (Lua):**
+Learn "Summon Water Elemental" as the spawned hero.
+
+```{.lua}
+u = CreateUnit(Player(0), FourCC("Hamg"), -30, 0, 90)
+-- AHwe = Abil-Human-water-elemental summon
+SelectHeroSkill(u, FourCC'AHwe')
+```
+
 @patch 1.00
 */
 native          SelectHeroSkill     takes unit whichHero, integer abilcode returns nothing
@@ -19716,6 +19761,14 @@ Returns:
 @param whichUnit Target unit.
 
 @param itemId Item's raw code identifier.
+
+@note **Example (Lua):**
+Spawn a hero and give him boots.
+
+```{.lua}
+u = CreateUnit(Player(0), FourCC("Hamg"), -30, 0, 90)
+UnitAddItemById(u, FourCC'belv') -- Add "Kelthas boots"
+```
 
 @note See: `UnitAddItemToSlotById`.
 
@@ -20388,7 +20441,7 @@ Returns:
 - true if the addition was successful (hero did not have this ability before)
 - false otherwise (hero already has this ability)
 
-@note **Example (Lua):** adds an item version of the place ward ability.
+@note **Example (Lua):** adds an item version of the "place ward" ability.
 
 ```{.lua}
 heroWithAbility = CreateUnit(Player(0), FourCC"Ewar", 384, 0, 270.0)
