@@ -30848,20 +30848,31 @@ htow = htow or CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
 use_calltoarms = CreateCommandButtonEffect(FourCC"Amic", "townbellon")
 ```
 
-Highlight unit to train/upgrade:
+Highlight human peasant to build farmhouse:
+
+Note: if player can build the building, the build button will light up too.
+If not, e.g. blacksmith requires town hall first, then the build button will not
+be highlighted, but the blacksmith icon inside will be.
 
 ```{.lua}
-htow = htow or CreateUnit(Player(0), FourCC("htow"), 128, 1024, 270.0)
+peasant = CreateUnit(Player(0), FourCC("hpea"), 512, 768, 90)
+build_farm = CreateCommandButtonEffect(FourCC("AHbu"), UnitId2String(FourCC("hhou")))
+build_blacksmith = CreateCommandButtonEffect(FourCC("AHbu"), UnitId2String(FourCC("hbla")))
+```
+
+Highlight a unit to train/upgrade into:
+
+```{.lua}
+htow = htow or CreateUnit(Player(0), FourCC("htow"), 768, 1024, 270.0)
 -- Aque is an internal "training queue" ability
 train_hpea = CreateCommandButtonEffect(FourCC"Aque", UnitId2String(FourCC("hpea")))
 -- Aupg is an internal ability to initiate a unit (building) upgrade
 upgr_htow = CreateCommandButtonEffect(FourCC"Aupg", UnitId2String(FourCC("hkee")))
 ```
 
-Highlight building to upgrade into: yet to figure out... Aque doesn't work.
-
 @note See: `TriggerRegisterCommandEvent`, `TriggerRegisterUpgradeCommandEvent`,
-`CreateUpgradeCommandButtonEffect`, `CreateLearnCommandButtonEffect`
+`CreateUpgradeCommandButtonEffect`, `CreateLearnCommandButtonEffect`,
+`CreateCommonCommandButtonEffectBJ`, `CreateTrainCommandButtonEffectBJ`, `CreateBuildCommandButtonEffectBJ`
 
 @patch 1.32.0.13369
 */
@@ -30879,7 +30890,8 @@ upgrade_Rhar = CreateUpgradeCommandButtonEffect(FourCC"Rhar")
 ```
 
 @note See: `TriggerRegisterCommandEvent`, `TriggerRegisterUpgradeCommandEvent`,
-`CreateCommandButtonEffect`, `CreateLearnCommandButtonEffect`
+`CreateCommandButtonEffect`, `CreateLearnCommandButtonEffect`,
+`CreateCommonCommandButtonEffectBJ`, `CreateTrainCommandButtonEffectBJ`, `CreateBuildCommandButtonEffectBJ`
 
 @patch 1.32.0.13369
 */
@@ -30905,7 +30917,8 @@ learn_AHwe = CreateLearnCommandButtonEffect(FourCC"AHwe")
 ```
 
 @note See: `TriggerRegisterCommandEvent`, `TriggerRegisterUpgradeCommandEvent`,
-`CreateCommandButtonEffect`, `CreateUpgradeCommandButtonEffect`
+`CreateCommandButtonEffect`, `CreateUpgradeCommandButtonEffect`,
+`CreateCommonCommandButtonEffectBJ`, `CreateTrainCommandButtonEffectBJ`, `CreateBuildCommandButtonEffectBJ`
 
 @patch 1.32.0.13369
 */
