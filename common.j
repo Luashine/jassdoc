@@ -17086,7 +17086,8 @@ However, an order is issued, hence returns true.
 
 - Inferno Stone `'infs'`: same as with dagger above.
 
-@note See: `UnitUseItemPoint`, `UnitUseItemTarget`.
+@note See: `UnitUseItemPoint`, `UnitUseItemTarget`;
+and `BlzGetItemAbilityByIndex` when item has multiple abilities.
 
 @patch 1.00
 */
@@ -27255,6 +27256,14 @@ native BlzRemoveAbilityStringLevelArrayField       takes ability whichAbility, a
 // Item 
 
 /**
+
+@note There are cases when an item has two active abilities attached and which ability
+is considered the "default" one for casting is unspecified.
+For example, there's a report where a unit who dies and respawns has the item's ability order changed.
+This order can be shuffled (or reset?) by dropping and picking up the item.
+
+@note See: `BlzGetItemAbility`
+
 @patch 1.31.0.11889
 */
 native BlzGetItemAbilityByIndex                    takes item whichItem, integer index returns ability
