@@ -19200,6 +19200,8 @@ the research is done again, the unit will benefit doubly.
 be overwritten, i.e., they will remain and be merged with the non-hero attributes. This can be observed in the persisted .w3v file. Ingame, it
 would not make a difference because the restored non-hero unit normally would not use the hero attributes.
 
+@bug When a EVENT_PLAYER_HERO_LEVEL adds bonus Str, Agi or Int (green number), then the Restored Hero will have incorrect base values.
+
 @patch 1.00
 */
 native  StoreUnit						takes gamecache cache, string missionKey, string key, unit whichUnit returns boolean
