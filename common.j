@@ -17086,7 +17086,8 @@ However, an order is issued, hence returns true.
 
 - Inferno Stone `'infs'`: same as with dagger above.
 
-@note See: `UnitUseItemPoint`, `UnitUseItemTarget`.
+@note See: `UnitUseItemPoint`, `UnitUseItemTarget`;
+and `BlzGetItemAbilityByIndex` when item has multiple abilities.
 
 @patch 1.00
 */
@@ -19180,23 +19181,38 @@ native  StoreReal						takes gamecache cache, string missionKey, string key, rea
 native  StoreBoolean					takes gamecache cache, string missionKey, string key, boolean value returns nothing
 
 /**
-Stores a description of a unit in a game cache that can be retrieved with `RestoreUnit`.
+Stores a description of a (hero) unit in a game cache that can be later retrieved with `RestoreUnit`,
+e.g. on the next campaign level.
 
-The saved attributes of the unit are (non-exhaustive): unit id, experience, hero level, unused skill points, hero proper name (index),
-strength/agility/intelligence, attack speed/move speed increments from agility, life, mana and attack damage increments
-(can be adjusted individually using tome abilities), sight range (day) (can be adjusted with `UNIT_RF_SIGHT_RADIUS`), armor increment
+The saved attributes of the unit are:
 
-Descriptions of the items in the unit's inventory will also be saved (non-exhaustive): item id, charges, flags: drop upon death, perishable,
-invulnerable, pawnable, used on acquire (powerup), droppable, actively used
+- unit type ID
+- control groups the unit was assigned to, for example CTRL+3 is control group 3
 
-Descriptions of the unit's hero abilities will also be saved: ability id, current level
+additionally for heroes (as part of the `'AHer'` hero attributes ability):
+
+- hero level, experience, unused skill points, hero proper name (as index)
+- for both weapons: damage, range, attack speed as deltas
+- base strength/agility/intelligence and separately their bonus
+- armor & move speed as deltas
+- for life and mana: current, max, and regen values as deltas
+(can be adjusted individually using tome abilities)
+	- life is stored adjusted for player's handicap
+- sight range (day) (can be adjusted with `UNIT_RF_SIGHT_RADIUS`)
+- hero abilities: ability type ID, current level
+
+Unit's inventory items with these attributes: 
+
+- item type ID, charges
+- item flags:
+  drop upon death, perishable, invulnerable, pawnable, used on acquire (powerup), droppable, actively usable.
 
 See also the unit entry in the following Kaitai Struct file describing the w3v format (gamecaches file): https://github.com/WaterKnight/Warcraft3-Formats-KaitaiStruct/blob/main/w3-w3v.ksy
 
 @bug When a unit obtains armor from a research and is then stored in a game cache, restoring it will retain the armor increment without the research, so if
 the research is done again, the unit will benefit doubly.
 
-@bug If a hero unit was stored under some key pair and later the key pair is overwritten with a non-hero unit, the previous hero attributes will not
+@bug If a hero unit was stored under some key pair and later the key pair is overwritten with a non-hero unit, the previous hero attributes (`'AHer'`) will not
 be overwritten, i.e., they will remain and be merged with the non-hero attributes. This can be observed in the persisted .w3v file. Ingame, it
 would not make a difference because the restored non-hero unit normally would not use the hero attributes.
 
@@ -24320,8 +24336,10 @@ It works because the code is compiled on the fly with Jass2Lua.
 native Preload          takes string filename returns nothing
 
 /**
-Unknown. It's always generated at the end of a preload file as `call PreloadEnd( 123.456 )`,
-where timeout represents the time between calls to `PreloadStart` and `PreloadGenEnd` at the time the file was written.
+Same as `PreloadStart`, although it accepts `timeout` that it does nothing with.
+
+This call is always generated at the end of a preload file as `call PreloadEnd( 123.456 )`,
+where timeout represents the time in seconds between calls to `PreloadStart` and `PreloadGenEnd` at the time the file was written.
 
 @note See: `Preload`, `PreloadStart`, `PreloadRefresh`, `PreloadEndEx`, `PreloadGenClear`, `PreloadGenStart`, `PreloadGenEnd`, `Preloader`.
 
@@ -24331,7 +24349,7 @@ native PreloadEnd       takes real timeout returns nothing
 
 
 /**
-Clears the preload buffer and starts the timer. (Anything else?)
+Clears the preload buffer and starts the timer.
 
 `call PreloadStart()` is automatically generated at the top of a preload file saved by `PreloadGenEnd`.
 
@@ -24342,7 +24360,7 @@ Clears the preload buffer and starts the timer. (Anything else?)
 native PreloadStart     takes nothing returns nothing
 
 /**
-Unknown. It does not reset the timer or clear the buffer.
+Confirmed to do nothing at all.
 
 @note See: `Preload`, `PreloadEnd`, `PreloadStart`, `PreloadEndEx`, `PreloadGenClear`, `PreloadGenStart`, `PreloadGenEnd`, `Preloader`.
 
@@ -24351,7 +24369,7 @@ Unknown. It does not reset the timer or clear the buffer.
 native PreloadRefresh   takes nothing returns nothing
 
 /**
-Unknown
+Confirmed to do nothing at all.
 
 @note See: `Preload`, `PreloadEnd`, `PreloadStart`, `PreloadRefresh`, `PreloadGenClear`, `PreloadGenStart`, `PreloadGenEnd`, `Preloader`.
 
@@ -27242,6 +27260,14 @@ native BlzRemoveAbilityStringLevelArrayField       takes ability whichAbility, a
 // Item 
 
 /**
+
+@note There are cases when an item has two active abilities attached and which ability
+is considered the "default" one for casting is unspecified.
+For example, there's a report where a unit who dies and respawns has the item's ability order changed.
+This order can be shuffled (or reset?) by dropping and picking up the item.
+
+@note See: `BlzGetItemAbility`
+
 @patch 1.31.0.11889
 */
 native BlzGetItemAbilityByIndex                    takes item whichItem, integer index returns ability
