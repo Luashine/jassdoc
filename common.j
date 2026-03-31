@@ -24334,8 +24334,10 @@ It works because the code is compiled on the fly with Jass2Lua.
 native Preload          takes string filename returns nothing
 
 /**
-Unknown. It's always generated at the end of a preload file as `call PreloadEnd( 123.456 )`,
-where timeout represents the time between calls to `PreloadStart` and `PreloadGenEnd` at the time the file was written.
+Same as `PreloadStart`, although it accepts `timeout` that it does nothing with.
+
+This call is always generated at the end of a preload file as `call PreloadEnd( 123.456 )`,
+where timeout represents the time in seconds between calls to `PreloadStart` and `PreloadGenEnd` at the time the file was written.
 
 @note See: `Preload`, `PreloadStart`, `PreloadRefresh`, `PreloadEndEx`, `PreloadGenClear`, `PreloadGenStart`, `PreloadGenEnd`, `Preloader`.
 
@@ -24345,7 +24347,7 @@ native PreloadEnd       takes real timeout returns nothing
 
 
 /**
-Clears the preload buffer and starts the timer. (Anything else?)
+Clears the preload buffer and starts the timer.
 
 `call PreloadStart()` is automatically generated at the top of a preload file saved by `PreloadGenEnd`.
 
@@ -24356,7 +24358,7 @@ Clears the preload buffer and starts the timer. (Anything else?)
 native PreloadStart     takes nothing returns nothing
 
 /**
-Unknown. It does not reset the timer or clear the buffer.
+Confirmed to do nothing at all.
 
 @note See: `Preload`, `PreloadEnd`, `PreloadStart`, `PreloadEndEx`, `PreloadGenClear`, `PreloadGenStart`, `PreloadGenEnd`, `Preloader`.
 
@@ -24365,7 +24367,7 @@ Unknown. It does not reset the timer or clear the buffer.
 native PreloadRefresh   takes nothing returns nothing
 
 /**
-Unknown
+Confirmed to do nothing at all.
 
 @note See: `Preload`, `PreloadEnd`, `PreloadStart`, `PreloadRefresh`, `PreloadGenClear`, `PreloadGenStart`, `PreloadGenEnd`, `Preloader`.
 
