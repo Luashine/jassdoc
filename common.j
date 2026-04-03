@@ -28364,6 +28364,7 @@ Does not clear the buffer or timer after flushing. The file is overwritten. It's
 	endfunction
 
 @param filename The filepath to be written to. Max length for filename is 259 characters (see: Windows MAX_PATH).
+Must end in ".pld" or ".txt".
 
 @note Before Reforged (which version?) you needed to enable "Allow Local Files" in registry.
 
