@@ -647,7 +647,20 @@ type ubersplat          extends     handle
 type hashtable          extends     agent
 
 /**
+Warcraft III has two incompatible UI families: Frames and SimpleFrames. Keep
+Frame children under Frame parents and SimpleFrame children under SimpleFrame
+parents.
+
+@note Load required TOC files during map initialization, but create, move,
+resize, show, hide or reparent custom frames at elapsed game time `0.00` or
+later. Frame manipulation during blocking map initialization can produce
+incorrect results.
+
 @bug wrong type, should be `extends agent` instead.
+
+@bug Custom UI frames are not reliably preserved by save/load. Rebuild them
+after `EVENT_GAME_LOADED` and do not reuse cached framehandles from before the
+load.
 
 @patch 1.31.0.11889
 */
@@ -25902,9 +25915,15 @@ Here is a basic example that creates a custom timerdialog window:
 
 @param index Values that are too high return the frame from the last valid index.
 
-@note The first time a Frame enters the map's script it takes a handleId.
+@note The first time a frame enters the map script it takes a handle ID. Never
+acquire an origin frame for the first time inside a `GetLocalPlayer()` block:
+reserve it for all players first. After that, local show/hide code can reuse the
+cached handle.
 
-@note This is up for edition, this native is lacking a more in-depth explanation. For example a list of all of the originframetypes, and their possible indexes.
+@note Some default frames are created only after local UI activity. Quest
+dialog frames appear after opening the quest dialog, chat frames only exist in
+multiplayer, and portrait text appears after selecting a unit. Avoid these
+frames or force their creation for all players before acquiring their handles.
 
 @patch 1.31.0.11889
 */
@@ -25952,6 +25971,13 @@ Owner and BluePrint have to be from the Frame family.
 Can only create rootFrames (not subFrames).
 Created Frames are stored into the game's Frame-Storage, `BlzGetFrameByName(name, createContext)`. Overwrites occupied slots.
 
+@note Do not create frames during blocking map initialization. Create custom UI
+at elapsed game time `0.00` or later; loading TOC files during initialization is
+safe.
+
+@note Frame creation allocates a handle ID. In multiplayer, create frames
+synchronously for all players and only make visibility or appearance local.
+
 @patch 1.31.0.11889
 */
 native BlzCreateFrame                              takes string name, framehandle owner, integer priority, integer createContext returns framehandle
@@ -25960,6 +25986,13 @@ native BlzCreateFrame                              takes string name, framehandl
 Like `BlzCreateFrame` but for the SimpleFrame family, Frame "SIMPLExxxx".
 
 @note Only Frames loaded by used tocs are valid names.
+
+@note A SimpleFrame cannot be parented under a Frame-family frame. Warcraft III
+will substitute another parent. Keep both the owner and template in the
+SimpleFrame family.
+
+@note Do not create frames during blocking map initialization. In multiplayer,
+create them for all players at elapsed game time `0.00` or later.
 
 @patch 1.31.0.11889
 */
@@ -26005,11 +26038,23 @@ List of known valid type names that return a new frame:
 * `"SIMPLECHECKBOX"`
 * `"SIMPLESTATUSBAR"`
 
+@note Do not create frames during blocking map initialization. In multiplayer,
+create them for all players at elapsed game time `0.00` or later.
+
 @patch 1.31.0.11889
 */
 native BlzCreateFrameByType                        takes string typeName, string name, framehandle owner, string inherits, integer createContext returns framehandle
 
 /**
+Destroys a frame.
+
+@bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
+doing so can crash the game.
+
+@note Never destroy a frame only for one local player. In multiplayer, create
+frames once for all players, then hide and reuse them instead of repeatedly
+destroying and recreating them.
+
 @patch 1.31.0.11889
 */
 native BlzDestroyFrame                             takes framehandle frame returns nothing
@@ -26020,6 +26065,11 @@ When FrameB moves FrameA's point will keep this rule and moves with it.
 
 Each point of a frame can be placed to one point.
 By placing multiple points of one Frame a Size is enforced.
+
+@note Setting one point does not remove the frame's other anchors. When moving
+an existing or default frame, call `BlzFrameClearAllPoints` first unless
+multiple anchors are intentional. Conflicting live anchors can stretch or
+collapse a frame.
 
 @patch 1.31.0.11889
 */
@@ -26040,6 +26090,10 @@ Coords are for the 4:3 Screen
 In widescreen format one can go further left with -x or further right with x > 0.8
 Only some Frames and their Children/Offspring can leave 4:3.
 SimpleFrames, Leaderboard, TimerDialog, Multiboard, ConsoleUIBackdrop
+
+@bug Most Frame-family UI becomes malformed or truncated when any part leaves
+the 4:3 area. The listed exceptions do not have this restriction. Keep ordinary
+custom Frame roots inside `0.0 .. 0.8` by `0.0 .. 0.6`.
 
 @param point framepointtype is a point, position of which you set to move the frame relatively to it.
 
@@ -26072,6 +26126,9 @@ native BlzFrameSetAllPoints                        takes framehandle frame, fram
 /**
 Sets visibility of a frame and its children.
 
+@bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
+doing so can crash the game. Show or hide their owning SimpleFrame instead.
+
 @param visible true is visible, false is invisible.
 
 @patch 1.31.0.11889
@@ -26080,6 +26137,9 @@ native BlzFrameSetVisible                          takes framehandle frame, bool
 
 /**
 Returns visibility status of frame.
+
+@bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
+doing so can crash the game.
 
 @param frame Target frame.
 
@@ -26090,14 +26150,26 @@ Returns visibility status of frame.
 native BlzFrameIsVisible                           takes framehandle frame returns boolean
 
 /**
-Requires a string for the frame name that you want to retrieve (get), and an integer (which in most cases should be 0) that specifies the index of the frame that you want to get (for example for inventory slots you have 6, from 0-5).
+Returns a frame from the internal frame storage by its name and creation
+context. The second argument is not a child or inventory-slot index. It must
+match the `createContext` used when the frame or its named parent tree was
+created. Built-in frames usually use context `0`.
 
-Read from the internal Frame-Storage.
-The first time a Frame enters the map's script it takes a handleId.
+Named children created from an FDF template use the same creation context as
+their root frame. Reusing the same `(name, createContext)` pair can overwrite
+the stored lookup.
 
 Example: `BlzGetFrameByName("SimpleHeroLevelBar", 0)`.
 
+@note Inventory and command slots use distinct names such as
+`"InventoryButton_0"` or `"CommandButton_0"`; the numeric suffix is part of the
+name, not the `createContext`.
+
 @note Refer to fdf files for frame names.
+
+@note The first time a frame enters the map script it takes a handle ID. Never
+acquire this handle for the first time inside a `GetLocalPlayer()` block.
+Acquire and cache it for all players first.
 
 @patch 1.31.0.11889
 */
@@ -26215,6 +26287,9 @@ A disabled frame is transparent to the mouse (can click on things behind it) and
 The frame's Tooltip is still shown on hover.
 (false) Removes KeyboardFocus.
 
+@bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
+doing so can crash the game.
+
 @patch 1.31.0.11889
 */
 native BlzFrameSetEnable                           takes framehandle frame, boolean enabled returns nothing
@@ -26228,6 +26303,15 @@ native BlzFrameGetEnable                           takes framehandle frame retur
 
 /**
 Affects child-Frames, when they don't have an own Alpha.
+
+@note Apply alpha after the frame has been parented, anchored and sized. Alpha
+set on a bare frame can be reset by later layout or parent changes.
+
+@note A shown, enabled frame can still intercept mouse input at alpha `0`.
+Disable it or hide it when it should not block frames behind it.
+
+@bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
+doing so can crash the game.
 
 @param alpha 0 to 255.
 
@@ -26339,6 +26423,9 @@ Affects child-Frames, when they don't have an own Scale.
 
 @note Setting a negative scale value may result in the frame being mirrored on both axes.
 
+@bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
+doing so can crash the game.
+
 @patch 1.31.0.11889
 */
 native BlzFrameSetScale                            takes framehandle frame, real scale returns nothing
@@ -26417,7 +26504,11 @@ If you want to control the model’s size, use `BlzFrameSetScale` instead.
 native BlzFrameSetSize                             takes framehandle frame, real width, real height returns nothing
 
 /**
-`SIMPLESTATUSBAR` and `SIMPLETEXTURE` (``Texture`` in FDF) only. 
+Sets the vertex color of model/sprite frames, `SIMPLESTATUSBAR` fills and
+SimpleFrame `Texture` children.
+
+@note This does not tint ordinary Frame-family `BACKDROP` textures, images or
+buttons. Use another texture or FDF backdrop for those frame types.
 
 @param color Four byte integer of the form 0xaarrggbb. You can also use `BlzConvertColor` to create such an integer.
 
@@ -26436,6 +26527,9 @@ For SimpleFrames Level sets them higher/lower to all other SimpleFrames.
 
 @bug Level values ​​above `9` for visible SimpleFrames crash the game.
 
+@bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
+doing so can crash the game.
+
 @patch 1.31.0.11889
 */
 native BlzFrameSetLevel                            takes framehandle frame, integer level returns nothing
@@ -26443,11 +26537,32 @@ native BlzFrameSetLevel                            takes framehandle frame, inte
 /**
 @bug In some cases, changing the parent after setting MDX model with `BlzFrameSetModel` can speed up the animations of the model.
 
+@bug For Frame-family frames, this native does not remove the frame from the old
+parent's child list. The frame then belongs to both parents, which can misalign
+its clickable area from its visual position. Create the frame under its final
+parent instead. SimpleFrames do not have this dual-parent bug.
+
+@bug Setting a frame's parent to itself or one of its descendants creates a
+cycle and can crash the game.
+
+@bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
+doing so can crash the game. Do not mix Frame and SimpleFrame families.
+
 @patch 1.31.0.11889
 */
 native BlzFrameSetParent                           takes framehandle frame, framehandle parent returns nothing
 
 /**
+Returns the frame's current parent.
+
+@bug Calling this on a top-level frame can crash the game.
+
+@note The first call that returns a parent not yet known to the map script
+consumes a handle ID. Acquire it for all players before using it inside
+local-only UI code.
+
+@async
+
 @patch 1.31.0.11889
 */
 native BlzFrameGetParent                           takes framehandle frame returns framehandle
@@ -26500,25 +26615,49 @@ Should work with the following frame types:
 native BlzFrameSetTextAlignment                    takes framehandle frame, textaligntype vert, textaligntype horz returns nothing
 
 /**
-Ignores String/Texture.
+Returns the number of direct child frames. `String` and `Texture` SimpleFrame
+children are not included.
+
+@note The count of default UI children can change with local game state, for
+example when a multiboard, leaderboard or quest dialog is created. Do not use
+hard-coded default-frame child indices without controlling that state.
+
+@async
 
 @patch 1.32.10.18820
 */
 native BlzFrameGetChildrenCount                    takes framehandle frame returns integer
 
 /**
-Valid Indexes are 0 to `BlzFrameGetChildrenCount` - 1.
-Ignores String/Texture.
-Breaks `BlzGetOriginFrame` when the same frame is first get using `BlzFrameGetChild`.
+Returns a direct child frame at a zero-based index. Valid indices are `0` to
+`BlzFrameGetChildrenCount(frame) - 1`. `String` and `Texture` SimpleFrame
+children are not included.
+
+@bug This native performs no bounds checking. An invalid index can crash the
+game.
+
+@bug In affected 1.32 builds, acquiring a frame through `BlzFrameGetChild`
+before acquiring the same frame through `BlzGetOriginFrame` can make the later
+origin-frame lookup return an invalid handle.
+
+@note Default UI child counts and indices can change with game state. Prefer
+named frames or origin frames when available.
+
+@note The first call that returns a child not yet known to the map script
+consumes a handle ID. Acquire it for all players before using it inside a
+`GetLocalPlayer()` block.
+
+@async
 
 @patch 1.32.10.18820
 */
 native BlzFrameGetChild                            takes framehandle frame, integer index returns framehandle
 
 /**
-The event starts for all players when one player triggers it.
+Registers a synchronized FrameEvent. When one player triggers it, the event
+runs for all players.
 
-The Event Getter functions. 
+Read event data inside the event through:
 
 * `BlzGetTriggerFrame`
 * `BlzGetTriggerFrameEvent`
@@ -26527,7 +26666,9 @@ The Event Getter functions.
 * `GetTriggerPlayer`
 
 `BlzGetTriggerFrameValue` & `BlzGetTriggerFrameText` are only set for
-FrameEvents that use them.
+FrameEvents that provide the corresponding value. Do not read local
+`BlzFrameGetValue` or `BlzFrameGetText` later and use that result for
+synchronized game logic.
 
 @patch 1.31.0.11889
 */
@@ -26691,6 +26832,9 @@ native BlzSetMousePos                              takes integer x, integer y re
 /**
 Gets the width (pixels) of the Warcraft 3 window.
 
+@note This can temporarily return `0` while the client is minimized or changing
+display state.
+
 @async 
 
 @patch 1.31.0.11889
@@ -26699,6 +26843,9 @@ native BlzGetLocalClientWidth                      takes nothing returns integer
 
 /**
 Gets the height (pixels) of the Warcraft 3 window.
+
+@bug This returns `0` while Warcraft III is minimized. Guard the value before
+using it as a divisor in full-screen layout calculations.
 
 @async 
 
