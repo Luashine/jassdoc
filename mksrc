@@ -235,7 +235,7 @@ mksrc [options] [FILES]
 
 B<This program> takes any number of jass files and writes an SQL program to
 stdout. That SQL program will add a bunch of annotations to the annotations
-table, like the literal source code of each toplevel defintion, the start- and
-end line numbers and the kind of the definition (funciton, native, global, etc.).
+table, like the literal source code of each toplevel definition, the start- and
+end line numbers and the kind of the definition (function, native, global, etc.).
 
 
