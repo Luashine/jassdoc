@@ -26012,6 +26012,11 @@ native BlzConvertColor                             takes integer a, integer r, i
 Loads a TOC file containing paths to FDF files that define frame templates or
 localized strings. Returns `true` on success.
 
+@note FDF errors will be logged to
+`C:\Users\USERNAME\Documents\Warcraft III\Logs\War3Log.txt`
+or inside `Warcraft III Public Test`. New log lines may not be flushed immediately,
+close the game process to make sure everything has been written out so far.
+
 @note FDF load order matters. List base/included FDF files before templates that
 inherit from them.
 
