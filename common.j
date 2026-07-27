@@ -26916,7 +26916,8 @@ native BlzSetMousePos                              takes integer x, integer y re
 Gets the width (pixels) of the Warcraft 3 window.
 
 @note This can temporarily return `0` while the client is minimized or changing
-display state.
+display state. Be careful when using it in calculations (division by zero)
+for full-screen layout calculations
 
 @async 
 
@@ -26927,8 +26928,9 @@ native BlzGetLocalClientWidth                      takes nothing returns integer
 /**
 Gets the height (pixels) of the Warcraft 3 window.
 
-@bug This returns `0` while Warcraft III is minimized. Guard the value before
-using it as a divisor in full-screen layout calculations.
+@note This can temporarily return `0` while the client is minimized or changing
+display state. Be careful when using it in calculations (division by zero)
+for full-screen layout calculations
 
 @async 
 
