@@ -25943,6 +25943,12 @@ Unaffected: Mouse, Command Buttons, Chat, Messages, TimerDialog, Multiboard, Lea
 
 (De)Activates some auto-repositioning of default frames (see: `BlzEnableUIAutoPosition`).
 
+@bug Calling this native with `false` does not reliably restore every frame. On
+Reforged 2.0.1, the resource bar stays hidden.
+
+@note Command and inventory buttons can reappear when unit selection changes.
+Custom UI that permanently hides them must hide them again after selection.
+
 @patch 1.31.0.11889
 */
 native BlzHideOriginFrames                         takes boolean enable returns nothing
@@ -25955,10 +25961,18 @@ native BlzHideOriginFrames                         takes boolean enable returns 
 native BlzConvertColor                             takes integer a, integer r, integer g, integer b returns integer
 
 /**
-Loads in a TOCFile, to add/define Frame-Blueprints or Localized Strings
-A TOC file contains a list, Each line is a path to a fdf (not case sensitive).
+Loads a TOC file containing paths to FDF files that define frame templates or
+localized strings. Returns `true` on success.
 
-@bug The TOC needs to end with one or two empty lines.
+@note FDF load order matters. List base/included FDF files before templates that
+inherit from them.
+
+@bug The TOC must end with empty lines. CRLF files need at least one empty final
+line; LF-only files need two. Without the required ending, the last listed FDF
+can be silently skipped.
+
+@bug An FDF syntax error skips the remainder of that file. A duplicate
+top-level frame name can also abort processing of the remaining definitions.
 
 @patch 1.31.0.11889
 */
@@ -26002,7 +26016,9 @@ native BlzCreateSimpleFrame                        takes string name, framehandl
 Create & Define a new (Simple)Frame.
 Can use a root-(Simple)Frame-BluePrint with inherits, when that is done it needs to be a loaded BluePrint.
 
-@bug Using the `"CONTROL"` or `"SIMPLEMESSAGEFRAME"` as type name causes a game crash.
+@bug `BACKDROP`, `TEXTAREA`, `SIMPLEMESSAGEFRAME`, `DIALOG` and `CONTROL`
+frames can crash the game when created without their required FDF fields or
+other setup. Prefer a known-good template for these frame types.
 
 @param typeName A string reference to the internal frame type. 
 List of known valid type names that return a new frame:
@@ -26110,6 +26126,9 @@ Useful to move frames with the next SetPoint.
 native BlzFrameClearAllPoints                      takes framehandle frame returns nothing
 
 /**
+Copies the relative frame's size and position. The relationship remains live,
+so later changes to the relative frame also update this frame.
+
 Example:
 
 ````{.lua}
@@ -26426,6 +26445,9 @@ Affects child-Frames, when they don't have an own Scale.
 @bug Do not call this native on `String` or `Texture` children of a SimpleFrame;
 doing so can crash the game.
 
+@note Scaling can break a custom font. Set the scale after creating the frame
+and setting its text and font.
+
 @patch 1.31.0.11889
 */
 native BlzFrameSetScale                            takes framehandle frame, real scale returns nothing
@@ -26499,6 +26521,9 @@ In most cases, changing the size does not affect the model’s actual display si
 Unless you set a special `LayerStyle` property in the FDF (such as `3DWINDOW` or `SETSVIEWPORT`), it is recommended to set the frame’s size to a very small non-zero value (e.g., `0.001`).
 If you want to control the model’s size, use `BlzFrameSetScale` instead.
 
+@bug A displayed `TEXTAREA` must be at least `0.03` high. A smaller height can
+crash the game.
+
 @patch 1.31.0.11889
 */
 native BlzFrameSetSize                             takes framehandle frame, real width, real height returns nothing
@@ -26517,9 +26542,14 @@ buttons. Use another texture or FDF backdrop for those frame types.
 native BlzFrameSetVertexColor                      takes framehandle frame, integer color returns nothing
 
 /**
-Used to reorder the children of a Frame.
-SimpleFrames have fixed internal Layers. Which only contain String/Textures.
-For SimpleFrames Level sets them higher/lower to all other SimpleFrames.
+For Frame-family UI, reorders sibling frames that share the same parent. There
+is no global z-index: changing a deeply nested frame's level cannot raise it
+above an unrelated parent branch. Siblings at the same level follow creation
+order.
+
+For SimpleFrames, level orders the main SimpleFrame relative to other
+SimpleFrames. It cannot move a SimpleFrame above Frame-family UI. SimpleFrame
+`String` and `Texture` children have fixed internal layers.
 
 @param level bigger number gives a higher position.
 
