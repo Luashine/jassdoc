@@ -66,6 +66,12 @@ A length delimited byte addressable string type.
 JASS strings are written inside double-quote `""` (example: `"example"`).
 There are 2 null values for strings: `""` and `null`.
 
+@note **Encoding**
+
+Reforged 2.0.4: strings use UTF-8. Native length and indexing
+operations such as `StringLength` and `SubString` count bytes. ASCII characters
+use one byte; non-ASCII characters use two to four bytes.
+
 **Localized Strings**
 
 Some game API functions (natives) support the usage of `TRIGSTR_` prefix at the

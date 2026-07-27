@@ -11363,6 +11363,19 @@ For empty or invalid out-of-bounds values returns an empty string "" (in Lua).
 For start>end returns substring beginning with start until the actual end of string.
 For start<0 returns an empty string.
 
+@note Reforged 2.0.4: `start` and `end` are UTF-8 byte
+offsets, matching `StringLength`. A slice can split a multi-byte character. The
+partial bytes are retained without an error or adjustment to a character
+boundary, and adjacent slices concatenate back to the original string exactly:
+
+```{.lua}
+SubString("дä", 0, 1) .. SubString("дä", 1, 4) == "дä"
+SubString("дä", 0, 2) == "д"
+```
+
+See `StringHash` for detecting a slice that starts with a multi-byte lead byte
+but ends before the character is complete.
+
 **Examples (Lua):**
 
 ```{.lua}
@@ -11375,9 +11388,9 @@ SubString("abcdef", 2, 0) == "cdef"
 
 @param source Text string.
 
-@param start Starting position, zero-indexed, inclusive.
+@param start Starting byte position, zero-indexed, inclusive.
 
-@param end Last position, zero-indexed, exclusive.
+@param end Ending byte position, zero-indexed, exclusive.
 
 @pure 
 
@@ -11389,7 +11402,18 @@ native SubString takes string source, integer start, integer end returns string
 Returns the length of the string in *bytes*.
 This means Unicode (non-ASCII) characters will take up and return a higher byte count than there are letters.
 
-**Example**: `StringLength("я")` returns 2.
+**Examples (Reforged 2.0.4):**
+
+```{.lua}
+StringLength("a") == 1
+StringLength("я") == 2
+StringLength("中") == 3
+StringLength("😀") == 4
+```
+
+There is no native that returns the number of characters. See `StringHash` for
+a byte-based technique that widens each slice until it contains a complete
+UTF-8 character.
 
 @pure 
 
@@ -11427,6 +11451,30 @@ StringHash is also used for variable lookup: string name -> integer index.
 @note *Breaking:* The hashing of multi-byte characters (Unicode) was changed in v1.30.0/1.31.1.
 It's unknown if hashes of these characters are different in old versions between Windows/Mac OS
 or depends on OS-default character page settings (non-Unicode programs on Windows).
+
+@note Reforged 2.0.4: an incomplete multi-byte UTF-8 slice
+that begins with the character's lead byte hashes to `1843378377`. This was
+verified with 2-, 3- and 4-byte characters:
+
+```{.lua}
+StringHash(SubString("д",  0, 1)) == 1843378377  -- 2-byte char, 1 of 2
+StringHash(SubString("中", 0, 1)) == 1843378377  -- 3-byte char, 1 of 3
+StringHash(SubString("中", 0, 2)) == 1843378377  -- 3-byte char, 2 of 3
+StringHash(SubString("😀", 0, 3)) == 1843378377  -- 4-byte char, 3 of 4
+```
+
+These invalid sequences are normalized to a single replacement form before
+hashing. The exact replacement form was not verified. A slice that starts with
+a UTF-8 continuation byte does not use this marker and retains a distinct
+per-byte hash.
+
+To iterate over UTF-8 characters, hash a one-byte slice. If it returns
+`1843378377`, widen the slice one byte at a time, up to four bytes, until the
+hash differs. The resulting slice contains the complete character.
+
+@note Reforged 2.0.4: fixed-size byte chunks can produce hash
+collisions when they end partway through multi-byte characters, because every
+such lead-byte slice uses the same hash.
 
 @pure 
 
@@ -26756,6 +26804,11 @@ See also `BlzTriggerRegisterPlayerSyncEvent`.
 @param prefix Limited to something like 255 bytes.
 
 @param data Limited to something like 255 bytes.
+
+@note Reforged 2.0.4: splitting text at the byte limit can
+place part of a multi-byte character in each chunk. Rejoining the chunks before
+display preserves the text, while displaying a partial chunk on its own
+produces invalid text.
 
 @patch 1.31.0.11889
 */
