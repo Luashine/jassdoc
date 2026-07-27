@@ -879,7 +879,7 @@ For the previous example, it will return 3.
 native GetLastData          takes nothing                               returns integer
 
 /**
-Reduce the command queue counter by 1. It's important to pop last command because many sleep function in `common.ai` exits when the value of the command counter not equal to zero.
+Reduce the command queue counter by 1. It's important to pop last command because many sleep functions in `common.ai` exit when the value of the command counter is not equal to zero.
 
 @note See: `CommandsWaiting`, `GetLastCommand`, `GetLastData`
 

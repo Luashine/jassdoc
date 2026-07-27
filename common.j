@@ -10485,7 +10485,7 @@ printUnitAttacks("hgry")
 
 @note Works as intended
 
-@note Each type has a corresponding bit if targetting is enabled
+@note Each type has a corresponding bit if targeting is enabled
 
 ```{.lua}
 TARGETS_ALLOWED = {
@@ -20252,7 +20252,7 @@ be replaced by `GetPlayerName(toPlayer)`.
 @bug Only the first "%s" will be replaced correctly. Following "%s" will be
 printed as garbage or (v1.32.10, Lua) crash the game.
 
-Using formatters like "%i" will also print garbage and following "%s" wont
+Using formatters like "%i" will also print garbage and following "%s" won't
 work either.
 
 See: [C stdlib printf documentation](https://cplusplus.com/reference/cstdio/printf/).
@@ -20297,7 +20297,7 @@ When disabled this includes:
 
 - hide the cursor (you can still see UI on-hover effects with menu buttons and
 even mouse-down animation on ability buttons)
-- on-hover unit selection circles no longer show (cannot be overriden with
+- on-hover unit selection circles no longer show (cannot be overridden with
 `EnableDragSelect`, `EnablePreSelect`, `EnableSelect`)
 - disable all hotkeys (binds, abilities, minimap, menus like F10), only Alt+F4 continues to work
 
@@ -22205,7 +22205,7 @@ beyond the visible area.
 **Summary:** To set the multiboard width, set the width of columns in the first row.
 
 @bug Although the column width is set immediately and items in the same row are
-moved left/right, the multiboard is not redrawn to accomodate the new width.
+moved left/right, the multiboard is not redrawn to accommodate the new width.
 
 To update the entire multiboard's width, you must manually minimize/maximize
 the multiboard or call `MultiboardDisplay(udg_myMultiboard, true)`
@@ -24020,8 +24020,8 @@ native SetImageRenderAlways         takes image whichImage, boolean flag returns
 
 /**
 Draws the specified image above the water if the flag is true. The second
-boolean (useWaterAlpha) doesnt seem to do much. Every imagetype other than 1
-doesnt seem to appear above water.
+boolean (useWaterAlpha) doesn't seem to do much. Every imagetype other than 1
+doesn't seem to appear above water.
 
 @patch 1.18a
 */
@@ -25900,7 +25900,7 @@ Here is a basic example that creates a custom timerdialog window:
 
 *Take a look at the .fdf files in the game’s CASC or point 1.3 (refer to this document’s table of contents for reference) it should give you some ideas.*
 
-@param index to high values will return the frame from the last valid Index.
+@param index Values that are too high return the frame from the last valid index.
 
 @note The first time a Frame enters the map's script it takes a handleId.
 
@@ -25922,7 +25922,7 @@ Hides/Shows most of the default in-game UI.
 Unaffected: Mouse, Command Buttons, Chat, Messages, TimerDialog, Multiboard, Leaderboard and ConsoleUIBackdrop.
 
 
-(De)Activades some auto-repositioning of default frames (see: `BlzEnableUIAutoPosition`).
+(De)Activates some auto-repositioning of default frames (see: `BlzEnableUIAutoPosition`).
 
 @patch 1.31.0.11889
 */
@@ -25937,7 +25937,7 @@ native BlzConvertColor                             takes integer a, integer r, i
 
 /**
 Loads in a TOCFile, to add/define Frame-Blueprints or Localized Strings
-A TOC file contains a list, Each line is a path to a fdf (not case sensitve).
+A TOC file contains a list, Each line is a path to a fdf (not case sensitive).
 
 @bug The TOC needs to end with one or two empty lines.
 
@@ -26324,7 +26324,7 @@ For example: token 2 (`Stand`) matches `Stand - 1`, `Stand - 2`, etc.
 native BlzFrameSetSpriteAnimate                    takes framehandle frame, integer primaryProp, integer flags returns nothing
 
 /**
-Overwrittes some fdf setup. Supported frame types: `BACKDROP`, `SIMPLESTATUSBAR`, `SIMPLETEXTURE` (`Texure` in FDF).
+Overwrites some fdf setup. Supported frame types: `BACKDROP`, `SIMPLESTATUSBAR`, `SIMPLETEXTURE` (`Texture` in FDF).
 
 @param flag texture fill setting: 0 to stretch, 1 to tile (`BACKDROP`).
 
@@ -26346,7 +26346,7 @@ native BlzFrameSetScale                            takes framehandle frame, real
 /**
 Frame tooltip is visible when hovered with the mouse. Otherwise tooltip will be hidden.
 
-tooltip is limited to 4:3, but not it's children.
+tooltip is limited to 4:3, but not its children.
 SimpleFrame tooltips are not hidden with this call.
 frame and tooltip have to be from the same Family (Frames/SimpleFrames).
 tooltip can only serve one frame.
@@ -26526,8 +26526,8 @@ The Event Getter functions.
 * `BlzGetTriggerFrameText`
 * `GetTriggerPlayer`
 
-`BlzGetTriggerFrameValue` & `BlzGetTriggerFrameText` are only set when the
-FrameEventEvent has use of them.
+`BlzGetTriggerFrameValue` & `BlzGetTriggerFrameText` are only set for
+FrameEvents that use them.
 
 @patch 1.31.0.11889
 */
@@ -26682,7 +26682,7 @@ like the toolbar at the top or a multiboard.
 native BlzEnableCursor                             takes boolean enable returns nothing
 
 /**
-x & y are px upto the used resolution `BlzGetLocalClientWidth()` `BlzGetLocalClientHeight()`.
+x & y are px up to the used resolution `BlzGetLocalClientWidth()` `BlzGetLocalClientHeight()`.
 
 @patch 1.31.0.11889
 */

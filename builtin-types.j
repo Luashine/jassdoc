@@ -6,7 +6,7 @@ type handle extends void
 /**
 Booleans might be `true` or `false`, "common.j" variables `TRUE` and `FALSE` were added to allow you to use them, but it is not a good idea to do so. Using `true` is faster than getting a value of variable `TRUE`.
 
-Comparision expresions `==`, `<=`, `<`, `>`, `>=`, `!=` return `boolean`.
+Comparison expressions `==`, `<=`, `<`, `>`, `>=`, `!=` return `boolean`.
 
 Statements `if`, `elseif` and `exitwhen` take `boolean` as argument.
 */

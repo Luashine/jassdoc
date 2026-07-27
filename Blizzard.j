@@ -14453,7 +14453,7 @@ function MeleeRandomHeroLoc takes player p, integer id1, integer id2, integer id
     local integer pick
     local version v
 
-    // The selection of heroes is dependant on the game version.
+    // The selection of heroes is dependent on the game version.
     set v = VersionGet()
     if (v == VERSION_REIGN_OF_CHAOS) then
         set roll = GetRandomInt(1,3)
