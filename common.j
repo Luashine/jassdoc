@@ -12230,6 +12230,18 @@ native SetPlayerRacePreference  takes player whichPlayer, racepreference whichRa
 
 
 /**
+Set player's HUD skin.
+
+Specialty: allows usage of `RACE_PREF_FORSAKEN` which is not a race, but only a HUD skin.
+
+@param whichRacePreference Only the following preferences are valid according to WE:
+`RACE_PREF_HUMAN`, `RACE_PREF_ORC`, `RACE_PREF_NIGHTELF`, `RACE_PREF_UNDEAD`,
+`RACE_PREF_USER_SELECTABLE`, `RACE_PREF_FORSAKEN`
+
+@note A getter does not exist.
+
+@note This function is used within the scope of function `config` in war3map.j.
+
 @patch 3.0.0.24268
 */
 native SetPlayerRaceSkin        takes player whichPlayer, racepreference whichRacePreference returns nothing
@@ -24553,6 +24565,10 @@ native SetWaterBaseColor            takes integer red, integer green, integer bl
 native SetHDWaterParams             	takes integer red, integer green, integer blue, boolean useColor, integer vertexDisplacement, integer minOpacity, integer maxOpacity, integer reflectivity, integer emissivity, integer edgeSoftness, integer waveStrength returns nothing
 
 /**
+
+@note This function is used within the scope of function `main` in war3map.j.
+It is generated based on set map water settings.
+
 @patch 3.0.0.24268
 */
 native SetHDWaterParamsEx           	takes integer red, integer green, integer blue, boolean override, integer vertexDisplacement, integer minOpacity, integer maxOpacity, integer reflectivity, integer emissivity, integer edgeSoftness, integer waveStrength, integer envMapStrength returns nothing
