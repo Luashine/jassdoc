@@ -4781,14 +4781,12 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
 /**
 @note Enum changed from 7 to 8 in v3.0.0.24268
 @patch 1.07
-@patch 3.0.0.24268
 */
     constant itemtype ITEM_TYPE_UNKNOWN                     = ConvertItemType(8)
 
 /**
 @note Enum changed from 8 to 9 in v3.0.0.24268
 @patch 1.07
-@patch 3.0.0.24268
 */
     constant itemtype ITEM_TYPE_ANY                         = ConvertItemType(9)
 
