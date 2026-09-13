@@ -186,6 +186,16 @@ Specifies the default unit rotation for BJ functions. Set to 270° meaning facin
     constant integer   bj_MAX_INVENTORY                 =  6
 
 /**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MAX_EXTENDED_INVENTORY        =  30
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MAX_EQUIPMENT_INVENTORY       =  9
+
+/**
 Stores the maximum number of playable player slots regardless of map options.
 
 @note See: `GetBJMaxPlayers`, `GetBJMaxPlayerSlots`
@@ -620,6 +630,16 @@ Stores the maximum number of internal player slots regardless of map options.
 */
     constant integer   bj_CAMPAIGN_INDEX_XO       = 8
 
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_CAMPAIGN_INDEX_RH       = 9
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_CAMPAIGN_INDEX_RU       = 10
+
     // Campaign offset constants (for mission indexing)
 
 /**
@@ -666,6 +686,16 @@ Stores the maximum number of internal player slots regardless of map options.
 @patch 1.07
 */
     constant integer   bj_CAMPAIGN_OFFSET_XO      = 8
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_CAMPAIGN_OFFSET_RH      = 0
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_CAMPAIGN_OFFSET_RU      = 1
 
     // Mission indexing constants
     // Tutorial
@@ -1114,8 +1144,55 @@ Stores the maximum number of internal player slots regardless of map options.
 */
     constant integer   bj_MISSION_INDEX_XO03       = bj_CAMPAIGN_OFFSET_XO * 1000 + 3
 
-    // Cinematic indexing constants
+    // Rebirth Human
 
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RH00       = bj_CAMPAIGN_OFFSET_RH * 1000 + 0
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RH01       = bj_CAMPAIGN_OFFSET_RH * 1000 + 1
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RH02       = bj_CAMPAIGN_OFFSET_RH * 1000 + 2
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RH03       = bj_CAMPAIGN_OFFSET_RH * 1000 + 3
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RH04       = bj_CAMPAIGN_OFFSET_RH * 1000 + 4
+    // Rebirth Undead
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RU00       = bj_CAMPAIGN_OFFSET_RU * 1000 + 0
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RU01       = bj_CAMPAIGN_OFFSET_RU * 1000 + 1
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RU02       = bj_CAMPAIGN_OFFSET_RU * 1000 + 2
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_MISSION_INDEX_RU03       = bj_CAMPAIGN_OFFSET_RU * 1000 + 3
+
+    // Cinematic indexing constants
 /**
 @patch 1.00
 */
@@ -1170,6 +1247,16 @@ Stores the maximum number of internal player slots regardless of map options.
 @patch 1.07
 */
     constant integer   bj_CINEMATICINDEX_XED      = 10
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_CINEMATICINDEX_HFO      = 11
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_CINEMATICINDEX_UFE      = 12
 
     // Alliance settings
 
@@ -1246,6 +1333,11 @@ Stores the maximum number of internal player slots regardless of map options.
 @patch 1.07
 */
     constant integer   bj_KEYEVENTKEY_UP           = 3
+
+/**
+@patch 3.0.0.24268
+*/
+    constant integer   bj_KEYEVENTKEY_A           = 4
 
     // Mouse Event Types
 
@@ -2458,6 +2550,21 @@ Stores the maximum number of internal player slots regardless of map options.
 */
     widget             bj_lastDyingWidget          = null
 
+/**
+@patch 3.0.0.24268
+*/
+    boolean            bj_HeroGlowAllUnitsFlag     = true
+
+/**
+@patch 3.0.0.24268
+*/
+    boolean            bj_enableAurasAllUnits      = true
+
+/**
+@patch 3.0.0.24268
+*/
+    boolean            bj_affectsUIAurasAllUnits   = true
+
     // Random distribution vars
 
 /**
@@ -2632,6 +2739,16 @@ Stores the maximum number of internal player slots regardless of map options.
 */
 	commandbuttoneffect bj_lastCreatedCommandButtonEffect = null
 
+/**
+@patch 3.0.0.24268
+*/
+    item               bj_lastEquippedItem         = null
+
+/**
+@patch 3.0.0.24268
+*/
+    item               bj_lastUnequippedItem       = null
+
     // Filter function vars
 
 /**
@@ -2676,6 +2793,16 @@ Stores the maximum number of internal player slots regardless of map options.
 */
     boolean            bj_wantDestroyGroup         = false
 
+/**
+@patch 3.0.0.24268
+*/
+	effect 			   bj_destroyEffectAsyncEffect = null
+
+/**
+@patch 3.0.0.24268
+*/
+	real 			   bj_destroyEffectAsyncTime   = 0
+
     // Instanced Operation Results
 
 /**
@@ -2706,7 +2833,35 @@ function BJDebugMsg takes string msg returns nothing
     endloop
 endfunction
 
+//***************************************************************************
+//*
+//*  Memory Cleanup Functions
+//*
+//***************************************************************************
 
+
+/**
+@patch 3.0.0.24268
+*/
+function SetWantDestroyGroupBJ takes nothing returns nothing
+	set bj_wantDestroyGroup = true
+endfunction
+
+
+/**
+@patch 3.0.0.24268
+*/
+function ClearWantDestroyGroupBJ takes nothing returns nothing
+	set bj_wantDestroyGroup = false
+endfunction
+
+
+/**
+@patch 3.0.0.24268
+*/
+function GetWantDestroyGroupBJ takes nothing returns boolean
+	return bj_wantDestroyGroup
+endfunction
 
 //***************************************************************************
 //*
@@ -3699,6 +3854,18 @@ endfunction
 //===========================================================================
 
 /**
+@patch 3.0.0.24268
+*/
+function SetCameraFieldControlledByInputForPlayer takes player whichPlayer, camerafield whichField, boolean controlled returns nothing
+    if (GetLocalPlayer() == whichPlayer) then
+        // Use only local code (no net traffic) within this block to avoid desyncs.
+        call SetCameraFieldControlledByInput(whichField, controlled)
+    endif
+endfunction
+
+//===========================================================================
+
+/**
 @patch 1.00
 */
 function SetCameraTargetControllerNoZForPlayer takes player whichPlayer, unit whichUnit, real xoffset, real yoffset, boolean inheritOrientation returns nothing
@@ -4341,6 +4508,33 @@ endfunction
 //===========================================================================
 
 /**
+@patch 3.0.0.24268
+*/
+function IsMouseButtonPressedBJ takes mousebuttontype mouseButtonType returns boolean
+    return BlzIsMouseButtonPressed(mouseButtonType)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function IsMetaKeyPressedBJ takes integer metakey returns boolean
+    return BlzIsMetaKeyPressed(metakey)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function IsKeyPressedBJ takes oskeytype key returns boolean
+    return BlzIsKeyPressed(key)
+endfunction
+
+//===========================================================================
+
+/**
 @patch 1.00
 */
 function TriggerRegisterPlayerEventVictory takes trigger trig, player whichPlayer returns event
@@ -4868,6 +5062,115 @@ endfunction
 //===========================================================================
 
 /**
+@patch 3.0.0.24268
+*/
+function SetHDWaterParamsExBJ takes real red, real green, real blue, boolean override, integer vertexDisplacement, integer minOpacity, integer maxOpacity, integer reflectivity, integer emissivity, integer edgeSoftness, integer waveStrength, integer envMapStrength returns nothing
+    call SetHDWaterParamsEx (PercentTo255(red), PercentTo255(green), PercentTo255(blue), override, vertexDisplacement, minOpacity, maxOpacity, reflectivity, emissivity, edgeSoftness, waveStrength, envMapStrength)
+endfunction
+
+//===========================================================================        	
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterColorBJ takes real red, real green, real blue returns nothing	
+	call BlzSetHDWaterColor(PercentTo255(red), PercentTo255(green), PercentTo255(blue))
+	call BlzSetHDWaterColorOverride(true)
+endfunction
+
+//===========================================================================        	
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterColorOverrideBJ takes nothing returns nothing
+	call BlzSetHDWaterColorOverride(true)
+endfunction
+
+//===========================================================================        	
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzClearHDWaterColorOverrideBJ takes nothing returns nothing
+	call BlzSetHDWaterColorOverride(false)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterVertexDisplacementBJ takes integer vertexDisplacement returns nothing
+	call BlzSetHDWaterVertexDisplacement(vertexDisplacement)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterMinOpacityBJ takes integer minOpacity returns nothing
+	call BlzSetHDWaterMinOpacity(minOpacity)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterMaxOpacityBJ takes integer maxOpacity returns nothing
+	call BlzSetHDWaterMaxOpacity(maxOpacity)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterReflectivityBJ takes integer reflectivity returns nothing
+	call BlzSetHDWaterReflectivity(reflectivity)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterEmissivityBJ takes integer emissivity returns nothing
+	call BlzSetHDWaterEmissivity(emissivity)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterEdgeSoftnessBJ takes integer edgeSoftness returns nothing
+	call BlzSetHDWaterEdgeSoftness(edgeSoftness)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterWaveStrengthBJ takes integer waveStrength returns nothing
+	call BlzSetHDWaterWaveStrength(waveStrength)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetHDWaterEnvMapStrengthBJ takes integer envMapStrengthy returns nothing
+	call BlzSetHDWaterEnvMapStrength(envMapStrengthy)
+endfunction
+
+//===========================================================================
+
+/**
 @patch 1.00
 */
 function CreateFogModifierRectSimple takes player whichPlayer, fogstate whichFogState, rect r, boolean afterUnits returns fogmodifier
@@ -4985,6 +5288,115 @@ endfunction
 //===========================================================================
 
 /**
+@patch 3.0.0.24268
+*/
+function SetTerrainFogExVBJ takes integer style, real zstart, real zend, real density, real heightStart, real heightEnd, real linearStart, real linearEnd, real red, real green, real blue returns nothing
+    call SetTerrainFogExV(style, zstart, zend, density, heightStart, heightEnd, linearStart, linearEnd, red * 0.01, green * 0.01, blue * 0.01)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogStyleBJ takes fogstyle style returns nothing
+    call BlzSetTerrainFogStyle(style)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogZStartBJ takes real zStart returns nothing
+    call BlzSetTerrainFogZStart(zStart)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogZEndBJ takes real zEnd returns nothing
+    call BlzSetTerrainFogZEnd(zEnd)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogDensityBJ takes real density returns nothing
+    call BlzSetTerrainFogDensity(density)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogHeightStartBJ takes real heightStart returns nothing
+    call BlzSetTerrainFogHeightStart(heightStart)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogHeightEndBJ takes real heightEnd returns nothing
+    call BlzSetTerrainFogHeightEnd(heightEnd)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogLinearStartBJ takes real linearStart returns nothing
+    call BlzSetTerrainFogLinearStart(linearStart)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogLinearEndBJ takes real linearEnd returns nothing
+    call BlzSetTerrainFogLinearEnd(linearEnd)
+endfunction
+
+//===========================================================================
+// It refers to max opacity
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogMaxLinearDensityBJ takes real maxLinearDensity returns nothing
+    call BlzSetTerrainFogMaxLinearDensity(maxLinearDensity)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogDrawOverSkyBJ takes boolean drawOverSky returns nothing
+    call BlzSetTerrainFogDrawOverSky(drawOverSky)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetTerrainFogColorBJ takes real red, real green, real blue returns nothing
+    call BlzSetTerrainFogColor(red * 0.01, green * 0.01, blue * 0.01)
+endfunction
+
+//===========================================================================
+
+/**
 @patch 1.00
 */
 function ResetTerrainFogBJ takes nothing returns nothing
@@ -5011,11 +5423,133 @@ endfunction
 
 //===========================================================================
 
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetSingleDoodadAnimationBJ takes string animName, integer index returns nothing
+    call BlzSetSingleDoodadAnimation(index, animName, false)
+endfunction
+
+//===========================================================================
+
 /**
 @patch 1.00
 */
 function AddUnitAnimationPropertiesBJ takes boolean add, string animProperties, unit whichUnit returns nothing
     call AddUnitAnimationProperties(whichUnit, animProperties, add)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function SetDoodadColorBJ takes playercolor color, integer doodadID, real radius, location center returns nothing
+    call SetDoodadColor(GetLocationX(center), GetLocationY(center), radius, doodadID, false, color)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function SetDoodadColorRectBJ takes playercolor color, integer doodadID, rect r returns nothing
+    call SetDoodadColorRect(r, doodadID, color)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzSetSingleDoodadColorBJ takes playercolor color, integer index returns nothing
+    call BlzSetSingleDoodadColor(index, color)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function AllowHeroGlowOnUnitBJ takes unit whichUnit returns nothing
+    call AllowHeroGlowOnUnit(whichUnit)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function DisallowHeroGlowOnUnitBJ takes unit whichUnit returns nothing
+    call DisallowHeroGlowOnUnit(whichUnit)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function ToggleHeroGlowOnAllUnitsBJEnum takes nothing returns nothing
+    if bj_HeroGlowAllUnitsFlag then
+        call AllowHeroGlowOnUnit(GetEnumUnit())
+    else
+        call DisallowHeroGlowOnUnit(GetEnumUnit())
+    endif
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function ToggleHeroGlowOnAllUnitsBJ takes boolean allow returns nothing
+    local integer index
+    local player  indexPlayer
+    local group   g
+
+    set bj_HeroGlowAllUnitsFlag = allow
+    set g = CreateGroup()
+    set index = 0
+    loop
+        set indexPlayer = Player( index )
+
+        // Enumerate and allow/disallow glow on every unit owned by the player.
+        call GroupEnumUnitsOfPlayer( g, indexPlayer, null )
+        call ForGroup( g, function ToggleHeroGlowOnAllUnitsBJEnum )
+        call GroupClear( g )
+
+        set index = index + 1
+        exitwhen index == bj_MAX_PLAYER_SLOTS
+    endloop
+    call DestroyGroup(g)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function AllowHeroGlowOnAllUnitsBJ takes nothing returns nothing
+    call ToggleHeroGlowOnAllUnitsBJ(true)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function DisallowHeroGlowOnAllUnitsBJ takes nothing returns nothing
+    call ToggleHeroGlowOnAllUnitsBJ(false)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function HeroGlowIsAllowedOnUnitBJ takes unit whichUnit returns boolean
+    return HeroGlowIsAllowedOnUnit(whichUnit)
 endfunction
 
 
@@ -5862,6 +6396,32 @@ function GetLastCreatedEffectBJ takes nothing returns effect
     return bj_lastCreatedEffect
 endfunction
 
+//===========================================================================
+// Note: this function should be used in conjunction with the one below, which is the only one that is really exposed in GUI
+
+/**
+@patch 3.0.0.24268
+*/
+function DestroyEffectAsyncBJ takes nothing returns nothing
+	local effect localEffect = bj_destroyEffectAsyncEffect
+	local real localTime = bj_destroyEffectAsyncTime
+	
+	call TriggerSleepAction(localTime)
+	call DestroyEffect(localEffect)
+endfunction
+
+
+/**
+@patch 3.0.0.24268
+*/
+function DestroyEffectAfterTimeBJ takes effect whichEffect, real time returns nothing
+	// Save arguments to globals
+	set bj_destroyEffectAsyncEffect = whichEffect
+	set bj_destroyEffectAsyncTime = time
+	
+	// Externalize to an async thread
+	call ExecuteFunc("DestroyEffectAsyncBJ")
+endfunction
 
 
 //***************************************************************************
@@ -6100,6 +6660,41 @@ function UnitRemoveItemSwapped takes item whichItem, unit whichHero returns noth
 endfunction
 
 //===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitEquipItemSwapped takes item whichItem, unit whichHero returns boolean
+    local boolean success = UnitEquipItem(whichHero, whichItem)
+    if (success) then
+        set bj_lastEquippedItem = whichItem
+    endif
+    
+    return success
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitEquipItemByIdSwapped takes integer itemId, unit whichHero returns item
+    // Create the item at the hero's feet first, and then give it to him.
+    // This is to ensure that the item will be left at the hero's feet if
+    // his inventory is full.
+    local boolean success
+    
+    set bj_lastCreatedItem = CreateItem(itemId, GetUnitX(whichHero), GetUnitY(whichHero))
+    set success = UnitEquipItem(whichHero, bj_lastCreatedItem)
+    
+    if (success) then
+        set bj_lastEquippedItem = bj_lastCreatedItem
+    endif
+
+    return bj_lastCreatedItem
+endfunction
+
+//===========================================================================
 // Translates 0-based slot indices to 1-based slot indices.
 //
 
@@ -6109,6 +6704,24 @@ endfunction
 function UnitRemoveItemFromSlotSwapped takes integer itemSlot, unit whichHero returns item
     set bj_lastRemovedItem = UnitRemoveItemFromSlot(whichHero, itemSlot-1)
     return bj_lastRemovedItem
+endfunction
+
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitUnequipItemSwapped takes unit whichHero, item whichItem returns nothing
+    set bj_lastUnequippedItem = whichItem
+    call UnitUnequipItem(whichHero, whichItem)
+endfunction
+
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitUnequipItemFromSlotSwapped takes unit whichHero, loadoutslot slot returns item
+    set bj_lastUnequippedItem = UnitUnequipItemFromSlot(whichHero, slot)
+    return bj_lastUnequippedItem
 endfunction
 
 //===========================================================================
@@ -6137,6 +6750,24 @@ endfunction
 */
 function GetLastRemovedItem takes nothing returns item
     return bj_lastRemovedItem
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetLastEquippedItem takes nothing returns item
+    return bj_lastEquippedItem
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetLastUnequippedItem takes nothing returns item
+    return bj_lastUnequippedItem
 endfunction
 
 //===========================================================================
@@ -6381,6 +7012,22 @@ function UnitItemInSlotBJ takes unit whichUnit, integer itemSlot returns item
     return UnitItemInSlot(whichUnit, itemSlot-1)
 endfunction
 
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitItemInBagSlotBJ takes unit whichUnit, integer itemSlot returns item
+    return UnitItemInBagSlot(whichUnit, itemSlot-1)
+endfunction
+
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitItemInEquipmentSlotBJ takes unit whichUnit, loadoutslot slot returns item
+    return UnitItemInEquipmentSlot(whichUnit, slot)
+endfunction
+
 //===========================================================================
 // Translates 0-based slot indices to 1-based slot indices.
 //
@@ -6434,6 +7081,172 @@ endfunction
 //===========================================================================
 
 /**
+@patch 3.0.0.24268
+*/
+function GetInventoryBagIndexOfItemTypeBJ takes unit whichUnit, integer itemId returns integer
+    local integer index
+    local item    indexItem
+
+    set index = 0
+    loop
+        set indexItem = UnitItemInBagSlot(whichUnit, index)
+        if (indexItem != null) and (GetItemTypeId(indexItem) == itemId) then
+            return index + 1
+        endif
+
+        set index = index + 1
+        exitwhen index >= bj_MAX_EXTENDED_INVENTORY
+    endloop
+    return 0
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetItemOfTypeFromUnitBagBJ takes unit whichUnit, integer itemId returns item
+    local integer index = GetInventoryBagIndexOfItemTypeBJ(whichUnit, itemId)
+
+    if (index == 0) then
+        return null
+    else
+        return UnitItemInBagSlot(whichUnit, index - 1)
+    endif
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitHasItemOfTypeBaggedBJ takes unit whichUnit, integer itemId returns boolean
+    return GetInventoryBagIndexOfItemTypeBJ(whichUnit, itemId) > 0
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetInventoryBagIndexOfEquipmentTypeBJ takes unit whichUnit, equipmentType whichEquipmentType returns integer
+    local integer index
+    local item    indexItem
+
+    set index = 0
+    loop
+        set indexItem = UnitItemInBagSlot(whichUnit, index)
+        if (indexItem != null) and (GetItemEquipmentType(indexItem) == whichEquipmentType) then
+            return index + 1
+        endif
+
+        set index = index + 1
+        exitwhen index >= bj_MAX_EXTENDED_INVENTORY
+    endloop
+    return 0
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetItemOfEquipmentTypeFromUnitBagBJ takes unit whichUnit, equipmentType whichEquipmentType returns item
+    local integer index = GetInventoryBagIndexOfEquipmentTypeBJ(whichUnit, whichEquipmentType)
+
+    if (index == 0) then
+        return null
+    else
+        return UnitItemInBagSlot(whichUnit, index - 1)
+    endif
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetEquipmentInventoryIndexOfItemTypeBJ takes unit whichUnit, integer itemId returns integer
+    local integer index
+    local item    indexItem
+
+    set index = 0
+    loop
+        set indexItem = UnitItemInEquipmentSlot(whichUnit, ConvertLoadoutSlot(index))
+        if (indexItem != null) and (GetItemTypeId(indexItem) == itemId) then
+            return index + 1
+        endif
+
+        set index = index + 1
+        exitwhen index >= bj_MAX_EQUIPMENT_INVENTORY
+    endloop
+    return 0
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetEquipmentInventoryIndexOfEquipmentTypeBJ takes unit whichUnit, equipmentType whichEquipmentType returns integer
+    local integer index
+    local item    indexItem
+
+    set index = 0
+    loop
+        set indexItem = UnitItemInEquipmentSlot(whichUnit, ConvertLoadoutSlot(index))
+        if (indexItem != null) and (GetItemEquipmentType(indexItem) == whichEquipmentType) then
+            return index + 1
+        endif
+
+        set index = index + 1
+        exitwhen index >= bj_MAX_EQUIPMENT_INVENTORY
+    endloop
+    return 0
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetItemEquippedByHeroOfTypeBJ takes unit whichUnit, integer itemId returns item
+    local integer index = GetEquipmentInventoryIndexOfItemTypeBJ(whichUnit, itemId)
+
+    if (index == 0) then
+        return null
+    else
+        return UnitItemInEquipmentSlot(whichUnit, ConvertLoadoutSlot(index - 1))
+    endif
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function GetItemEquippedByHeroOfEquipmentTypeBJ takes unit whichUnit, equipmentType whichEquipmentType returns item
+    local integer index = GetEquipmentInventoryIndexOfEquipmentTypeBJ(whichUnit, whichEquipmentType)
+
+    if (index == 0) then
+        return null
+    else
+        return UnitItemInEquipmentSlot(whichUnit, ConvertLoadoutSlot(index - 1))
+    endif
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitHasItemOfTypeEquippedBJ takes unit whichUnit, integer itemId returns boolean
+    return GetEquipmentInventoryIndexOfItemTypeBJ(whichUnit, itemId) > 0
+endfunction
+
+//===========================================================================
+
+/**
 @patch 1.13
 */
 function UnitInventoryCount takes unit whichUnit returns integer
@@ -6459,6 +7272,58 @@ endfunction
 */
 function UnitInventorySizeBJ takes unit whichUnit returns integer
     return UnitInventorySize(whichUnit)
+endfunction
+
+//===========================================================================
+
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitExtendedInventoryCount takes unit whichUnit returns integer
+    local integer index = 0
+    local integer count = 0
+
+    loop
+        if (UnitItemInBagSlot(whichUnit, index) != null) then
+            set count = count + 1
+        endif
+
+        set index = index + 1
+        exitwhen index >= bj_MAX_EXTENDED_INVENTORY
+    endloop
+
+    return count
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitExtendedInventorySizeBJ takes unit whichUnit returns integer
+    return UnitExtendedInventorySize(whichUnit)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function UnitEquipmentCount takes unit whichUnit returns integer
+    local integer index = 0
+    local integer count = 0
+
+    loop
+        if (UnitItemInEquipmentSlot(whichUnit, ConvertLoadoutSlot(index)) != null) then
+            set count = count + 1
+        endif
+
+        set index = index + 1
+        exitwhen index >= bj_MAX_EQUIPMENT_INVENTORY
+    endloop
+
+    return count
 endfunction
 
 //===========================================================================
@@ -6531,6 +7396,15 @@ endfunction
 */
 function ChooseRandomItemExBJ takes integer level, itemtype whichType returns integer
     return ChooseRandomItemEx(whichType, level)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function ChooseRandomItemExWithFilterBJ takes integer level, itemtype whichType, equipmentType whichEquipmentType, itemTag whichTag returns integer
+    return ChooseRandomItemExWithFilter(whichType, level, whichEquipmentType, whichTag)
 endfunction
 
 //===========================================================================
@@ -7617,6 +8491,43 @@ endfunction
 */
 function IsUnitPausedBJ takes unit whichUnit returns boolean
     return IsUnitPaused(whichUnit)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzAllUnitsEnableAurasBJEnum takes nothing returns nothing
+    call BlzUnitEnableAuras( GetEnumUnit(), bj_enableAurasAllUnits, bj_affectsUIAurasAllUnits )
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzAllUnitsEnableAurasBJ takes boolean enable, boolean affectsUI returns nothing
+    local integer index
+    local player  indexPlayer
+    local group   g
+
+    set bj_enableAurasAllUnits = enable
+    set bj_affectsUIAurasAllUnits = affectsUI
+    set g = CreateGroup()
+    set index = 0
+    loop
+        set indexPlayer = Player( index )
+
+        // Enumerate and enable/disable auras on every unit owned by the player.
+        call GroupEnumUnitsOfPlayer( g, indexPlayer, null )
+        call ForGroup( g, function BlzAllUnitsEnableAurasBJEnum )
+        call GroupClear( g )
+
+        set index = index + 1
+        exitwhen index == bj_MAX_PLAYER_SLOTS
+    endloop
+    call DestroyGroup(g)
 endfunction
 
 //===========================================================================
@@ -9422,6 +10333,19 @@ function QueueUnitAnimationBJ takes unit whichUnit, string whichAnimation return
 endfunction
 
 //===========================================================================
+// This version differs from the common.j interface in that the alpha value
+// is reversed so as to be displayed as transparency, and all four parameters
+// are treated as percentages rather than bytes.
+//
+
+/**
+@patch 3.0.0.24268
+*/
+function SetDestructableVertexColorBJ takes destructable whichDestructable, real red, real green, real blue, real transparency returns nothing
+    call SetDestructableVertexColor(whichDestructable, PercentTo255(red), PercentTo255(green), PercentTo255(blue), PercentTo255(100.0-transparency))
+endfunction
+
+//===========================================================================
 
 /**
 @patch 1.00
@@ -10190,6 +11114,10 @@ function CustomDefeatDialogBJ takes player whichPlayer, string message returns n
 
     if bj_isSinglePlayer then
         set t = CreateTrigger()
+        call TriggerRegisterDialogButtonEvent( t, DialogAddButton( d, GetLocalizedString( "GAMEOVER_LOAD" ), GetLocalizedHotkey("GAMEOVER_LOAD") ) )
+        call TriggerAddAction( t, function CustomDefeatLoadBJ )
+
+        set t = CreateTrigger()
         call TriggerRegisterDialogButtonEvent( t, DialogAddButton( d, GetLocalizedString( "GAMEOVER_RESTART" ), GetLocalizedHotkey("GAMEOVER_RESTART") ) )
         call TriggerAddAction( t, function CustomDefeatRestartBJ )
 
@@ -10198,10 +11126,6 @@ function CustomDefeatDialogBJ takes player whichPlayer, string message returns n
             call TriggerRegisterDialogButtonEvent( t, DialogAddButton( d, GetLocalizedString( "GAMEOVER_REDUCE_DIFFICULTY" ), GetLocalizedHotkey("GAMEOVER_REDUCE_DIFFICULTY") ) )
             call TriggerAddAction( t, function CustomDefeatReduceDifficultyBJ )
         endif
-
-        set t = CreateTrigger()
-        call TriggerRegisterDialogButtonEvent( t, DialogAddButton( d, GetLocalizedString( "GAMEOVER_LOAD" ), GetLocalizedHotkey("GAMEOVER_LOAD") ) )
-        call TriggerAddAction( t, function CustomDefeatLoadBJ )
     endif
 
     set t = CreateTrigger()
@@ -11874,6 +12798,17 @@ endfunction
 //===========================================================================
 
 /**
+@patch 3.0.0.24268
+*/
+function SetCameraBlockerForPlayerBJ takes rect r, boolean flag, player whichPlayer returns nothing
+    if (GetLocalPlayer() == whichPlayer) then
+        // Use only local code (no net traffic) within this block to avoid desyncs.
+        call EnableCameraBlocker(r,flag)
+    endif
+endfunction
+
+//===========================================================================
+/**
 @patch 1.07
 */
 function ForceCinematicSubtitlesBJ takes boolean flag returns nothing
@@ -12365,6 +13300,10 @@ function SetCampaignMenuRaceBJ takes integer campaignNumber returns nothing
         call SetCampaignMenuRaceEx(bj_CAMPAIGN_OFFSET_XU)
     elseif (campaignNumber == bj_CAMPAIGN_INDEX_XO) then
         call SetCampaignMenuRaceEx(bj_CAMPAIGN_OFFSET_XO)
+    elseif (campaignNumber == bj_CAMPAIGN_INDEX_RH) then
+        call SetCampaignMenuRace(RACE_HUMAN)
+    elseif (campaignNumber == bj_CAMPAIGN_INDEX_RU) then
+        call SetCampaignMenuRace(RACE_UNDEAD)
     else
         // Unrecognized campaign - ignore the request
     endif
@@ -12408,6 +13347,10 @@ function SetCampaignAvailableBJ takes boolean available, integer campaignNumber 
         set campaignOffset = bj_CAMPAIGN_OFFSET_XU
     elseif (campaignNumber == bj_CAMPAIGN_INDEX_XO) then
         set campaignOffset = bj_CAMPAIGN_OFFSET_XO
+    elseif (campaignNumber == bj_CAMPAIGN_INDEX_RH) then
+        set campaignOffset = bj_CAMPAIGN_OFFSET_RH
+    elseif (campaignNumber == bj_CAMPAIGN_INDEX_RU) then
+        set campaignOffset = bj_CAMPAIGN_OFFSET_RU
     else
         set campaignOffset = campaignNumber
     endif
@@ -12456,6 +13399,12 @@ function SetCinematicAvailableBJ takes boolean available, integer cinematicIndex
     elseif (cinematicIndex == bj_CINEMATICINDEX_XED) then
         call SetEdCinematicAvailable( bj_CAMPAIGN_OFFSET_XU, available )
         call PlayCinematic( "OutroX" )
+    elseif (cinematicIndex == bj_CINEMATICINDEX_HFO) then
+        call SetOpCinematicAvailable( bj_CAMPAIGN_OFFSET_RH, available )
+        call PlayCinematic( "IntroRE" )
+    elseif (cinematicIndex == bj_CINEMATICINDEX_UFE) then
+        call SetEdCinematicAvailable( bj_CAMPAIGN_INDEX_RU, available )
+        call PlayCinematic( "OutroRE" )
     else
         // Unrecognized cinematic - ignore the request.
     endif
@@ -14200,6 +15149,7 @@ function MeleeStartingHeroLimit takes nothing returns nothing
         call ReducePlayerTechMaxAllowed(Player(index), 'Nalc', bj_MELEE_HERO_TYPE_LIMIT)
         call ReducePlayerTechMaxAllowed(Player(index), 'Ntin', bj_MELEE_HERO_TYPE_LIMIT)
         call ReducePlayerTechMaxAllowed(Player(index), 'Nfir', bj_MELEE_HERO_TYPE_LIMIT)
+        call ReducePlayerTechMaxAllowed(Player(index), 'Npal', bj_MELEE_HERO_TYPE_LIMIT)
 
         set index = index + 1
         exitwhen index == bj_MAX_PLAYERS
@@ -17306,4 +18256,13 @@ endfunction
 */
 function BlzSetUnitWeaponStringFieldBJ takes unit whichUnit, unitweaponstringfield whichField, integer index, string value returns nothing
     set bj_lastInstObjFuncSuccessful = BlzSetUnitWeaponStringField(whichUnit, whichField, index, value)
+endfunction
+
+//===========================================================================
+
+/**
+@patch 3.0.0.24268
+*/
+function BlzEnableAuras takes unit whichUnit, boolean enable returns nothing
+    call BlzUnitEnableAuras(whichUnit, enable, false)
 endfunction
