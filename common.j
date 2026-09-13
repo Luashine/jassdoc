@@ -26012,6 +26012,11 @@ native BlzConvertColor                             takes integer a, integer r, i
 Loads a TOC file containing paths to FDF files that define frame templates or
 localized strings. Returns `true` on success.
 
+@note FDF errors will be logged to
+`C:\Users\USERNAME\Documents\Warcraft III\Logs\War3Log.txt`
+or inside `Warcraft III Public Test`. New log lines may not be flushed immediately,
+close the game process to make sure everything has been written out so far.
+
 @note FDF load order matters. List base/included FDF files before templates that
 inherit from them.
 
@@ -26916,7 +26921,8 @@ native BlzSetMousePos                              takes integer x, integer y re
 Gets the width (pixels) of the Warcraft 3 window.
 
 @note This can temporarily return `0` while the client is minimized or changing
-display state.
+display state. Be careful when using it in calculations (division by zero)
+for full-screen layout calculations
 
 @async 
 
@@ -26927,8 +26933,9 @@ native BlzGetLocalClientWidth                      takes nothing returns integer
 /**
 Gets the height (pixels) of the Warcraft 3 window.
 
-@bug This returns `0` while Warcraft III is minimized. Guard the value before
-using it as a divisor in full-screen layout calculations.
+@note This can temporarily return `0` while the client is minimized or changing
+display state. Be careful when using it in calculations (division by zero)
+for full-screen layout calculations
 
 @async 
 
