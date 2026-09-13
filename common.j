@@ -690,6 +690,10 @@ type frameeventtype     extends     handle
 @patch 1.31.0.11889
 */
 type oskeytype          extends     handle
+
+/**
+@patch 3.0.0.24268
+*/
 type metakeytype        extends     handle
 
 /**
@@ -863,9 +867,25 @@ type pathingflag                    extends handle
 */
 type commandbuttoneffect            extends handle
 
+
+/**
+@patch 3.0.0.24268
+*/
 type fogstyle                       extends handle
+
+/**
+@patch 3.0.0.24268
+*/
 type equipmentType                  extends handle
+
+/**
+@patch 3.0.0.24268
+*/
 type itemTag                        extends handle
+
+/**
+@patch 3.0.0.24268
+*/
 type loadoutslot                    extends handle
 
 
@@ -1684,9 +1704,25 @@ constant native ConvertUnitCategory                     takes integer i returns 
 @patch 1.31.0.11889
 */
 constant native ConvertPathingFlag                      takes integer i returns pathingflag
+
+/**
+@patch 3.0.0.24268
+*/
 constant native ConvertFogStyle                         takes integer i returns fogstyle
+
+/**
+@patch 3.0.0.24268
+*/
 constant native ConvertEquipmentType                    takes integer i returns equipmentType
+
+/**
+@patch 3.0.0.24268
+*/
 constant native ConvertItemTag                          takes integer i returns itemTag
+
+/**
+@patch 3.0.0.24268
+*/
 constant native ConvertLoadoutSlot                      takes integer i returns loadoutslot
 
 
@@ -2054,6 +2090,10 @@ Stores the zero-based ID of neutral aggressive player.
 @patch 1.29.2.9231
 */
     constant playercolor        PLAYER_COLOR_PEANUT             = ConvertPlayerColor(23)
+
+/**
+@patch 3.0.0.24268
+*/
     constant playercolor        PLAYER_COLOR_BLACK              = ConvertPlayerColor(24)
 
 
@@ -2861,6 +2901,10 @@ Allows to spent the other player's resources.
 @patch 1.00
 */
     constant racepreference     RACE_PREF_USER_SELECTABLE           = ConvertRacePref(64)
+
+/**
+@patch 3.0.0.24268
+*/
     constant racepreference     RACE_PREF_FORSAKEN                  = ConvertRacePref(128)
 
 
@@ -3172,11 +3216,35 @@ Allows to spent the other player's resources.
 */
     constant playerslotstate    PLAYER_SLOT_STATE_LEFT              = ConvertPlayerSlotState(2)
 
+
+/**
+@patch 3.0.0.24268
+*/
     constant fogstyle           FOG_STYLE_LINEAR                    = ConvertFogStyle(0)
+
+/**
+@patch 3.0.0.24268
+*/
     constant fogstyle           FOG_STYLE_EXP                       = ConvertFogStyle(1)
+
+/**
+@patch 3.0.0.24268
+*/
     constant fogstyle           FOG_STYLE_EXP2                      = ConvertFogStyle(2)
+
+/**
+@patch 3.0.0.24268
+*/
     constant fogstyle           FOG_STYLE_HEIGHT                    = ConvertFogStyle(3)
+
+/**
+@patch 3.0.0.24268
+*/
     constant fogstyle           FOG_STYLE_NEW_EXP                   = ConvertFogStyle(4)
+
+/**
+@patch 3.0.0.24268
+*/
     constant fogstyle           FOG_STYLE_NEW_EXP_2                 = ConvertFogStyle(5)
 
 //===================================================
@@ -4406,7 +4474,15 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
 @patch 1.32.10.18820
 */
     constant playerunitevent    EVENT_PLAYER_UNIT_STACK_ITEM            = ConvertPlayerUnitEvent(319)
+
+/**
+@patch 3.0.0.24268
+*/
     constant playerunitevent    EVENT_PLAYER_UNIT_EQUIP_ITEM            = ConvertPlayerUnitEvent(321)
+
+/**
+@patch 3.0.0.24268
+*/
     constant playerunitevent    EVENT_PLAYER_UNIT_UNEQUIP_ITEM          = ConvertPlayerUnitEvent(323)
 
     //===================================================
@@ -4463,7 +4539,15 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
 @patch 1.32.10.18820
 */
     constant unitevent          EVENT_UNIT_STACK_ITEM                   = ConvertUnitEvent(318)
+
+/**
+@patch 3.0.0.24268
+*/
     constant unitevent          EVENT_UNIT_EQUIP_ITEM                   = ConvertUnitEvent(320)
+
+/**
+@patch 3.0.0.24268
+*/
     constant unitevent          EVENT_UNIT_UNEQUIP_ITEM                 = ConvertUnitEvent(322)
 
     //===================================================
@@ -4688,17 +4772,29 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
 */
     constant itemtype ITEM_TYPE_MISCELLANEOUS               = ConvertItemType(6)
 
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemtype ITEM_TYPE_EQUIPMENT                   = ConvertItemType(7)
 
 /**
 @note Enum changed from 7 to 8 in v3.0.0.24268
 @patch 1.07
 */
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemtype ITEM_TYPE_UNKNOWN                     = ConvertItemType(8)
 
 /**
 @note Enum changed from 8 to 9 in v3.0.0.24268
 @patch 1.07
+*/
+
+/**
+@patch 3.0.0.24268
 */
     constant itemtype ITEM_TYPE_ANY                         = ConvertItemType(9)
 
@@ -4713,43 +4809,155 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
 // Item Equipment Type Constants for use with ChooseRandomItemExWithFilter()
 //===================================================
 
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_NONE                  = ConvertEquipmentType(0)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_HEAD                  = ConvertEquipmentType(1)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_CHEST                 = ConvertEquipmentType(2)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_GLOVES                = ConvertEquipmentType(3)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_BOOTS                 = ConvertEquipmentType(4)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_RING                  = ConvertEquipmentType(5)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_PRIMARY               = ConvertEquipmentType(6)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_OFFHAND               = ConvertEquipmentType(7)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_TRINKET               = ConvertEquipmentType(8)
+
+/**
+@patch 3.0.0.24268
+*/
     constant equipmentType EQUIPMENT_TYPE_ANY                   = ConvertEquipmentType(9)
 
 //===================================================
 // Item Tag Type Constants for use with ChooseRandomItemExWithFilter()
 //===================================================
 
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_UNDEFINED                     = ConvertItemTag(0)
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_DROPPABLE                     = ConvertItemTag(1)
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_QUESTREWARD                   = ConvertItemTag(2)
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_BOSSDROP                      = ConvertItemTag(3)
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_SECRET                        = ConvertItemTag(4)
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_PUZZLE                        = ConvertItemTag(5)
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_WORLD                         = ConvertItemTag(6)
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_SHOP                          = ConvertItemTag(7)
+
+/**
+@patch 3.0.0.24268
+*/
     constant itemTag ITEMTAG_TYPE_ANY                           = ConvertItemTag(8)
 
 //===================================================
 // Equipment slot constants
 //===================================================
 
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_HEAD            = ConvertLoadoutSlot(0)
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_CHEST           = ConvertLoadoutSlot(1)
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_GLOVES          = ConvertLoadoutSlot(2)
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_BOOTS           = ConvertLoadoutSlot(3)
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_RING            = ConvertLoadoutSlot(4)
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_RINGALT         = ConvertLoadoutSlot(5)
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_PRIMARY         = ConvertLoadoutSlot(6)
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_OFFHAND         = ConvertLoadoutSlot(7)
+
+/**
+@patch 3.0.0.24268
+*/
     constant loadoutslot EQUIPMENT_LOADOUT_SLOT_TRINKET         = ConvertLoadoutSlot(8)
 
 //===================================================
@@ -4811,8 +5019,20 @@ followMouse_a = TriggerAddAction(followMouse_t, followMouse_func)
 @patch 1.31.0.11889
 */
     constant camerafield CAMERA_FIELD_LOCAL_ROLL            = ConvertCameraField(10)
+
+/**
+@patch 3.0.0.24268
+*/
     constant camerafield CAMERA_FIELD_DEPTH_OF_FIELD_DISTANCE = ConvertCameraField(11)
+
+/**
+@patch 3.0.0.24268
+*/
     constant camerafield CAMERA_FIELD_DEPTH_OF_FIELD_SCALE    = ConvertCameraField(12)
+
+/**
+@patch 3.0.0.24268
+*/
     constant camerafield CAMERA_FIELD_ZABSOLUTE               = ConvertCameraField(13)
 
 
@@ -6220,10 +6440,30 @@ Not functional.
 //===================================================
 // Meta Key constants
 //===================================================
+
+/**
+@patch 3.0.0.24268
+*/
     constant integer                METAKEY_NONE                         = 0
+
+/**
+@patch 3.0.0.24268
+*/
     constant integer                METAKEY_SHIFT                        = 1
+
+/**
+@patch 3.0.0.24268
+*/
     constant integer                METAKEY_CTRL                         = 2
+
+/**
+@patch 3.0.0.24268
+*/
     constant integer                METAKEY_ALT                          = 4
+
+/**
+@patch 3.0.0.24268
+*/
     constant integer                METAKEY_WINKEYS                      = 8
 
 //===================================================
@@ -10467,7 +10707,15 @@ Source: <https://d1stats.ru/blogs-vision/?lang=en>
 @patch 1.31.0.11889
 */
     constant unitbooleanfield UNIT_BF_HAS_WATER_SHADOW                      = ConvertUnitBooleanField('ushr')
+
+/**
+@patch 3.0.0.24268
+*/
     constant unitbooleanfield UNIT_BF_SHOW_AIR_TO_GROUND                    = ConvertUnitBooleanField('uatg')
+
+/**
+@patch 3.0.0.24268
+*/
     constant unitbooleanfield UNIT_BF_FORCE_DISPLAY_HP                      = ConvertUnitBooleanField('ufhp')
 
 
@@ -11988,6 +12236,10 @@ the map for preview.
 */
 native SetPlayerRacePreference  takes player whichPlayer, racepreference whichRacePreference returns nothing
 
+
+/**
+@patch 3.0.0.24268
+*/
 native SetPlayerRaceSkin        takes player whichPlayer, racepreference whichRacePreference returns nothing
 
 /**
@@ -14171,9 +14423,17 @@ constant native GetManipulatingUnit takes nothing returns unit
 constant native GetManipulatedItem  takes nothing returns item
 
 // EVENT_PLAYER_UNIT_EQUIP_ITEM
+
+/**
+@patch 3.0.0.24268
+*/
 constant native GetEquippedItem     takes nothing returns item
 
 // EVENT_PLAYER_UNIT_UNEQUIP_ITEM
+
+/**
+@patch 3.0.0.24268
+*/
 constant native GetUnequippedItem   takes nothing returns item
 
 // For EVENT_PLAYER_UNIT_PICKUP_ITEM, returns the item absorbing the picked up item in case it is stacking.
@@ -15136,7 +15396,15 @@ calls are done.
 @patch 1.07
 */
 native TriggerSyncReady     takes nothing returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzTriggerIsRunning     takes trigger whichTrigger returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzTriggerInterrupt     takes trigger whichTrigger returns nothing
 
 //============================================================================
@@ -15514,6 +15782,10 @@ Sets destructable's animation speed multiplier.
 @patch 1.07
 */
 native          SetDestructableAnimationSpeed takes destructable d, real speedFactor returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native          SetDestructableColor        takes destructable d, playercolor color returns nothing
 
 /**
@@ -15647,6 +15919,10 @@ native          GetItemY        takes item i returns real
 @patch 1.00
 */
 native          SetItemPosition takes item i, real x, real y returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native          SetItemColor takes item whichItem, playercolor whichColor returns nothing
 
 /**
@@ -15678,7 +15954,15 @@ native          SetItemInvulnerable takes item whichItem, boolean flag returns n
 @patch 1.00
 */
 native          IsItemInvulnerable  takes item whichItem returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native          IsItemEquipped  takes item whichItem returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native          IsItemInBag     takes item whichItem returns boolean
 
 /**
@@ -15789,7 +16073,15 @@ native          GetItemUserData takes item whichItem returns integer
 @patch 1.13
 */
 native          SetItemUserData takes item whichItem, integer data returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native          GetItemEquipmentType takes item whichItem returns equipmentType
+
+/**
+@patch 3.0.0.24268
+*/
 native          GetItemTag           takes item whichItem returns itemTag
 
 //============================================================================
@@ -16482,11 +16774,31 @@ native          SetUnitAnimationWithRarity  takes unit whichUnit, string whichAn
 @patch 1.00
 */
 native          AddUnitAnimationProperties  takes unit whichUnit, string animProperties, boolean add returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native          AllowHeroGlowOnUnit         takes unit whichUnit returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native          DisallowHeroGlowOnUnit      takes unit whichUnit returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native          HeroGlowIsAllowedOnUnit     takes unit whichUnit returns boolean
 
+
+/**
+@patch 3.0.0.24268
+*/
 native          BlzGetUnitAnimationDuration        takes unit whichUnit, string whichAnimation returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native          BlzGetUnitAnimationDurationByIndex takes unit whichUnit, integer index returns real
 
 
@@ -17042,6 +17354,10 @@ Returns:
 */
 native          UnitAddItem             takes unit whichUnit, item whichItem returns boolean
 
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitEquipItem           takes unit whichUnit, item whichItem returns boolean
 
 /**
@@ -17130,7 +17446,15 @@ Returns null on failure (no item, invalid slot/unit).
 */
 native          UnitRemoveItemFromSlot  takes unit whichUnit, integer itemSlot returns item
 
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitUnequipItem         takes unit whichUnit, item whichItem returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitUnequipItemFromSlot takes unit whichUnit, loadoutslot slot returns item
 
 /**
@@ -17145,6 +17469,10 @@ Returns false otherwise (null unit, item not found in inventory, null item etc).
 */
 native          UnitHasItem             takes unit whichUnit, item whichItem returns boolean
 
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitHasItemBagged       takes unit whichUnit, item whichItem returns boolean
 
 /**
@@ -17170,14 +17498,46 @@ Returns zero if unit is invalid or has no inventory.
 @patch 1.17a
 */
 native          UnitInventorySize       takes unit whichUnit returns integer
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitExtendedInventorySize takes unit whichUnit returns integer
 
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitItemInBagSlot               takes unit whichUnit, integer itemSlot returns item
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitItemInEquipmentSlot         takes unit whichUnit, loadoutslot itemSlot returns item
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitHasItemEquipped             takes unit whichUnit, item whichItem returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitHasLoadoutSlotEmpty         takes unit whichUnit, loadoutslot itemSlot returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitHasAnyItemEquiped           takes unit whichUnit returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitHasItemEquipmentOfType      takes unit whichUnit, equipmentType equipmentId returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native          UnitCanEquipItemOfEquipmentType takes unit whichUnit, equipmentType equipmentId returns boolean
 
 /**
@@ -20313,6 +20673,10 @@ of the specified level, the id returned will be 0.
 @patch 1.07
 */
 native ChooseRandomItemEx       takes itemtype whichType, integer level returns integer
+
+/**
+@patch 3.0.0.24268
+*/
 native ChooseRandomItemExWithFilter takes itemtype whichType, integer level, equipmentType whichEquipmentType, itemTag whichTag returns integer
 
 /**
@@ -20367,17 +20731,65 @@ native SetUnitFog                   takes real a, real b, real c, real d, real e
 */
 native SetTerrainFogEx              takes integer style, real zstart, real zend, real density, real red, real green, real blue returns nothing
 
+
+/**
+@patch 3.0.0.24268
+*/
 native SetTerrainFogExV             takes integer style, real zstart, real zend, real density, real heightStart, real heightEnd, real linearStart, real linearEnd, real red, real green, real blue returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogStyle        takes fogstyle style returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogZStart       takes real zStart returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogZEnd         takes real ZEnd returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogDensity      takes real density returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogHeightStart  takes real heightStart returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogHeightEnd    takes real heightEnd returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogLinearStart  takes real linearStart returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogLinearEnd    takes real linearEnd returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogMaxLinearDensity takes real maxLinearDensity returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogDrawOverSky  takes boolean drawOverSky returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetTerrainFogColor        takes real red, real green, real blue returns nothing
 
 /**
@@ -20711,12 +21123,40 @@ native EnableWorldFogBoundary       takes boolean b returns nothing
 */
 native PlayModelCinematic           takes string modelName returns nothing
 
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetModelCinematicGameShotCount  takes nothing returns integer
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetModelCinematicGameCurrentShot  takes nothing returns integer
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetModelCinematicGameRemainingTime  takes nothing returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzPlayModelCinematicGameAtPosition  takes string modelName, real posX, real posY, real posZ, real RotZ returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetCinematicEnabledDE     takes boolean enable returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetMinShadowCastingPointLightCount takes integer count returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetMinShadowCastingPointLightCount takes nothing returns integer
 
 /**
@@ -22527,7 +22967,15 @@ Changes one of the game camera's options whichField by offset over duration seco
 */
 native AdjustCameraField            takes camerafield whichField, real offset, real duration returns nothing
 
+
+/**
+@patch 3.0.0.24268
+*/
 native SetCameraFieldControlledByInput takes camerafield whichField, boolean controlled returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native GetCameraFieldControlledByInput takes camerafield whichField returns boolean
 
 /**
@@ -22540,7 +22988,15 @@ native SetCameraTargetController    takes unit whichUnit, real xoffset, real yof
 */
 native SetCameraOrientController    takes unit whichUnit, real xoffset, real yoffset returns nothing
 
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCameraSetCameraType       takes integer cameraType returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCameraGetCameraType       takes nothing returns integer
 
 /**
@@ -22709,7 +23165,15 @@ native BlzCameraSetupSetLabel               takes camerasetup whichSetup, string
 */
 native BlzCameraSetupGetLabel               takes camerasetup whichSetup returns string
 
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCameraSetupSetCameraType          takes camerasetup whichSetup, integer cameraType returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCameraSetupGetCameraType          takes camerasetup whichSetup returns integer
 
 /**
@@ -22880,7 +23344,15 @@ native GetCameraMargin                  takes integer whichMargin returns real
 
 // These return values for the local players camera only...
 
+
+/**
+@patch 3.0.0.24268
+*/
 native EnableCameraBlocker              takes rect r, boolean flag returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native AddCameraBlocker                 takes rect where returns nothing
 
 /**
@@ -23374,6 +23846,10 @@ The thematic music does not play repeatedly, but interrupts the PlayMusic-music.
 @patch 1.07
 */
 native PlayThematicMusicEx          takes string musicFileName, integer frommsecs returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzPauseThematicMusicOnFocusLost takes boolean pause returns nothing
 
 /**
@@ -24078,17 +24554,65 @@ Sets the tint of the water.
 @patch 1.07
 */
 native SetWaterBaseColor            takes integer red, integer green, integer blue, integer alpha returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native SetHDWaterParams             	takes integer red, integer green, integer blue, boolean useColor, integer vertexDisplacement, integer minOpacity, integer maxOpacity, integer reflectivity, integer emissivity, integer edgeSoftness, integer waveStrength returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native SetHDWaterParamsEx           	takes integer red, integer green, integer blue, boolean override, integer vertexDisplacement, integer minOpacity, integer maxOpacity, integer reflectivity, integer emissivity, integer edgeSoftness, integer waveStrength, integer envMapStrength returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterColor   			takes integer red, integer green, integer blue returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterColorOverride   	takes boolean override returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterVertexDisplacement  takes integer vertexDisplacement returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterMinOpacity     		takes integer minOpacity returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterMaxOpacity  		takes integer maxOpacity returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterReflectivity    	takes integer reflectivity returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterEmissivity  		takes integer emissivity returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterEdgeSoftness    	takes integer edgeSoftness returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterWaveStrength 		takes integer waveStrength returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetHDWaterEnvMapStrength  		takes integer envMapStrengthy returns nothing
 
 /**
@@ -24128,6 +24652,10 @@ Returns if a specific pathingtype is set at the location.
 @patch 1.18a
 */
 native IsTerrainPathable            takes real x, real y, pathingtype t returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzIsTerrainPathableEx       	takes real x, real y, pathingtype t returns boolean
 
 /**
@@ -24422,22 +24950,90 @@ See `SetDoodadAnimation` for other parameters and notes.
 @patch 1.00
 */
 native SetDoodadAnimationRect   takes rect r, integer doodadID, string animName, boolean animRandom returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetSingleDoodadAnimation  takes integer index, string animName, boolean animRandom returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native SetDoodadColor               takes real x, real y, real radius, integer doodadID, boolean nearestOnly, playercolor whichColor returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native SetDoodadColorRect           takes rect r, integer doodadID, playercolor whichColor returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetSingleDoodadColor      takes integer index, playercolor whichColor returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadX                takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadY                takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadZ                takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadScaleX           takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadScaleY           takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadScaleZ           takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadIsUsingModelAxes takes integer index returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadYaw              takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadPitch            takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadRoll             takes integer index returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadVariation        takes integer index returns integer
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetDoodadId               takes integer index returns integer
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetNumDoodads             takes nothing returns integer
 
 //============================================================================
@@ -25258,6 +25854,10 @@ Set a unit’s base Attack Cooldown, weapon index can be either 0 and 1 (a unit 
 @patch 1.29.2.9231
 */
 native BlzSetUnitAttackCooldown                    takes unit whichUnit, real cooldown, integer weaponIndex returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzResetUnitAttack                          takes unit whichUnit, integer weaponIndex returns nothing
 
 /**
@@ -25638,8 +26238,20 @@ Plays a specific subanimation (tag) on a specified special effect at a specific 
 @patch 1.30.0.9655
 */
 native BlzPlaySpecialEffectWithTimeScale           takes effect whichEffect, animtype whichAnim, real timeScale returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetSpecialEffectAnimationBlendTime       takes effect whichEffect, real blendTime returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzQueueSpecialEffectAnimation              takes effect whichEffect, string whichAnimation returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetSpecialEffectAnimation                takes effect whichEffect, string whichAnimation returns nothing
 
 /**
@@ -25710,6 +26322,10 @@ See `GetUnitAbilityLevel`.
 @patch 1.29.2.9231
 */
 native BlzUnitDisableAbility                       takes unit whichUnit, integer abilId, boolean flag, boolean hideUI returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzUnitEnableAuras                          takes unit whichUnit, boolean enable, boolean affectsUI returns nothing
 
 /**
@@ -25821,10 +26437,30 @@ Get a specific unit’s remaining ability cooldown.
 @patch 1.29.2.9231
 */
 native BlzGetUnitAbilityCooldownRemaining          takes unit whichUnit, integer abilId returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetUnitAbilityCooldownPercent            takes unit whichUnit, integer abilId returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetUnitAbilityCooldownRemaining          takes unit whichUnit, integer abilId, real duration returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzSetUnitAbilityCooldownPercent            takes unit whichUnit, integer abilId, real percent returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzAdjustUnitAbilityCooldownRemaining       takes unit whichUnit, integer abilId, real duration returns nothing
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzAdjustUnitAbilityCooldownPercent         takes unit whichUnit, integer abilId, real percent returns nothing
 
 /**
@@ -26738,6 +27374,10 @@ Gets the current Frame Value. Works only for FrameTypes that support values:
 @patch 1.31.0.11889
 */
 native BlzFrameGetValue                            takes framehandle frame returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzTextAreaFrameSetAutoScroll               takes framehandle frame, boolean value returns nothing
 
 /**
@@ -27085,10 +27725,30 @@ native BlzGetTriggerPlayerMetaKey                  takes nothing returns integer
 @patch 1.31.0.11889
 */
 native BlzGetTriggerPlayerIsKeyDown                takes nothing returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzIsMetaKeyPressed                         takes integer metakey returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzIsKeyPressed                             takes oskeytype key returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzIsMouseButtonPressed                     takes mousebuttontype mouseButtonType returns boolean
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetMouseScreenPosX                       takes nothing returns integer
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzGetMouseScreenPosY                       takes nothing returns integer
 
 /**
@@ -27152,9 +27812,25 @@ Returns the unit that is currently hovered by the mouse of the local player.
 @patch 1.31.0.11889
 */
 native BlzGetMouseFocusUnit                        takes nothing returns unit
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzPixelToFrameX                            takes integer pixelX returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzPixelToFrameY                            takes integer pixelY returns real
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzFrameToPixelX                            takes real frameX returns integer
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzFrameToPixelY                            takes real frameY returns integer
 
 /**
@@ -28194,30 +28870,130 @@ Stops the current order and optionally clears the queue.
 */
 native BlzUnitForceStopOrder takes unit whichUnit, boolean clearQueue returns nothing
 
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructablePitchRoll              takes integer objectid, real x, real y, real face, real roll, real pitch, real scale, integer variation returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableZPitchRoll             takes integer objectid, real x, real y, real z, real face, real roll, real pitch, real scale, integer variation returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructablePitchRoll          takes integer objectid, real x, real y, real face, real roll, real pitch, real scale, integer variation returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableZPitchRoll         takes integer objectid, real x, real y, real z, real face, real roll, real pitch, real scale, integer variation returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableWithSkinPitchRoll      takes integer objectid, real x, real y, real face, real roll, real pitch, real scale, integer variation, integer skinId returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableZWithSkinPitchRoll     takes integer objectid, real x, real y, real z, real face, real roll, real pitch, real scale, integer variation, integer skinId returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableWithSkinPitchRoll  takes integer objectid, real x, real y, real face, real roll, real pitch, real scale, integer variation, integer skinId returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableZWithSkinPitchRoll takes integer objectid, real x, real y, real z, real face, real roll, real pitch, real scale, integer variation, integer skinId returns destructable
 
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableWithColor                   takes integer objectid, real x, real y, real face, real scale, integer variation, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableZWithColor                  takes integer objectid, real x, real y, real z, real face, real scale, integer variation, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableWithColor               takes integer objectid, real x, real y, real face, real scale, integer variation, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableZWithColor              takes integer objectid, real x, real y, real z, real face, real scale, integer variation, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableWithSkinColor               takes integer objectid, real x, real y, real face, real scale, integer variation, integer skinId, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableZWithSkinColor              takes integer objectid, real x, real y, real z, real face, real scale, integer variation, integer skinId, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableWithSkinColor           takes integer objectid, real x, real y, real face, real scale, integer variation, integer skinId, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableZWithSkinColor          takes integer objectid, real x, real y, real z, real face, real scale, integer variation, integer skinId, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructablePitchRollWithColor          takes integer objectid, real x, real y, real face, real roll, real pitch, real scale, integer variation, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableZPitchRollWithColor         takes integer objectid, real x, real y, real z, real face, real roll, real pitch, real scale, integer variation, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructablePitchRollWithColor      takes integer objectid, real x, real y, real face, real roll, real pitch, real scale, integer variation, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableZPitchRollWithColor     takes integer objectid, real x, real y, real z, real face, real roll, real pitch, real scale, integer variation, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableWithSkinPitchRollColor      takes integer objectid, real x, real y, real face, real roll, real pitch, real scale, integer variation, integer skinId, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDestructableZWithSkinPitchRollColor     takes integer objectid, real x, real y, real z, real face, real roll, real pitch, real scale, integer variation, integer skinId, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableWithSkinPitchRollColor  takes integer objectid, real x, real y, real face, real roll, real pitch, real scale, integer variation, integer skinId, playercolor color returns destructable
+
+/**
+@patch 3.0.0.24268
+*/
 native BlzCreateDeadDestructableZWithSkinPitchRollColor takes integer objectid, real x, real y, real z, real face, real roll, real pitch, real scale, integer variation, integer skinId, playercolor color returns destructable
 
+
+/**
+@patch 3.0.0.24268
+*/
 native SetDestructableVertexColor			takes destructable whichDestructable, integer red, integer green, integer blue, integer alpha returns nothing
