@@ -12699,13 +12699,18 @@ Does nothing if `whichGroup` is null.
 
 @param filter A filter function that is run for each considered unit.
 
-@note Does not consider locust units. Locust units cannot be spatially enumerated.
+If it is `null` (`nil` in Lua), all considered units will be added to the group.
+
+@note Includes dead units (e.g. corpses, not yet removed from map).
+
+Does not include:
+
+- Hidden units
+- locust units, they cannot be spatially enumerated.
 
 @note Within the filter function, the considered unit can be accessed with `GetFilterUnit`.
 
 @note The filter function must return true (a truthy value in Lua) in order to add the unit to the group.
-
-@note If the filter function is `null` (`nil` in Lua), all considered units will be added to the group.
 
 @note The units are added consecutively to the group between filter runs, not in bulk after all filter runs were processed.
 
@@ -12718,8 +12723,6 @@ were added to the sector.
 
 @note The origin of the unit must be within the area of the circle to be considered. The collision size of the unit
 does not matter.
-
-@note Hidden units are not enumerated with this function.
 
 @note See: `GroupEnumUnitsInRect`, `GroupEnumUnitsInRangeOfLoc`.
 

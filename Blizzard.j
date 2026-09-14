@@ -21,6 +21,11 @@ globals
     constant real      bj_E                             = 2.71828
 
 /**
+Spatial size of map cells. For example, it can be used as a radius in search.
+
+@note See `IssueHauntOrderAtLocBJ`, its comment says:
+"Search for a gold mine within a 1-cell radius of the specified location."
+
 @patch 1.00
 */
     constant real      bj_CELLWIDTH                     = 128.0
