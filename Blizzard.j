@@ -5506,6 +5506,8 @@ endfunction
 //===========================================================================
 
 /**
+@bug Leaks handle `g`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
 @patch 3.0.0.24268
 */
 function ToggleHeroGlowOnAllUnitsBJ takes boolean allow returns nothing
@@ -6405,6 +6407,8 @@ endfunction
 // Note: this function should be used in conjunction with the one below, which is the only one that is really exposed in GUI
 
 /**
+@bug Leaks handle `localEffect`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
 @patch 3.0.0.24268
 */
 function DestroyEffectAsyncBJ takes nothing returns nothing
@@ -7086,6 +7090,8 @@ endfunction
 //===========================================================================
 
 /**
+@bug Leaks handle `indexItem`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
 @patch 3.0.0.24268
 */
 function GetInventoryBagIndexOfItemTypeBJ takes unit whichUnit, integer itemId returns integer
@@ -7132,6 +7138,8 @@ endfunction
 //===========================================================================
 
 /**
+@bug Leaks handle `indexItem`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
 @patch 3.0.0.24268
 */
 function GetInventoryBagIndexOfEquipmentTypeBJ takes unit whichUnit, equipmentType whichEquipmentType returns integer
@@ -7169,6 +7177,8 @@ endfunction
 //===========================================================================
 
 /**
+@bug Leaks handle `indexItem`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
 @patch 3.0.0.24268
 */
 function GetEquipmentInventoryIndexOfItemTypeBJ takes unit whichUnit, integer itemId returns integer
@@ -7191,6 +7201,8 @@ endfunction
 //===========================================================================
 
 /**
+@bug Leaks handle `indexItem`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
 @patch 3.0.0.24268
 */
 function GetEquipmentInventoryIndexOfEquipmentTypeBJ takes unit whichUnit, equipmentType whichEquipmentType returns integer
@@ -8510,6 +8522,8 @@ endfunction
 //===========================================================================
 
 /**
+@bug Leaks handle `g`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+
 @patch 3.0.0.24268
 */
 function BlzAllUnitsEnableAurasBJ takes boolean enable, boolean affectsUI returns nothing
