@@ -15054,7 +15054,8 @@ endfunction
 /**
 @note It is called directly by the default "Melee Initialization" trigger.
 
-@bug Leaks handle `v`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+@note handle `v` is not nulled at the end, but it doesn't matter for Jass leaks,
+because the version handle is constant and always reused.
 
 @patch 1.00
 */
@@ -15398,7 +15399,8 @@ endfunction
 
 @bug Leaks handle `hero`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
 
-@bug Leaks handle `v`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+@note handle `v` is not nulled at the end, but it doesn't matter for Jass leaks,
+because the version handle is constant and always reused.
 
 @patch 1.00
 */
@@ -17420,7 +17422,8 @@ endfunction
 //===========================================================================
 
 /**
-@bug Leaks handle `v`: In Jass you must set local variables that hold agents (or any child type) to `null` at the end of functions to avoid reference counter leaks.
+@note handle `v` is not nulled at the end, but it doesn't matter for Jass leaks,
+because the version handle is constant and always reused.
 
 @patch 1.00
 */
