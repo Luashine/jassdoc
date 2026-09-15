@@ -11652,7 +11652,7 @@ Returns the internal index of the given handle; returns 0 if `h` is `null`.
 
 Typical handles of game objects are offset by positive `0x100000`.
 
-For text tags, returns the text tag ID, which count from 0 to 99 (inclusive).
+For text tags, returns the text tag ID, which count from 0 to MAX_TAG_COUNT (inclusive).
 
 **Example:** `GetHandleId(Player(0)) --> 1048584`
 
@@ -21237,14 +21237,17 @@ Creates a text tag.
 
 @note The text tag initially has the absolute world coordinates (0, 0, 0).
 
-@note You can have a maximum amount of 100 text tags at a time.
+@note The maximum amount of existing text tags is limited (MAX_TAG_COUNT):
 
-@note The IDs of text tags range from 99 to 0 as returned by `GetHandleId`.
+- v3.0.0: 10000 tags
+- older patches: 100 text tags
 
-@note When there are already 100 text tags, this function will return the text tag with the ID 0 without resetting any of its properties.
+@note The IDs of text tags range from (MAX_TAG_COUNT-1) to 0 as returned by `GetHandleId`.
+
+@note When there are already MAX_TAG_COUNT text tags, this function will return the text tag with the ID 0 without resetting any of its properties.
 
 @note When a text tag is destroyed, its ID is pushed to a stack. Creating a text tag, when there are still IDs available, will pop from the stack, i.e., the last
-destroyed ID will be re-used first. You can also envision that 100 IDs counting up from 0 to 99 are pushed to the stack at the beginning of the game and ID 99 will
+destroyed ID will be re-used first. You can also envision that MAX_TAG_COUNT IDs counting up from 0 to (MAX_TAG_COUNT-1) are pushed to the stack at the beginning of the game and ID (MAX_TAG_COUNT-1) will
 be popped first.
 
 @patch 1.07
@@ -24134,6 +24137,9 @@ In 1.29.2.9231 and newer use `BlzSetSpecialEffectPosition` or `BlzSetSpecialEffe
 @note To create an effect only visible to one player see <https://www.hiveworkshop.com/threads/gs.300430/#post-3209073>
 
 @note An effect is only visible if its center is within draw distance and is not hidden by fog of war.
+
+@note If effect emits light: There is a limit to how many lights can be rendered in an area at once.
+HD mode is unlimited since v3.0.0; before HD had a lower limit than SD.
 
 @patch 1.00
 */
